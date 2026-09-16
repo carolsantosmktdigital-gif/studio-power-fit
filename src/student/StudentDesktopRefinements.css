@@ -197,7 +197,7 @@
 
     text-align: center !important;
 
-    white-space: nowrap !important;
+    white-space: normal !important;
 
     border-radius: 999px !important;
 
@@ -339,7 +339,7 @@
     */
     width: 100%;
 
-    max-width: 140px;
+    max-width: 122px;
 
     /*
       continua alinhado à direita,
@@ -347,34 +347,34 @@
     */
     justify-self: end;
 
-    gap: 4px;
+    gap: 3px;
   }
 
 
   .student-finance-actions
   .student-payment-pill {
 
-    min-height: 30px !important;
+    min-height: 28px !important;
 
     padding:
-      5px
-      8px !important;
+      4px
+      7px !important;
 
-    font-size: 9px !important;
+    font-size: 8.5px !important;
   }
 
 
   .student-finance-actions
   .student-secondary-button {
 
-    min-height: 40px !important;
+    min-height: 36px !important;
 
     padding:
       0
-      8px !important;
+      6px !important;
 
-    font-size: 10px !important;
+    font-size: 9px !important;
 
-    gap: 4px !important;
+    gap: 3px !important;
   }
 }
