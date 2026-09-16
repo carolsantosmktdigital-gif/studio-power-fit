@@ -2884,3 +2884,30 @@
     height: 40px;
   }
 }
+
+
+/* =========================================================
+   ROLAGEM DA ÁREA DO ALUNO
+   O login usa overflow bloqueado globalmente. Ao entrar no
+   perfil do aluno, a página volta a ter rolagem normal.
+========================================================= */
+
+html.student-scroll-page,
+body.student-scroll-page {
+  height: auto !important;
+  min-height: 100% !important;
+  overflow-x: hidden !important;
+  overflow-y: auto !important;
+  overscroll-behavior-y: auto;
+}
+
+#root.student-scroll-root {
+  height: auto !important;
+  min-height: 100vh !important;
+  overflow: visible !important;
+}
+
+.student-scroll-root .student-app {
+  min-height: 100vh;
+  overflow: visible;
+}
