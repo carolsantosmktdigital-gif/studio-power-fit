@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 import studioLogo from '../assets/studio-power-fit-logo.png'
 import StudentAppointments from './StudentAppointments'
 import './StudentApp.css'
+import './StudentDesktopRefinements.css'
 
 const pages = {
   HOME: 'Início',
@@ -36,6 +37,7 @@ function StudentApp({ profile, onLogout }) {
     document.documentElement.style.overflowX = 'hidden'
     document.documentElement.style.overflowY = 'auto'
     document.documentElement.style.height = 'auto'
+
     document.body.style.overflowX = 'hidden'
     document.body.style.overflowY = 'auto'
     document.body.style.height = 'auto'
@@ -51,6 +53,7 @@ function StudentApp({ profile, onLogout }) {
       document.documentElement.style.height = previous.htmlHeight
       document.body.style.overflow = previous.bodyOverflow
       document.body.style.height = previous.bodyHeight
+
       if (root) {
         root.style.overflow = previous.rootOverflow
         root.style.height = previous.rootHeight
@@ -59,8 +62,23 @@ function StudentApp({ profile, onLogout }) {
     }
   }, [])
 
+  useEffect(() => {
+    const html = document.documentElement
+    const body = document.body
+    const root = document.getElementById('root')
+
+    html.classList.add('student-scroll-page')
+    body.classList.add('student-scroll-page')
+    root?.classList.add('student-scroll-root')
+
+    return () => {
+      html.classList.remove('student-scroll-page')
+      body.classList.remove('student-scroll-page')
+      root?.classList.remove('student-scroll-root')
+    }
+  }, [])
+
   const [page, setPage] = useState(pages.HOME)
-  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('power-fit-theme') === 'dark')
   const [student, setStudent] = useState(null)
   const [nextWorkout, setNextWorkout] = useState(null)
   const [latestPayment, setLatestPayment] = useState(null)
@@ -70,131 +88,154 @@ function StudentApp({ profile, onLogout }) {
   const [loadingData, setLoadingData] = useState(true)
   const [dataError, setDataError] = useState('')
   const [refreshKey, setRefreshKey] = useState(0)
+  const [darkMode, setDarkMode] = useState(false)
+  const [greeting, setGreeting] = useState(() => getGreeting())
 
   useEffect(() => {
-    localStorage.setItem('power-fit-theme', darkMode ? 'dark' : 'light')
-  }, [darkMode])
+    const updateGreeting = () => setGreeting(getGreeting())
+    const timer = window.setInterval(updateGreeting, 60_000)
+    return () => window.clearInterval(timer)
+  }, [])
 
-  useEffect(() => {
-    const html = document.documentElement
-    const body = document.body
-    const root = document.getElementById('root')
-    html.classList.add('student-scroll-page')
-    body.classList.add('student-scroll-page')
-    root?.classList.add('student-scroll-root')
-    return () => {
-      html.classList.remove('student-scroll-page')
-      body.classList.remove('student-scroll-page')
-      root?.classList.remove('student-scroll-root')
-    }
+  const firstName = useMemo(() => {
+    return String(profile?.full_name || 'Aluno').trim().split(/\s+/)[0]
+  }, [profile?.full_name])
+
+  const todayLabel = useMemo(() => {
+    return new Intl.DateTimeFormat('pt-BR', {
+      weekday: 'long',
+      day: '2-digit',
+      month: 'long',
+    }).format(new Date())
   }, [])
 
   useEffect(() => {
-    let cancelled = false
+    let active = true
+
     async function loadStudentData() {
       if (!profile?.id) return
       setLoadingData(true)
       setDataError('')
-      const { data: studentRow, error: studentError } = await supabase
-        .from('students').select('id, profile_id, status, payment_plan').eq('profile_id', profile.id).single()
-      if (cancelled) return
-      if (studentError) {
-        setDataError('Alguns dados do seu perfil ainda não estão disponíveis.')
-        setLoadingData(false)
-        return
+
+      try {
+        const { data: studentRow, error: studentError } = await supabase
+          .from('students')
+          .select('*')
+          .eq('profile_id', profile.id)
+          .maybeSingle()
+
+        if (studentError) throw studentError
+        if (!active) return
+
+        setStudent(studentRow || null)
+
+        if (!studentRow?.id) {
+          setNextWorkout(null)
+          setLatestPayment(null)
+          setPaymentHistory([])
+          setAttendanceCount(0)
+          setAssessments([])
+          setDataError('Alguns dados do seu perfil ainda não estão disponíveis.')
+          return
+        }
+
+        const now = new Date()
+        const today = now.toISOString().slice(0, 10)
+        const monthStart = `${today.slice(0, 7)}-01`
+        const nextMonth = new Date(now.getFullYear(), now.getMonth() + 1, 1)
+        const nextMonthStart = nextMonth.toISOString().slice(0, 10)
+
+        const [appointmentResult, paymentsResult, attendanceResult, assessmentsResult] = await Promise.all([
+          supabase.from('appointments').select('*').eq('student_id', studentRow.id).eq('status', 'CONFIRMADO').gte('appointment_date', today).order('appointment_date', { ascending: true }).order('start_time', { ascending: true }).limit(1).maybeSingle(),
+          supabase.from('payments').select('*').eq('student_id', studentRow.id).order('due_date', { ascending: false }).limit(12),
+          supabase.from('attendance').select('id', { count: 'exact', head: true }).eq('student_id', studentRow.id).gte('attendance_date', monthStart).lt('attendance_date', nextMonthStart).eq('status', 'PRESENTE'),
+          supabase.from('physical_assessments').select('*').eq('student_id', studentRow.id).order('assessment_date', { ascending: true }).limit(24),
+        ])
+
+        if (!active) return
+
+        setNextWorkout(appointmentResult.data || null)
+        const paymentRows = paymentsResult.data || []
+        setPaymentHistory(paymentRows)
+        setLatestPayment(paymentRows[0] || null)
+        setAttendanceCount(attendanceResult.count || 0)
+        setAssessments(assessmentsResult.data || [])
+      } catch (error) {
+        if (!active) return
+        console.error(error)
+        setDataError('Não foi possível atualizar todos os dados agora.')
+      } finally {
+        if (active) setLoadingData(false)
       }
-      setStudent(studentRow)
-      const today = new Date()
-      const todayIso = today.toISOString().slice(0, 10)
-      const monthStart = new Date(today.getFullYear(), today.getMonth(), 1).toISOString()
-      const monthEnd = new Date(today.getFullYear(), today.getMonth() + 1, 1).toISOString()
-      const [appointmentsResult, paymentsResult, attendanceResult, assessmentsResult] = await Promise.all([
-        supabase.from('appointments').select('id, student_id, appointment_date, start_time, status').eq('student_id', studentRow.id).gte('appointment_date', todayIso).eq('status', 'CONFIRMADO').order('appointment_date', { ascending: true }).order('start_time', { ascending: true }).limit(1),
-        supabase.from('payments').select('id, student_id, amount, due_date, payment_date, status, payment_type').eq('student_id', studentRow.id).order('due_date', { ascending: false }).limit(12),
-        supabase.from('attendance').select('id, registered_at, status').eq('student_id', studentRow.id).eq('status', 'PRESENTE').gte('registered_at', monthStart).lt('registered_at', monthEnd),
-        supabase.from('physical_assessments').select('assessment_date, weight_kg').eq('student_id', studentRow.id).not('weight_kg', 'is', null).order('assessment_date', { ascending: true }),
-      ])
-      if (cancelled) return
-      setNextWorkout(appointmentsResult.data?.[0] ?? null)
-      setLatestPayment(paymentsResult.data?.[0] ?? null)
-      setPaymentHistory(paymentsResult.data ?? [])
-      setAttendanceCount(attendanceResult.data?.length ?? 0)
-      setAssessments(assessmentsResult.data ?? [])
-      if (appointmentsResult.error || paymentsResult.error || attendanceResult.error || assessmentsResult.error) {
-        setDataError('Algumas informações podem aparecer de forma parcial.')
-      }
-      setLoadingData(false)
     }
+
     loadStudentData()
-    return () => { cancelled = true }
+    return () => { active = false }
   }, [profile?.id, refreshKey])
 
-  const firstName = useMemo(() => String(profile?.full_name || 'Aluno').trim().split(/\s+/)[0], [profile?.full_name])
-  const greeting = useMemo(() => {
-    const hour = new Date().getHours()
-    if (hour < 12) return 'Bom dia'
-    if (hour < 18) return 'Boa tarde'
-    return 'Boa noite'
-  }, [])
-  const todayLabel = useMemo(() => new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' }).format(new Date()), [])
-  const formattedWorkoutDate = useMemo(() => {
-    if (!nextWorkout?.appointment_date) return ''
-    const date = new Date(`${nextWorkout.appointment_date}T12:00:00`)
-    return new Intl.DateTimeFormat('pt-BR', { weekday: 'short', day: '2-digit', month: '2-digit' }).format(date)
-  }, [nextWorkout?.appointment_date])
-
   const frequencyGoal = 12
-  const frequencyPercent = Math.min(Math.round((attendanceCount / frequencyGoal) * 100), 100)
-  const initialWeight = assessments[0]?.weight_kg
-  const currentWeight = assessments[assessments.length - 1]?.weight_kg
-  const weightDifference = initialWeight != null && currentWeight != null ? Number(currentWeight) - Number(initialWeight) : null
+  const frequencyPercent = Math.min(100, Math.round((attendanceCount / frequencyGoal) * 100))
   const challengeGoal = 30
-  const challengeDays = Math.min(attendanceCount, challengeGoal)
-  const challengePercent = Math.min(Math.round((challengeDays / challengeGoal) * 100), 100)
-  const challengeRemaining = Math.max(challengeGoal - challengeDays, 0)
+  const challengeDays = Math.min(challengeGoal, attendanceCount)
+  const challengePercent = Math.min(100, Math.round((challengeDays / challengeGoal) * 100))
+  const challengeRemaining = Math.max(0, challengeGoal - challengeDays)
   const paymentConfirmed = latestPayment?.status === 'IDENTIFICADO'
 
-  const formatWeight = (value) => value == null ? '— kg' : `${Number(value).toLocaleString('pt-BR', { maximumFractionDigits: 1 })} kg`
-  const formatCurrency = (value) => value == null ? '—' : Number(value).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
-  const formatDate = (value) => !value ? '—' : new Intl.DateTimeFormat('pt-BR').format(new Date(`${value}T12:00:00`))
-  const profileAddress = [profile?.address_street, profile?.address_number, profile?.address_complement, profile?.address_district, profile?.address_city, profile?.address_state].filter(Boolean).join(', ')
+  const initialWeight = useMemo(() => {
+    const values = assessments.map((item) => Number(item.weight_kg)).filter(Number.isFinite)
+    return values.length ? values[0] : numberOrNull(student?.initial_weight_kg)
+  }, [assessments, student?.initial_weight_kg])
+
+  const currentWeight = useMemo(() => {
+    const values = assessments.map((item) => Number(item.weight_kg)).filter(Number.isFinite)
+    return values.length ? values[values.length - 1] : numberOrNull(student?.current_weight_kg)
+  }, [assessments, student?.current_weight_kg])
+
+  const weightDifference = initialWeight != null && currentWeight != null ? currentWeight - initialWeight : null
+
+  const formattedWorkoutDate = useMemo(() => {
+    if (!nextWorkout?.appointment_date) return ''
+    return new Intl.DateTimeFormat('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' }).format(new Date(`${nextWorkout.appointment_date}T12:00:00`))
+  }, [nextWorkout?.appointment_date])
+
+  const profileAddress = useMemo(() => {
+    return [profile?.address, profile?.neighborhood, profile?.city, profile?.state].filter(Boolean).join(', ')
+  }, [profile?.address, profile?.neighborhood, profile?.city, profile?.state])
 
   const evolutionPoints = useMemo(() => {
-    if (assessments.length < 2) return ''
     const values = assessments.map((item) => Number(item.weight_kg)).filter(Number.isFinite)
-    if (values.length < 2) return ''
+    if (values.length < 2) return null
     const min = Math.min(...values)
     const max = Math.max(...values)
     const range = Math.max(max - min, 1)
     return values.map((value, index) => {
       const x = 20 + (index / Math.max(values.length - 1, 1)) * 560
-      const y = 150 - ((value - min) / range) * 115
-      return `${x.toFixed(1)},${y.toFixed(1)}`
+      const y = 150 - ((value - min) / range) * 110
+      return `${x},${y}`
     }).join(' ')
   }, [assessments])
 
-  const goHome = () => setPage(pages.HOME)
+  function goHome() {
+    setPage(pages.HOME)
+  }
 
   return (
-    <main className={`student-app ${darkMode ? 'student-theme-dark' : 'student-theme-light'}`}>
-      <aside className="student-sidebar" aria-label="Menu do aluno">
-        <button className="student-sidebar-brand" type="button" onClick={goHome}><img src={studioLogo} alt="Studio Power Fit" /></button>
-        <nav className="student-sidebar-nav">
-          {menuItems.map((item) => (
-            <button key={item.page} type="button" className={page === item.page ? 'active' : ''} onClick={() => setPage(item.page)}><span>{item.icon}</span><strong>{item.page}</strong></button>
-          ))}
+    <main className={`student-app ${darkMode ? 'student-dark' : ''}`}>
+      <aside className="student-sidebar">
+        <button className="student-sidebar-brand" type="button" onClick={goHome} aria-label="Voltar para o início"><img src={studioLogo} alt="Studio Power Fit" /></button>
+        <nav className="student-sidebar-nav" aria-label="Navegação do aluno">
+          {menuItems.map((item) => <button key={item.page} className={page === item.page ? 'active' : ''} type="button" onClick={() => setPage(item.page)}><span>{item.icon}</span><strong>{item.page}</strong></button>)}
         </nav>
+        <button className="student-help" type="button" onClick={() => window.open('https://wa.me/', '_blank')}><span>?</span><span><strong>Precisa de ajuda?</strong><small>Fale com a recepção</small></span><b>→</b></button>
       </aside>
 
       <div className="student-main">
         <header className="student-header">
-          <button className="student-mobile-brand" type="button" onClick={goHome} aria-label="Ir para o início"><img src={studioLogo} alt="Studio Power Fit" /></button>
+          <button className="student-mobile-brand" type="button" onClick={goHome} aria-label="Voltar para o início"><img src={studioLogo} alt="Studio Power Fit" /></button>
           <div className="student-header-actions">
-            <button className="student-theme-toggle" type="button" onClick={() => setDarkMode((value) => !value)} aria-label={darkMode ? 'Ativar modo claro' : 'Ativar modo escuro'} title={darkMode ? 'Modo claro' : 'Modo escuro'}><span aria-hidden="true">{darkMode ? '☀' : '☾'}</span></button>
-            <span className="student-notification-indicator" aria-label="Central de notificações"><span>◌</span><i /></span>
-            <button className="student-profile-button" type="button" onClick={() => setPage(pages.PROFILE)}>
-              <span className="student-avatar">{firstName.slice(0, 1).toUpperCase()}</span><span className="student-user-copy"><strong>{firstName}</strong><small>Aluno</small></span><span className="student-chevron">⌄</span>
-            </button>
+            <button className="student-icon-button student-theme-toggle" type="button" onClick={() => setDarkMode((value) => !value)} aria-label="Alternar tema">{darkMode ? '☀' : '☾'}</button>
+            <button className="student-icon-button student-notification-indicator" type="button" aria-label="Notificações">♧<i /></button>
+            <button className="student-profile-button" type="button" onClick={() => setPage(pages.PROFILE)}><span className="student-avatar">{firstName.slice(0, 1).toUpperCase()}</span><span className="student-user-copy"><strong>{firstName}</strong><small>Aluno(a)</small></span><span className="student-chevron">⌄</span></button>
           </div>
         </header>
 
@@ -204,8 +245,8 @@ function StudentApp({ profile, onLogout }) {
               <div><span className="student-kicker">SEU ESPAÇO POWER FIT</span><h1>{greeting}, <strong>{firstName}!</strong></h1><p>Seu treino começa aqui. Já agendou seu horário?</p></div>
               <div className="student-welcome-meta"><span>{todayLabel}</span><em>Disciplina hoje, resultados amanhã.</em></div>
             </section>
-            {dataError && <div className="student-data-alert" role="status"><span>{dataError}</span><button type="button" onClick={() => setRefreshKey((value) => value + 1)}>Tentar novamente</button></div>}
-            <section className={`student-home-grid ${loadingData ? 'is-loading' : ''}`} aria-busy={loadingData}>
+            {dataError && <div className="student-data-alert">{dataError}<button type="button" onClick={() => setRefreshKey((value) => value + 1)}>Tentar novamente</button></div>}
+            <section className="student-home-grid">
               <article className="student-card student-next-workout">
                 <div className="student-card-heading"><div className="student-title-with-icon"><span className="student-card-icon">▣</span><div><span className="student-kicker">PRÓXIMO TREINO</span><h2>{nextWorkout ? formattedWorkoutDate : 'Seu próximo treino começa aqui.'}</h2></div></div><span className={`student-status-badge ${nextWorkout ? 'confirmed' : ''}`}>{nextWorkout ? '✓ Confirmado' : 'Sem treino agendado'}</span></div>
                 <div className="student-workout-details">{nextWorkout ? <><div className="student-workout-time"><span>◷</span><strong>{String(nextWorkout.start_time || '').slice(0, 5)}</strong></div><div className="student-workout-type"><span>Modalidade</span><strong>Musculação</strong></div></> : <p>Veja as vagas disponíveis para hoje, amanhã e depois de amanhã.</p>}</div>
@@ -250,6 +291,36 @@ function StudentApp({ profile, onLogout }) {
       </div>
     </main>
   )
+}
+
+function getGreeting() {
+  const hour = new Date().getHours()
+  if (hour >= 5 && hour < 12) return 'Bom dia'
+  if (hour >= 12 && hour < 18) return 'Boa tarde'
+  return 'Boa noite'
+}
+
+function numberOrNull(value) {
+  if (value === null || value === undefined || value === '') return null
+  const number = Number(value)
+  return Number.isFinite(number) ? number : null
+}
+
+function formatWeight(value) {
+  const number = numberOrNull(value)
+  if (number == null) return '— kg'
+  return `${number.toLocaleString('pt-BR', { maximumFractionDigits: 1 })} kg`
+}
+
+function formatDate(value) {
+  if (!value) return '—'
+  return new Intl.DateTimeFormat('pt-BR').format(new Date(`${value}T12:00:00`))
+}
+
+function formatCurrency(value) {
+  const number = numberOrNull(value)
+  if (number == null) return '—'
+  return new Intl.NumberFormat('pt-BR', { style: 'currency', currency: 'BRL' }).format(number)
 }
 
 export default StudentApp
