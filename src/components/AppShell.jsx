@@ -77,7 +77,7 @@ function AppShell({ profile, onLogout }) {
   const isAdmin = profile.role === 'ADMIN'
 
   const loadStudents = async () => {
-    const { data, error } = await supabase.from('students').select('id, profile_id, status, payment_plan, created_at').order('created_at', { ascending: false })
+    const { data, error } = await supabase.from('students').select('id, profile_id, status, created_at').order('created_at', { ascending: false })
     if (error) return setNotice(error.message)
     const ids = data.map((item) => item.profile_id)
     const { data: profiles } = ids.length ? await supabase.from('profiles').select('id, full_name, email, phone').in('id', ids) : { data: [] }
@@ -112,9 +112,9 @@ function AppShell({ profile, onLogout }) {
     dueSoonDate.setDate(dueSoonDate.getDate() + 7)
     const dueSoonLimit = dueSoonDate.toISOString().slice(0, 10)
     const [studentResult, staff, paymentResult, appointmentResult, teacherResult, attendanceResult] = await Promise.all([
-      supabase.from('students').select('status, payment_plan'),
+      supabase.from('students').select('id, status'),
       supabase.from('employees').select('*', { count: 'exact', head: true }).eq('status', 'ATIVO'),
-      supabase.from('payments').select('amount, status, due_date, payment_date, payment_type'),
+      supabase.from('payments').select('student_id, amount, status, due_date, payment_date, payment_type'),
       supabase.from('appointments').select('start_time, status').eq('appointment_date', today).eq('status', 'CONFIRMADO'),
       supabase.from('teachers').select('*', { count: 'exact', head: true }).eq('status', 'ATIVO'),
       supabase.from('attendance').select('status, attendance_date').gte('attendance_date', monthStart).lt('attendance_date', monthEnd),
@@ -139,8 +139,13 @@ function AppShell({ profile, onLogout }) {
     const activeTeachers = teacherResult.count ?? 0
     const slotCapacity = activeTeachers * 4
     const peakBooked = Math.max(0, ...Object.values(appointmentsByTime))
+    const latestPlanByStudent = paymentRows.reduce((plans, item) => {
+      const current = plans.get(item.student_id)
+      if (!current || String(item.due_date) > String(current.due_date)) plans.set(item.student_id, { due_date: item.due_date, plan: item.payment_type === 'MENSALIDADE' ? 'MENSALISTA' : item.payment_type })
+      return plans
+    }, new Map())
     const planCounts = activeRows.reduce((counts, item) => {
-      const plan = item.payment_plan || 'MENSALISTA'
+      const plan = latestPlanByStudent.get(item.id)?.plan || 'MENSALISTA'
       counts[plan] = (counts[plan] || 0) + 1
       return counts
     }, { MENSALISTA: 0, WELLHUB: 0, TOTALPASS: 0 })
