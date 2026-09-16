@@ -5,7 +5,7 @@
 -- 2) Capacidade = professores disponíveis x 4
 -- 3) 1 agendamento CONFIRMADO por aluno por dia
 -- 4) Total da lista de espera sem expor dados de outros alunos
--- 5) Horários de 06:00 a 20:00 para sessões de 1h
+-- 5) Funcionamento da academia: 06:00 às 21:00; para sessões de 1h, os inícios de horário vão de 06:00 a 20:00
 
 begin;
 
