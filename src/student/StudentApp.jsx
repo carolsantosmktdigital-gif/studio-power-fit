@@ -22,6 +22,7 @@ const menuItems = [
 
 function StudentApp({ profile, onLogout }) {
   const [page, setPage] = useState(pages.HOME)
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('power-fit-theme') === 'dark')
   const [student, setStudent] = useState(null)
   const [nextWorkout, setNextWorkout] = useState(null)
   const [latestPayment, setLatestPayment] = useState(null)
@@ -31,6 +32,10 @@ function StudentApp({ profile, onLogout }) {
   const [loadingData, setLoadingData] = useState(true)
   const [dataError, setDataError] = useState('')
   const [refreshKey, setRefreshKey] = useState(0)
+
+  useEffect(() => {
+    localStorage.setItem('power-fit-theme', darkMode ? 'dark' : 'light')
+  }, [darkMode])
 
   useEffect(() => {
     let cancelled = false
@@ -217,7 +222,7 @@ function StudentApp({ profile, onLogout }) {
   const goHome = () => setPage(pages.HOME)
 
   return (
-    <main className="student-app">
+    <main className={`student-app ${darkMode ? 'student-theme-dark' : 'student-theme-light'}`}>
       <aside className="student-sidebar" aria-label="Menu do aluno">
         <button className="student-sidebar-brand" type="button" onClick={goHome}>
           <img src={studioLogo} alt="Studio Power Fit" />
@@ -245,6 +250,15 @@ function StudentApp({ profile, onLogout }) {
           </button>
 
           <div className="student-header-actions">
+            <button
+              className="student-theme-toggle"
+              type="button"
+              onClick={() => setDarkMode((value) => !value)}
+              aria-label={darkMode ? 'Ativar modo claro' : 'Ativar modo escuro'}
+              title={darkMode ? 'Modo claro' : 'Modo escuro'}
+            >
+              <span aria-hidden="true">{darkMode ? '☀' : '☾'}</span>
+            </button>
             <span className="student-notification-indicator" aria-label="Central de notificações">
               <span>◌</span>
               <i />
@@ -433,38 +447,6 @@ function StudentApp({ profile, onLogout }) {
                         ? 'Desafio concluído. Excelente!'
                         : `Continue assim! Faltam ${challengeRemaining} dias para sua meta.`}
                     </strong>
-                  </div>
-                </article>
-
-                <article className="student-card student-shortcuts-card">
-                  <div className="student-card-heading">
-                    <div className="student-title-with-icon">
-                      <span className="student-card-icon">ϟ</span>
-                      <span className="student-kicker">ACESSO RÁPIDO</span>
-                    </div>
-                  </div>
-
-                  <div className="student-shortcuts">
-                    <button type="button" onClick={() => setPage(pages.APPOINTMENTS)}>
-                      <span>▣</span>
-                      <div><strong>Agendar treino</strong><small>Reserve seu horário</small></div>
-                      <b>›</b>
-                    </button>
-                    <button type="button" onClick={() => setPage(pages.EVOLUTION)}>
-                      <span>▥</span>
-                      <div><strong>Ver evolução</strong><small>Acompanhe seus resultados</small></div>
-                      <b>›</b>
-                    </button>
-                    <button type="button" onClick={() => setPage(pages.APPOINTMENTS)}>
-                      <span>▦</span>
-                      <div><strong>Meus agendamentos</strong><small>Veja e gerencie seus treinos</small></div>
-                      <b>›</b>
-                    </button>
-                    <button type="button" onClick={() => setPage(pages.PROFILE)}>
-                      <span>◎</span>
-                      <div><strong>Meu perfil</strong><small>Seus dados e configurações</small></div>
-                      <b>›</b>
-                    </button>
                   </div>
                 </article>
 
