@@ -1,80 +1,175 @@
 /* Mobile UX layer: login + aluno */
 @media (max-width: 700px) {
-  html, body, #root { width: 100%; max-width: 100%; min-height: 100%; border: 0; }
+  html, body, #root {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    min-height: 100% !important;
+    margin: 0 !important;
+    border: 0 !important;
+    overflow-x: hidden !important;
+  }
 
-  /* LOGIN: vira uma experiência nativa, direta e confortável */
-  .app-shell { min-height: 100dvh; overflow-x: hidden; }
+  /* LOGIN: força o layout a abandonar qualquer dimensão herdada do desktop */
+  .app-shell {
+    width: 100vw !important;
+    max-width: 100vw !important;
+    min-width: 0 !important;
+    min-height: 100dvh !important;
+    margin: 0 !important;
+    overflow-x: hidden !important;
+  }
+
+  .gym-background,
+  .background-overlay {
+    position: fixed !important;
+    inset: 0 !important;
+    width: 100vw !important;
+    max-width: 100vw !important;
+  }
+
   .gym-background { opacity: .34; transform: scale(1.04); }
   .background-overlay { background: linear-gradient(180deg, rgba(5,15,32,.44) 0%, rgba(5,15,32,.78) 58%, rgba(5,15,32,.94) 100%); }
   .theme-light .background-overlay { background: linear-gradient(180deg, rgba(244,247,251,.76) 0%, rgba(244,247,251,.94) 48%, #f4f7fb 100%); }
 
   .theme-toggle {
-    top: max(12px, env(safe-area-inset-top)); right: 14px;
-    min-height: 42px; padding: 0 12px; border-radius: 14px;
-    backdrop-filter: blur(18px); font-size: 12px; z-index: 20;
+    top: max(12px, env(safe-area-inset-top));
+    right: 14px;
+    min-height: 42px;
+    padding: 0 12px;
+    border-radius: 14px;
+    backdrop-filter: blur(18px);
+    font-size: 12px;
+    z-index: 20;
   }
 
   .login-layout {
-    width: 100%; min-height: 100dvh; display: flex; flex-direction: column;
-    justify-content: flex-start; gap: 0; padding: max(64px, calc(env(safe-area-inset-top) + 52px)) 16px max(28px, env(safe-area-inset-bottom));
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    min-height: 100dvh !important;
+    margin: 0 !important;
+    padding: max(64px, calc(env(safe-area-inset-top) + 52px)) 16px max(28px, env(safe-area-inset-bottom)) !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    flex-direction: column !important;
+    align-items: center !important;
+    justify-content: flex-start !important;
+    gap: 0 !important;
+    grid-template-columns: none !important;
+    overflow: visible !important;
+  }
+
+  .brand-column {
+    width: 100% !important;
+    max-width: 440px !important;
+    min-width: 0 !important;
+    margin: 0 auto !important;
+    padding: 0 !important;
+    align-items: center !important;
+  }
+
+  .brand-hero {
+    width: 100% !important;
+    max-width: none !important;
+    min-width: 0 !important;
+    margin: 0 !important;
+    display: grid !important;
+    place-items: center !important;
+  }
+
+  .main-logo,
+  .main-logo img {
+    max-width: 100% !important;
+  }
+
+  .main-logo img {
+    width: 124px !important;
+    max-height: 96px !important;
+    object-fit: contain;
+    filter: drop-shadow(0 10px 20px rgba(0,0,0,.12));
+  }
+
+  .side-phrase,
+  .motivational-copy { display: none !important; }
+
+  .login-column {
+    width: 100% !important;
+    max-width: 440px !important;
+    min-width: 0 !important;
+    margin: 8px auto 0 !important;
+    padding: 0 !important;
+    transform: none !important;
+    box-sizing: border-box !important;
+  }
+
+  .login-card {
+    position: relative !important;
+    left: auto !important;
+    right: auto !important;
+    transform: none !important;
+    width: 100% !important;
+    max-width: 440px !important;
+    min-width: 0 !important;
+    margin: 0 auto !important;
+    padding: 24px 18px 20px !important;
+    border-radius: 26px;
+    box-sizing: border-box !important;
+    box-shadow: 0 20px 60px rgba(4,15,35,.16);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    overflow: hidden;
+  }
+
+  .login-card *,
+  .login-form,
+  .login-form > *,
+  .input-wrapper {
+    max-width: 100%;
     box-sizing: border-box;
   }
 
-  .brand-column { width: 100%; align-items: center; }
-  .brand-hero { max-width: none; display: grid; place-items: center; }
-  .main-logo img { width: 132px; max-height: 104px; object-fit: contain; filter: drop-shadow(0 10px 20px rgba(0,0,0,.12)); }
-  .side-phrase, .motivational-copy { display: none; }
-
-  .login-column { margin-top: 8px; width: 100%; }
-  .login-card {
-    width: 100%; max-width: 440px; padding: 24px 18px 20px; border-radius: 26px;
-    box-sizing: border-box; box-shadow: 0 20px 60px rgba(4,15,35,.16);
-    backdrop-filter: blur(22px); -webkit-backdrop-filter: blur(22px);
-  }
   .theme-light .login-card { background: rgba(255,255,255,.94); border-color: rgba(8,22,47,.08); box-shadow: 0 18px 52px rgba(8,22,47,.11); }
-  .theme-dark .login-card { background: rgba(10,20,35,.92); border-color: rgba(255,255,255,.09); }
+  .theme-dark .login-card { background: rgba(10,20,35,.94); border-color: rgba(255,255,255,.09); }
 
   .login-heading { margin: 2px 0 24px; text-align: left; }
-  .login-heading h2 { font-size: 30px; letter-spacing: -.045em; }
+  .login-heading h2 { margin: 0; font-size: 30px; line-height: 1.08; letter-spacing: -.045em; }
   .login-heading p { margin-top: 8px; font-size: 13px; line-height: 1.5; }
   .login-form > label { margin: 0 0 8px; font-size: 12px; }
-  .input-wrapper { margin-bottom: 15px; }
-  .input-wrapper input { height: 56px; border-radius: 15px; font-size: 16px; padding-left: 48px; }
+  .input-wrapper { width: 100% !important; margin-bottom: 15px; }
+  .input-wrapper input { width: 100% !important; min-width: 0 !important; height: 56px; border-radius: 15px; font-size: 16px; padding-left: 48px; }
   .input-icon { left: 16px; }
   .visibility-button { width: 42px; height: 42px; right: 7px; }
 
-  .login-options { margin: 0 0 20px; flex-direction: row; align-items: center; gap: 10px; }
+  .login-options { width: 100%; margin: 0 0 20px; flex-direction: row; align-items: center; justify-content: space-between; gap: 10px; }
   .remember-option, .forgot-button { font-size: 12px; }
-  .custom-checkbox { width: 18px; height: 18px; }
-  .primary-button { min-height: 56px; border-radius: 16px; font-size: 15px; box-shadow: 0 12px 28px rgba(255,32,56,.2); }
-  .divider { margin: 20px 0 14px; font-size: 11px; }
-  .reception-button { min-height: 50px; border-radius: 15px; font-size: 12px; }
+  .custom-checkbox { width: 18px; height: 18px; flex: 0 0 18px; }
+  .primary-button { width: 100% !important; min-height: 56px; border-radius: 16px; font-size: 15px; box-shadow: 0 12px 28px rgba(255,32,56,.2); }
+  .divider { width: 100%; margin: 20px 0 14px; font-size: 11px; }
+  .reception-button { width: 100% !important; min-height: 50px; border-radius: 15px; font-size: 12px; }
   .access-note { margin-top: 14px; font-size: 11px; line-height: 1.45; }
   .error-message { font-size: 12px; border-radius: 13px; }
 
-  /* HOME ALUNO: informação primeiro, menos altura perdida */
+  /* HOME ALUNO */
   .student-app { padding-bottom: calc(88px + env(safe-area-inset-bottom)); background-attachment: fixed; }
   .student-main { min-height: 100dvh; }
-  .student-header {
-    width: 100%; min-height: 64px; padding: max(8px, env(safe-area-inset-top)) 14px 4px;
-    box-sizing: border-box; position: sticky; top: 0; z-index: 45;
-    background: rgba(244,247,251,.88); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px);
-    border-bottom: 1px solid rgba(8,22,47,.05);
-  }
+  .student-header { width: 100%; min-height: 64px; padding: max(8px, env(safe-area-inset-top)) 14px 4px; box-sizing: border-box; position: sticky; top: 0; z-index: 45; background: rgba(244,247,251,.88); backdrop-filter: blur(18px); -webkit-backdrop-filter: blur(18px); border-bottom: 1px solid rgba(8,22,47,.05); }
   .student-theme-dark .student-header { background: rgba(7,16,28,.88); border-bottom-color: rgba(255,255,255,.055); }
   .student-mobile-brand img { width: 62px; height: 48px; }
   .student-header-actions { gap: 6px; }
   .student-theme-toggle, .student-notification-indicator { width: 40px; height: 40px; border-radius: 13px; }
   .student-profile-button { min-height: 42px; padding: 2px; }
   .student-avatar { width: 40px; height: 40px; border-radius: 13px; }
-
   .student-content { width: calc(100% - 28px); padding-bottom: 10px; }
   .student-welcome { padding: 22px 2px 18px; display: block; text-align: left; }
   .student-welcome .student-kicker { font-size: 8px; letter-spacing: .15em; }
   .student-welcome h1 { margin: 8px 0 6px; font-size: clamp(31px, 9vw, 38px); line-height: 1; letter-spacing: -.05em; }
   .student-welcome p { max-width: 330px; font-size: 13px; line-height: 1.45; }
   .student-data-alert { margin: 0 0 12px; display: flex; align-items: center; justify-content: space-between; gap: 8px; }
-
   .student-home-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .student-card { border-radius: 18px; box-shadow: 0 8px 28px rgba(8,22,47,.045); }
   .student-next-workout { grid-column: 1 / -1; min-height: 0; padding: 18px; }
@@ -86,7 +181,6 @@
   .student-workout-details > p { font-size: 12px; }
   .student-workout-time strong { font-size: 26px; }
   .student-primary-button { min-height: 48px; border-radius: 13px; font-size: 12px; }
-
   .student-frequency-card, .student-evolution-card, .student-challenge-card { grid-column: auto; padding: 15px; min-width: 0; }
   .student-frequency-card .student-link-button, .student-evolution-card .student-link-button { display: none; }
   .student-frequency-card .student-title-with-icon, .student-evolution-card .student-title-with-icon, .student-challenge-card .student-title-with-icon { gap: 7px; }
@@ -99,7 +193,6 @@
   .student-frequency-body > div:last-child span { font-size: 9px; }
   .student-info-strip { min-height: 44px; padding: 9px; }
   .student-info-strip strong { font-size: 8px; }
-
   .student-evolution-metrics { grid-template-columns: 1fr; gap: 5px; margin: 12px 0 8px; }
   .student-evolution-metrics > div { padding: 8px; display: flex; justify-content: space-between; align-items: center; }
   .student-evolution-metrics span { margin: 0; font-size: 8px; }
@@ -107,7 +200,6 @@
   .student-evolution-message { min-height: 44px; padding: 9px; }
   .student-evolution-message strong { font-size: 9px; }
   .student-evolution-message small { display: none; }
-
   .student-challenge-card { grid-column: 1 / -1; }
   .student-challenge-count { margin: 16px 0 10px; }
   .student-challenge-count strong, .student-challenge-count span { font-size: 16px; }
@@ -115,16 +207,10 @@
   .student-finance-card h2 { font-size: 18px; }
   .student-finance-actions { width: 100%; }
   .student-secondary-button { min-height: 42px; flex: 1; font-size: 11px; }
-
-  .student-bottom-nav {
-    bottom: max(8px, env(safe-area-inset-bottom)); width: calc(100% - 20px); height: 66px;
-    border-radius: 20px; box-shadow: 0 16px 44px rgba(8,22,47,.24);
-  }
+  .student-bottom-nav { bottom: max(8px, env(safe-area-inset-bottom)); width: calc(100% - 20px); height: 66px; border-radius: 20px; box-shadow: 0 16px 44px rgba(8,22,47,.24); }
   .student-bottom-nav button { min-width: 0; border-radius: 15px; }
   .student-bottom-nav button span { font-size: 19px; }
   .student-bottom-nav button small { font-size: 8px; }
-
-  /* Páginas internas também respiram no celular */
   .student-section-page { padding-top: 16px; }
   .student-section-page-heading { align-items: flex-start; }
   .student-section-page h1 { font-size: 31px; margin: 5px 0; }
@@ -136,8 +222,8 @@
 }
 
 @media (max-width: 380px) {
-  .login-layout { padding-inline: 12px; }
-  .login-card { padding-inline: 15px; }
+  .login-layout { padding-inline: 12px !important; }
+  .login-card { padding-inline: 15px !important; }
   .login-options { align-items: flex-start; flex-direction: column; }
   .student-content { width: calc(100% - 20px); }
   .student-home-grid { grid-template-columns: 1fr; }
