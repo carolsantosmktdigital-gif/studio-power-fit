@@ -258,6 +258,7 @@ function StudentApp({ profile, onLogout }) {
                 </div>
 
                 <p>
+                  {student?.payment_plan && <strong className="student-plan-label">{student.payment_plan}</strong>}
                   {latestPayment
                     ? paymentConfirmed
                       ? 'Pagamento identificado com sucesso.'
