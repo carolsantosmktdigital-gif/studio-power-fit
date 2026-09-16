@@ -25,6 +25,7 @@ function StudentApp({ profile, onLogout }) {
   const [student, setStudent] = useState(null)
   const [nextWorkout, setNextWorkout] = useState(null)
   const [latestPayment, setLatestPayment] = useState(null)
+  const [paymentHistory, setPaymentHistory] = useState([])
   const [attendanceCount, setAttendanceCount] = useState(0)
   const [assessments, setAssessments] = useState([])
   const [loadingData, setLoadingData] = useState(true)
@@ -78,10 +79,10 @@ function StudentApp({ profile, onLogout }) {
           .limit(1),
         supabase
           .from('payments')
-          .select('id, student_id, amount, due_date, status, payment_type')
+          .select('id, student_id, amount, due_date, payment_date, status, payment_type')
           .eq('student_id', studentRow.id)
           .order('due_date', { ascending: false })
-          .limit(1),
+          .limit(12),
         supabase
           .from('attendance')
           .select('id, registered_at, status')
@@ -101,6 +102,7 @@ function StudentApp({ profile, onLogout }) {
 
       setNextWorkout(appointmentsResult.data?.[0] ?? null)
       setLatestPayment(paymentsResult.data?.[0] ?? null)
+      setPaymentHistory(paymentsResult.data ?? [])
       setAttendanceCount(attendanceResult.data?.length ?? 0)
       setAssessments(assessmentsResult.data ?? [])
 
@@ -174,6 +176,43 @@ function StudentApp({ profile, onLogout }) {
       maximumFractionDigits: 1,
     })} kg`
   }
+
+  const formatCurrency = (value) => {
+    if (value == null) return '—'
+    return Number(value).toLocaleString('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    })
+  }
+
+  const formatDate = (value) => {
+    if (!value) return '—'
+    return new Intl.DateTimeFormat('pt-BR').format(new Date(`${value}T12:00:00`))
+  }
+
+  const profileAddress = [
+    profile?.address_street,
+    profile?.address_number,
+    profile?.address_complement,
+    profile?.address_district,
+    profile?.address_city,
+    profile?.address_state,
+  ].filter(Boolean).join(', ')
+
+  const evolutionPoints = useMemo(() => {
+    if (assessments.length < 2) return ''
+    const values = assessments.map((item) => Number(item.weight_kg)).filter(Number.isFinite)
+    if (values.length < 2) return ''
+    const min = Math.min(...values)
+    const max = Math.max(...values)
+    const range = Math.max(max - min, 1)
+
+    return values.map((value, index) => {
+      const x = 20 + (index / Math.max(values.length - 1, 1)) * 560
+      const y = 150 - ((value - min) / range) * 115
+      return `${x.toFixed(1)},${y.toFixed(1)}`
+    }).join(' ')
+  }, [assessments])
 
   const goHome = () => setPage(pages.HOME)
 
@@ -483,28 +522,215 @@ function StudentApp({ profile, onLogout }) {
             </section>
           )}
 
-          {page !== pages.HOME && page !== pages.APPOINTMENTS && (
+          {page === pages.PAYMENTS && (
             <section className="student-section-page">
               <div className="student-section-page-heading">
                 <button className="student-back-button" type="button" onClick={goHome}>←</button>
                 <div>
-                  <span className="student-kicker">STUDIO POWER FIT</span>
-                  <h1>{page}</h1>
+                  <span className="student-kicker">ÁREA DO ALUNO</span>
+                  <h1>Pagamentos</h1>
+                  <p>Acompanhe sua situação financeira sem perder tempo.</p>
                 </div>
               </div>
 
-              <div className="student-section-placeholder">
-                <span className="student-placeholder-icon">
-                  {page === pages.PAYMENTS ? '▤' : page === pages.EVOLUTION ? '↗' : '◎'}
-                </span>
-                <h2>{page}</h2>
-                <p>Estamos preparando esta área para concentrar suas informações com a mesma experiência do restante do aplicativo.</p>
+              <div className="student-detail-grid student-payments-page">
+                <article className={`student-detail-hero ${paymentConfirmed ? 'success' : ''}`}>
+                  <div>
+                    <span className="student-kicker">SITUAÇÃO ATUAL</span>
+                    <h2>{paymentConfirmed ? 'Pagamento identificado' : latestPayment ? 'Aguardando confirmação' : 'Nenhuma cobrança disponível'}</h2>
+                    <p>
+                      {paymentConfirmed
+                        ? 'Seu pagamento foi confirmado pela recepção.'
+                        : latestPayment
+                          ? 'Assim que a recepção identificar o pagamento, o status será atualizado aqui.'
+                          : 'Quando houver uma cobrança, você poderá acompanhar tudo por esta área.'}
+                    </p>
+                  </div>
+                  <span className="student-detail-status-icon">{paymentConfirmed ? '✓' : '◷'}</span>
+                </article>
 
-                {page === pages.PROFILE && (
-                  <button className="student-secondary-button student-logout-button" type="button" onClick={onLogout}>
-                    Sair da conta
-                  </button>
-                )}
+                <div className="student-detail-metrics">
+                  <article>
+                    <span>Modalidade</span>
+                    <strong>{student?.payment_plan || '—'}</strong>
+                  </article>
+                  <article>
+                    <span>Vencimento</span>
+                    <strong>{formatDate(latestPayment?.due_date)}</strong>
+                  </article>
+                  <article>
+                    <span>Valor</span>
+                    <strong>{formatCurrency(latestPayment?.amount)}</strong>
+                  </article>
+                </div>
+
+                <article className="student-detail-card student-history-card">
+                  <div className="student-detail-heading">
+                    <div>
+                      <span className="student-kicker">HISTÓRICO</span>
+                      <h2>Últimos pagamentos</h2>
+                    </div>
+                    <span>{paymentHistory.length} registros</span>
+                  </div>
+
+                  {paymentHistory.length === 0 ? (
+                    <div className="student-detail-empty">Nenhum pagamento encontrado.</div>
+                  ) : (
+                    <div className="student-history-list">
+                      {paymentHistory.map((payment) => (
+                        <div className="student-history-row" key={payment.id}>
+                          <div>
+                            <strong>{formatDate(payment.due_date)}</strong>
+                            <span>{payment.payment_type || 'Mensalidade'}</span>
+                          </div>
+                          <strong>{formatCurrency(payment.amount)}</strong>
+                          <span className={`student-history-status ${payment.status === 'IDENTIFICADO' ? 'success' : ''}`}>
+                            {payment.status === 'IDENTIFICADO' ? 'Identificado' : 'Aguardando'}
+                          </span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </article>
+              </div>
+            </section>
+          )}
+
+          {page === pages.EVOLUTION && (
+            <section className="student-section-page">
+              <div className="student-section-page-heading">
+                <button className="student-back-button" type="button" onClick={goHome}>←</button>
+                <div>
+                  <span className="student-kicker">SUA JORNADA</span>
+                  <h1>Minha Evolução</h1>
+                  <p>Resultados ganham força quando você consegue enxergar o caminho percorrido.</p>
+                </div>
+              </div>
+
+              <div className="student-detail-grid student-evolution-page">
+                <div className="student-detail-metrics">
+                  <article>
+                    <span>Peso inicial</span>
+                    <strong>{formatWeight(initialWeight)}</strong>
+                  </article>
+                  <article>
+                    <span>Peso atual</span>
+                    <strong>{formatWeight(currentWeight)}</strong>
+                  </article>
+                  <article>
+                    <span>Diferença</span>
+                    <strong className={weightDifference != null && weightDifference <= 0 ? 'positive' : ''}>
+                      {weightDifference == null
+                        ? '— kg'
+                        : `${weightDifference > 0 ? '+' : ''}${weightDifference.toLocaleString('pt-BR', { maximumFractionDigits: 1 })} kg`}
+                    </strong>
+                  </article>
+                  <article>
+                    <span>Frequência no mês</span>
+                    <strong>{attendanceCount} treinos</strong>
+                  </article>
+                </div>
+
+                <article className="student-detail-card student-evolution-chart-card">
+                  <div className="student-detail-heading">
+                    <div>
+                      <span className="student-kicker">EVOLUÇÃO DE PESO</span>
+                      <h2>Histórico das avaliações</h2>
+                    </div>
+                    <span>{assessments.length} avaliações</span>
+                  </div>
+
+                  {evolutionPoints ? (
+                    <div className="student-evolution-chart-wrap">
+                      <svg viewBox="0 0 600 180" role="img" aria-label="Gráfico da evolução de peso">
+                        <defs>
+                          <linearGradient id="studentEvolutionFill" x1="0" y1="0" x2="0" y2="1">
+                            <stop offset="0%" stopColor="#ff2038" stopOpacity=".18" />
+                            <stop offset="100%" stopColor="#ff2038" stopOpacity="0" />
+                          </linearGradient>
+                        </defs>
+                        <line x1="20" y1="150" x2="580" y2="150" className="student-chart-axis" />
+                        <polyline points={evolutionPoints} className="student-chart-stroke" />
+                      </svg>
+                    </div>
+                  ) : (
+                    <div className="student-detail-empty">Com duas ou mais avaliações, sua curva de evolução aparecerá aqui.</div>
+                  )}
+                </article>
+
+                <article className="student-detail-card student-history-card">
+                  <div className="student-detail-heading">
+                    <div>
+                      <span className="student-kicker">AVALIAÇÕES</span>
+                      <h2>Histórico recente</h2>
+                    </div>
+                  </div>
+
+                  {assessments.length === 0 ? (
+                    <div className="student-detail-empty">Nenhuma avaliação registrada ainda.</div>
+                  ) : (
+                    <div className="student-history-list">
+                      {[...assessments].reverse().slice(0, 8).map((assessment) => (
+                        <div className="student-history-row" key={`${assessment.assessment_date}-${assessment.weight_kg}`}>
+                          <div>
+                            <strong>{formatDate(assessment.assessment_date)}</strong>
+                            <span>Avaliação física</span>
+                          </div>
+                          <strong>{formatWeight(assessment.weight_kg)}</strong>
+                          <span className="student-history-status success">Registrada</span>
+                        </div>
+                      ))}
+                    </div>
+                  )}
+                </article>
+              </div>
+            </section>
+          )}
+
+          {page === pages.PROFILE && (
+            <section className="student-section-page">
+              <div className="student-section-page-heading">
+                <button className="student-back-button" type="button" onClick={goHome}>←</button>
+                <div>
+                  <span className="student-kicker">CONTA DO ALUNO</span>
+                  <h1>Meu Perfil</h1>
+                  <p>Seus dados principais e informações de acesso ao Studio Power Fit.</p>
+                </div>
+              </div>
+
+              <div className="student-profile-page">
+                <article className="student-profile-summary">
+                  <span className="student-profile-big-avatar">{firstName.slice(0, 1).toUpperCase()}</span>
+                  <div>
+                    <span className="student-kicker">ALUNO</span>
+                    <h2>{profile?.full_name || firstName}</h2>
+                    <p>{profile?.email || 'E-mail não informado'}</p>
+                  </div>
+                </article>
+
+                <article className="student-detail-card student-profile-data">
+                  <div className="student-detail-heading">
+                    <div>
+                      <span className="student-kicker">DADOS PRINCIPAIS</span>
+                      <h2>Informações cadastrais</h2>
+                    </div>
+                    <span>Gerenciados com segurança</span>
+                  </div>
+
+                  <div className="student-profile-fields">
+                    <div><span>Nome completo</span><strong>{profile?.full_name || '—'}</strong></div>
+                    <div><span>E-mail</span><strong>{profile?.email || '—'}</strong></div>
+                    <div><span>Telefone</span><strong>{profile?.phone || '—'}</strong></div>
+                    <div><span>CPF</span><strong>{profile?.cpf || '—'}</strong></div>
+                    <div className="wide"><span>Endereço</span><strong>{profileAddress || '—'}</strong></div>
+                    <div><span>Plano</span><strong>{student?.payment_plan || '—'}</strong></div>
+                    <div><span>Status</span><strong>{student?.status || '—'}</strong></div>
+                  </div>
+                </article>
+
+                <button className="student-signout-button" type="button" onClick={onLogout}>
+                  Sair da minha conta
+                </button>
               </div>
             </section>
           )}
