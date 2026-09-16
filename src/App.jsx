@@ -75,7 +75,7 @@ function App() {
 
     const { data, error } = await supabase
       .from('profiles')
-      .select('id, full_name, email, role, active')
+      .select('id, full_name, email, phone, cpf, birth_date, address_zip_code, address_street, address_number, address_complement, address_district, address_city, address_state, role, active')
       .eq('id', userId)
       .single()
 
