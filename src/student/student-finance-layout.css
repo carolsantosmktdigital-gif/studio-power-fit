@@ -1,0 +1,109 @@
+/* Desktop finance card: layout fechado, sem qualquer elemento escapar do card */
+@media (min-width: 701px) {
+  .student-finance-card {
+    grid-column: 2 / -1 !important;
+    grid-row: 2 !important;
+    min-width: 0 !important;
+    width: 100% !important;
+    box-sizing: border-box !important;
+    padding: 24px !important;
+    display: grid !important;
+    grid-template-columns: minmax(190px, .9fr) minmax(220px, 1.15fr) minmax(170px, .72fr) !important;
+    gap: 22px !important;
+    align-items: center !important;
+    overflow: hidden !important;
+  }
+
+  .student-finance-card > .student-title-with-icon,
+  .student-finance-card > p,
+  .student-finance-card > .student-finance-actions {
+    min-width: 0 !important;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  .student-finance-card > .student-title-with-icon {
+    align-items: flex-start !important;
+  }
+
+  .student-finance-card > .student-title-with-icon > div {
+    min-width: 0 !important;
+  }
+
+  .student-finance-card h2 {
+    font-size: 22px !important;
+    line-height: 1.08 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .student-finance-card > p {
+    margin: 0 !important;
+    display: grid !important;
+    gap: 7px !important;
+    color: var(--student-soft) !important;
+    font-size: 12px !important;
+    line-height: 1.45 !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .student-finance-actions {
+    width: 100% !important;
+    display: grid !important;
+    grid-template-columns: 1fr !important;
+    justify-items: stretch !important;
+    align-items: stretch !important;
+    gap: 10px !important;
+  }
+
+  .student-finance-actions .student-payment-pill {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: center !important;
+    text-align: center !important;
+    white-space: normal !important;
+    overflow-wrap: anywhere !important;
+  }
+
+  .student-finance-actions .student-secondary-button {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0 !important;
+    min-height: 46px !important;
+    box-sizing: border-box !important;
+    display: flex !important;
+    align-items: center !important;
+    justify-content: space-between !important;
+    gap: 10px !important;
+    white-space: normal !important;
+  }
+}
+
+/* Notebooks e janelas desktop menores: conteúdo vira 2 colunas e ações ocupam a linha inteira. */
+@media (min-width: 701px) and (max-width: 1180px) {
+  .student-finance-card {
+    grid-template-columns: minmax(190px, .9fr) minmax(260px, 1.1fr) !important;
+    gap: 18px 24px !important;
+  }
+
+  .student-finance-actions {
+    grid-column: 1 / -1 !important;
+    grid-template-columns: minmax(120px, .32fr) minmax(180px, .68fr) !important;
+    align-items: center !important;
+  }
+}
+
+/* Faixa crítica próxima ao breakpoint mobile: uma coluna segura e legível. */
+@media (min-width: 701px) and (max-width: 860px) {
+  .student-finance-card {
+    grid-template-columns: 1fr !important;
+  }
+
+  .student-finance-actions {
+    grid-column: auto !important;
+    grid-template-columns: 1fr !important;
+  }
+}
