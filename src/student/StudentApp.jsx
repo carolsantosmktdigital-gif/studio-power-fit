@@ -5,6 +5,7 @@ import StudentAppointments from './StudentAppointments'
 import './StudentApp.css'
 import './StudentDesktopRefinements.css'
 import './StudentHomePolish.css'
+import './StudentExperienceRefinement.css'
 
 const pages = {
   HOME: 'Início',
