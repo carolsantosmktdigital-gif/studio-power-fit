@@ -48,6 +48,7 @@ function StudentAppointments({ student, latestPayment, onChanged }) {
   const [actionLoading, setActionLoading] = useState('')
   const [notice, setNotice] = useState('')
   const [leaveCandidate, setLeaveCandidate] = useState(null)
+  const [cancelCandidate, setCancelCandidate] = useState(null)
 
   const load = async () => {
     if (!student?.id) return
@@ -156,19 +157,22 @@ function StudentAppointments({ student, latestPayment, onChanged }) {
     setActionLoading('')
   }
 
-  const handleCancel = async (appointment) => {
-    setActionLoading(`cancel-${appointment.id}`)
+  const handleCancel = async () => {
+    if (!cancelCandidate) return
+
+    setActionLoading(`cancel-${cancelCandidate.id}`)
     setNotice('')
 
     const { error } = await supabase.rpc('cancel_appointment', {
-      p_appointment_id: appointment.id,
+      p_appointment_id: cancelCandidate.id,
       p_reason: 'Cancelado pelo aluno no aplicativo',
     })
 
     if (error) {
       setNotice(error.message)
     } else {
-      setNotice('Agendamento cancelado.')
+      setNotice('Agendamento cancelado com sucesso.')
+      setCancelCandidate(null)
       await load()
       onChanged?.()
     }
@@ -201,9 +205,9 @@ function StudentAppointments({ student, latestPayment, onChanged }) {
     <div className="student-booking-page">
       <section className="student-booking-intro">
         <div>
-          <span className="student-kicker">MUSCULAÇÃO • V1</span>
+          <span className="student-kicker">MUSCULAÇÃO</span>
           <h2>Escolha quando você quer treinar.</h2>
-          <p>Você escolhe a data e o horário. O professor é definido pelo Studio Power Fit.</p>
+          <p>Escolha sua data e horário. O Studio Power Fit cuida da distribuição da equipe para você.</p>
         </div>
 
         <div className={`student-booking-status ${isBlocked ? 'blocked' : 'ok'}`}>
@@ -218,7 +222,7 @@ function StudentAppointments({ student, latestPayment, onChanged }) {
         </div>
       </section>
 
-      {notice && <div className="student-data-alert">{notice}</div>}
+      {notice && <div className="student-data-alert" role="status"><span>{notice}</span></div>}
 
       <section className="student-my-bookings">
         <div className="student-booking-section-title">
@@ -252,7 +256,7 @@ function StudentAppointments({ student, latestPayment, onChanged }) {
                   type="button"
                   className="student-cancel-button"
                   disabled={actionLoading === `cancel-${appointment.id}`}
-                  onClick={() => handleCancel(appointment)}
+                  onClick={() => setCancelCandidate(appointment)}
                 >
                   {actionLoading === `cancel-${appointment.id}` ? 'Cancelando...' : 'Cancelar'}
                 </button>
@@ -306,7 +310,7 @@ function StudentAppointments({ student, latestPayment, onChanged }) {
             <span className="student-kicker">AGENDAR MUSCULAÇÃO</span>
             <h3>Horários disponíveis</h3>
           </div>
-          <small>Capacidade = professores disponíveis × 4</small>
+          <small>Vagas atualizadas automaticamente conforme a equipe disponível</small>
         </div>
 
         <div className="student-date-tabs">
@@ -331,7 +335,10 @@ function StudentAppointments({ student, latestPayment, onChanged }) {
         )}
 
         {loading ? (
-          <div className="student-loading-slots">Carregando horários...</div>
+          <div className="student-loading-slots" role="status">
+            <span className="student-loading-dot" />
+            <span>Carregando horários disponíveis...</span>
+          </div>
         ) : selectedSlots.length === 0 ? (
           <div className="student-empty-state">
             <span>◌</span>
@@ -392,6 +399,31 @@ function StudentAppointments({ student, latestPayment, onChanged }) {
           </div>
         )}
       </section>
+
+      {cancelCandidate && (
+        <div className="student-modal-backdrop" role="presentation">
+          <div className="student-confirm-modal" role="dialog" aria-modal="true" aria-labelledby="cancel-booking-title">
+            <span className="student-modal-icon">×</span>
+            <span className="student-kicker">CANCELAR TREINO</span>
+            <h3 id="cancel-booking-title">Cancelar este agendamento?</h3>
+            <p>
+              {prettyDate(cancelCandidate.appointment_date)} às {prettyTime(cancelCandidate.start_time)}.
+              O cancelamento só é permitido dentro do prazo definido pelo Studio Power Fit.
+            </p>
+            <div>
+              <button type="button" onClick={() => setCancelCandidate(null)}>Manter treino</button>
+              <button
+                type="button"
+                className="confirm danger"
+                disabled={actionLoading === `cancel-${cancelCandidate.id}`}
+                onClick={handleCancel}
+              >
+                {actionLoading === `cancel-${cancelCandidate.id}` ? 'Cancelando...' : 'Cancelar treino'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
 
       {leaveCandidate && (
         <div className="student-modal-backdrop" role="presentation">
