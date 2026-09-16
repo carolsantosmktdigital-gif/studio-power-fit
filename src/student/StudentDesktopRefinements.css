@@ -161,19 +161,19 @@
   }
 
   .student-finance-actions {
-    max-width: 120px;
+    max-width: 160px;
     gap: 8px;
   }
 
   .student-finance-actions .student-payment-pill {
     min-height: 32px !important;
-    padding: 6px 10px !important;
+    padding: 6px 7px !important;
     font-size: 9px !important;
   }
 
   .student-finance-actions .student-secondary-button {
     min-height: 42px !important;
-    padding: 0 11px !important;
+    padding: 0 7px !important;
     font-size: 10.5px !important;
   }
 }
