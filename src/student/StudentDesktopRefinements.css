@@ -1,88 +1,86 @@
-/* Home desktop do aluno: card Pagamentos final, inspirado na referência aprovada */
+/* Home desktop do aluno: card Pagamentos compacto, profissional e totalmente contido */
 @media (min-width: 921px) {
   .student-finance-card {
     grid-column: 2 / -1;
     grid-row: 2;
     width: 100%;
     min-width: 0;
-    min-height: 235px;
+    min-height: 220px;
     box-sizing: border-box;
-    padding: 28px 30px;
+    padding: 26px 28px;
     display: grid;
-    grid-template-columns: minmax(190px, .95fr) 1px minmax(210px, 1.1fr) 1px minmax(185px, .8fr);
-    column-gap: 24px;
+    grid-template-columns: minmax(185px, .92fr) minmax(190px, 1fr) minmax(175px, .78fr);
+    gap: 14px;
     align-items: center;
     overflow: hidden;
   }
 
   .student-finance-card::before,
   .student-finance-card::after {
-    content: '';
-    display: block;
-    width: 1px;
-    height: 112px;
-    justify-self: center;
-    background: linear-gradient(180deg, transparent, rgba(115,139,169,.22) 18%, rgba(115,139,169,.22) 82%, transparent);
+    content: none !important;
+    display: none !important;
   }
 
-  .student-finance-card::before { grid-column: 2; grid-row: 1; }
-  .student-finance-card::after { grid-column: 4; grid-row: 1; }
+  .student-finance-card > .student-title-with-icon,
+  .student-finance-card > p,
+  .student-finance-card > .student-finance-actions,
+  .student-finance-card > .student-title-with-icon > div {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
 
   .student-finance-card > .student-title-with-icon {
     grid-column: 1;
     grid-row: 1;
-    min-width: 0;
-    max-width: 100%;
-    box-sizing: border-box;
     align-items: flex-start;
-    gap: 14px;
-  }
-
-  .student-finance-card > .student-title-with-icon > div {
-    min-width: 0;
+    gap: 12px;
+    padding-right: 8px;
+    border-right: 1px solid rgba(115,139,169,.16);
   }
 
   .student-finance-card > .student-title-with-icon .student-card-icon {
-    flex: 0 0 46px;
-    width: 46px;
-    height: 46px;
-    border-radius: 14px;
+    flex: 0 0 42px;
+    width: 42px;
+    height: 42px;
+    border-radius: 13px;
   }
 
   .student-finance-card h2 {
-    margin: 8px 0 0;
-    max-width: 155px;
-    font-size: 22px;
-    line-height: 1.04;
+    margin: 7px 0 0;
+    max-width: 140px;
+    font-size: 21px;
+    line-height: 1.06;
     letter-spacing: -.025em;
     overflow-wrap: normal;
   }
 
   .student-finance-card > p {
-    grid-column: 3;
+    grid-column: 2;
     grid-row: 1;
-    min-width: 0;
-    max-width: 250px;
     margin: 0;
-    justify-self: center;
+    padding: 0 10px;
     color: var(--student-soft);
-    font-size: 12px;
-    line-height: 1.55;
-    overflow-wrap: normal;
+    font-size: 11.5px;
+    line-height: 1.5;
+    justify-self: stretch;
+    align-self: center;
+    border-right: 1px solid rgba(115,139,169,.16);
+    overflow-wrap: anywhere;
   }
 
   .student-finance-actions {
-    grid-column: 5;
+    grid-column: 3;
     grid-row: 1;
     width: 100%;
     min-width: 0;
-    max-width: 230px;
+    max-width: 190px;
     justify-self: end;
     display: flex;
     flex-direction: column;
     align-items: stretch;
     justify-content: center;
-    gap: 12px;
+    gap: 6px;
   }
 
   .student-finance-actions .student-payment-pill {
@@ -93,9 +91,9 @@
     width: 100% !important;
     max-width: 100% !important;
     min-width: 0 !important;
-    min-height: 36px !important;
+    min-height: 34px !important;
     margin: 0 !important;
-    padding: 8px 14px !important;
+    padding: 7px 12px !important;
     box-sizing: border-box !important;
     display: flex !important;
     align-items: center !important;
@@ -114,17 +112,17 @@
     width: 100% !important;
     max-width: 100% !important;
     min-width: 0 !important;
-    min-height: 48px !important;
+    min-height: 44px !important;
     margin: 0 !important;
-    padding: 0 16px !important;
+    padding: 0 13px !important;
     box-sizing: border-box !important;
     display: flex !important;
     align-items: center !important;
     justify-content: space-between !important;
-    gap: 12px !important;
+    gap: 8px !important;
     white-space: nowrap !important;
     overflow: hidden !important;
-    border-radius: 13px !important;
+    border-radius: 12px !important;
   }
 
   .student-finance-actions .student-secondary-button span {
@@ -132,45 +130,50 @@
   }
 }
 
-/* Notebook: preserva a mesma composição e reduz proporcionalmente, sem vazamentos. */
+/* Notebook: reduz ainda mais os espaços para preservar a margem da tela. */
 @media (min-width: 921px) and (max-width: 1180px) {
   .student-finance-card {
-    grid-template-columns: minmax(155px,.9fr) 1px minmax(165px,1fr) 1px minmax(155px,.82fr);
-    column-gap: 14px;
-    padding: 24px 22px;
-  }
-
-  .student-finance-card::before,
-  .student-finance-card::after {
-    height: 96px;
+    grid-template-columns: minmax(155px, .88fr) minmax(165px, .96fr) minmax(150px, .72fr);
+    gap: 10px;
+    padding: 22px 20px;
   }
 
   .student-finance-card > .student-title-with-icon {
-    gap: 10px;
+    gap: 9px;
+    padding-right: 6px;
   }
 
   .student-finance-card > .student-title-with-icon .student-card-icon {
-    flex-basis: 40px;
-    width: 40px;
-    height: 40px;
+    flex-basis: 38px;
+    width: 38px;
+    height: 38px;
   }
 
   .student-finance-card h2 {
-    max-width: 120px;
+    max-width: 112px;
     font-size: 18px;
   }
 
   .student-finance-card > p {
-    max-width: 190px;
+    padding: 0 7px;
     font-size: 10.5px;
+    line-height: 1.45;
   }
 
   .student-finance-actions {
-    max-width: 185px;
+    max-width: 165px;
+    gap: 5px;
+  }
+
+  .student-finance-actions .student-payment-pill {
+    min-height: 32px !important;
+    padding: 6px 10px !important;
+    font-size: 9px !important;
   }
 
   .student-finance-actions .student-secondary-button {
-    padding: 0 13px !important;
-    font-size: 11px !important;
+    min-height: 42px !important;
+    padding: 0 11px !important;
+    font-size: 10.5px !important;
   }
 }
