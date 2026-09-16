@@ -161,8 +161,8 @@
   }
 
   .student-finance-actions {
-    max-width: 165px;
-    gap: 5px;
+    max-width: 120px;
+    gap: 8px;
   }
 
   .student-finance-actions .student-payment-pill {
