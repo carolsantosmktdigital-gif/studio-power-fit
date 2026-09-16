@@ -134,7 +134,7 @@
 @media (min-width: 921px) and (max-width: 1180px) {
   .student-finance-card {
     grid-template-columns: minmax(155px, .88fr) minmax(165px, .96fr) minmax(150px, .72fr);
-    gap: 8px;
+    gap: 5px;
     padding: 22px 20px;
   }
 
@@ -155,20 +155,20 @@
   }
 
   .student-finance-card > p {
-    padding: 0 7px;
+    padding: 0 4px;
     font-size: 10.5px;
     line-height: 1.45;
   }
 
   .student-finance-actions {
-    max-width: 160px;
+    max-width: 100px;
     gap: 8px;
   }
 
   .student-finance-actions .student-payment-pill {
     min-height: 32px !important;
-    padding: 6px 7px !important;
-    font-size: 9px !important;
+    padding: 6px 10px !important;
+    font-size: 10px !important;
   }
 
   .student-finance-actions .student-secondary-button {
