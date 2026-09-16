@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from './lib/supabase'
 import logo from './assets/power-fit-logo.png'
 import AppShell from './components/AppShell'
+import StudentApp from './student/StudentApp'
 import './App.css'
 
 function App() {
@@ -133,6 +134,21 @@ function App() {
   }
 
   if (session && profile) {
+    if (profile.active === false) {
+      return (
+        <main className={`app-shell ${darkMode ? 'theme-dark' : 'theme-light'}`}>
+          <div className="loading-screen">
+            <div className="loading-logo">PF</div>
+            <span>Seu acesso está inativo. Fale com a recepção do Studio Power Fit.</span>
+          </div>
+        </main>
+      )
+    }
+
+    if (profile.role === 'ALUNO') {
+      return <StudentApp profile={profile} onLogout={handleLogout} />
+    }
+
     return <AppShell profile={profile} onLogout={handleLogout} />
   }
 
