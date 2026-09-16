@@ -2547,3 +2547,340 @@
     height: 210px;
   }
 }
+
+
+/* =========================================================
+   AJUSTES DE UX: HOME MAIS ENXUTA + TEMAS CLARO/ESCURO
+========================================================= */
+
+.student-welcome h1,
+.student-section-page h1 {
+  color: var(--student-text) !important;
+}
+
+.student-welcome h1 > strong {
+  color: var(--student-red) !important;
+}
+
+.student-theme-toggle {
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--student-border);
+  border-radius: 13px;
+  background: rgba(255,255,255,.84);
+  color: var(--student-navy);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  box-shadow: var(--student-shadow-sm);
+  transition: transform .16s ease, background .16s ease, border-color .16s ease;
+}
+
+.student-theme-toggle span {
+  font-size: 20px;
+  line-height: 1;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .student-theme-toggle:hover {
+    transform: translateY(-1px);
+    border-color: rgba(8,22,47,.16);
+    background: #fff;
+  }
+}
+
+/* Com o menu lateral no desktop, os atalhos duplicados não são necessários. */
+@media (min-width: 1221px) {
+  .student-challenge-card {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .student-finance-card {
+    grid-column: 2 / -1;
+    grid-row: 2;
+    grid-template-columns: minmax(240px, 1.2fr) minmax(220px, .9fr) auto;
+  }
+}
+
+@media (max-width: 1220px) and (min-width: 921px) {
+  .student-finance-card {
+    grid-column: 1 / -1;
+    grid-row: 3;
+  }
+}
+
+/* -------------------------
+   MODO ESCURO DO ALUNO
+-------------------------- */
+
+.student-theme-dark {
+  --student-red: #ff334b;
+  --student-red-strong: #e51d32;
+  --student-navy: #08111f;
+  --student-navy-soft: #162945;
+  --student-bg: #07101c;
+  --student-card: #0d1828;
+  --student-border: rgba(255,255,255,.085);
+  --student-border-strong: rgba(255,255,255,.15);
+  --student-text: #f5f8fc;
+  --student-soft: #b0bccd;
+  --student-muted: #8290a6;
+  --student-success: #59d99d;
+  --student-shadow-sm: 0 8px 24px rgba(0,0,0,.18);
+  --student-shadow-md: 0 18px 48px rgba(0,0,0,.28);
+
+  color-scheme: dark;
+  background:
+    radial-gradient(circle at 90% 0%, rgba(43, 88, 150, .15), transparent 29%),
+    radial-gradient(circle at 3% 4%, rgba(255, 51, 75, .09), transparent 23%),
+    linear-gradient(180deg, #091321 0%, #060d17 100%);
+}
+
+.student-theme-dark .student-sidebar {
+  background: rgba(8,17,31,.97);
+  border-right-color: rgba(255,255,255,.07);
+  box-shadow: 10px 0 34px rgba(0,0,0,.18);
+}
+
+.student-theme-dark .student-sidebar-nav button {
+  color: #aeb9c9;
+}
+
+.student-theme-dark .student-sidebar-nav button > span {
+  color: #d4dceb;
+}
+
+.student-theme-dark .student-sidebar-nav button:hover {
+  background: rgba(255,255,255,.035);
+  color: #fff;
+}
+
+.student-theme-dark .student-sidebar-nav button.active {
+  color: #fff;
+  background: linear-gradient(90deg, rgba(255,51,75,.20), rgba(255,51,75,.055));
+}
+
+.student-theme-dark .student-sidebar-nav button.active > span {
+  color: var(--student-red);
+}
+
+.student-theme-dark .student-theme-toggle,
+.student-theme-dark .student-notification-indicator,
+.student-theme-dark .student-profile-button:hover {
+  background: rgba(14,27,45,.92);
+  border-color: rgba(255,255,255,.085);
+  color: #eef3fb;
+}
+
+.student-theme-dark .student-profile-button {
+  color: var(--student-text);
+}
+
+.student-theme-dark .student-avatar {
+  background: linear-gradient(145deg, #264d83, #10233d);
+  box-shadow: 0 10px 26px rgba(0,0,0,.32);
+}
+
+.student-theme-dark .student-welcome-meta em {
+  color: #e9eff8;
+}
+
+.student-theme-dark .student-card,
+.student-theme-dark .student-detail-card,
+.student-theme-dark .student-detail-metrics article,
+.student-theme-dark .student-profile-summary,
+.student-theme-dark .student-section-placeholder,
+.student-theme-dark .student-booking-intro,
+.student-theme-dark .student-my-bookings,
+.student-theme-dark .student-waitlist-section,
+.student-theme-dark .student-slot-section,
+.student-theme-dark .student-booking-item,
+.student-theme-dark .student-waitlist-card,
+.student-theme-dark .student-slot-card,
+.student-theme-dark .student-confirm-modal {
+  background: linear-gradient(180deg, #0f1b2d 0%, #0b1626 100%);
+  border-color: rgba(255,255,255,.08);
+  color: var(--student-text);
+}
+
+.student-theme-dark .student-frequency-card,
+.student-theme-dark .student-evolution-card,
+.student-theme-dark .student-challenge-card {
+  background: linear-gradient(180deg, #101d30 0%, #0b1626 100%);
+}
+
+.student-theme-dark .student-finance-card {
+  background:
+    radial-gradient(circle at 92% 15%, rgba(255,51,75,.055), transparent 30%),
+    linear-gradient(100deg, #0f1b2d, #0b1626);
+}
+
+.student-theme-dark .student-card h2,
+.student-theme-dark .student-detail-heading h2,
+.student-theme-dark .student-profile-summary h2,
+.student-theme-dark .student-booking-intro h2,
+.student-theme-dark .student-booking-section-title h3,
+.student-theme-dark .student-booking-item-copy strong,
+.student-theme-dark .student-confirm-modal h3,
+.student-theme-dark .student-detail-metrics article strong,
+.student-theme-dark .student-profile-fields strong {
+  color: var(--student-text);
+}
+
+.student-theme-dark .student-evolution-metrics > div,
+.student-theme-dark .student-profile-fields > div,
+.student-theme-dark .student-shortcuts button,
+.student-theme-dark .student-detail-empty,
+.student-theme-dark .student-day-limit {
+  background: rgba(255,255,255,.035);
+  border-color: rgba(255,255,255,.07);
+}
+
+.student-theme-dark .student-evolution-message {
+  background: linear-gradient(90deg, rgba(42,181,118,.16), rgba(42,181,118,.055));
+  border-color: rgba(89,217,157,.12);
+}
+
+.student-theme-dark .student-info-strip {
+  background: linear-gradient(90deg, rgba(255,51,75,.14), rgba(255,51,75,.045));
+  border-color: rgba(255,51,75,.10);
+  color: #ffc1c9;
+}
+
+.student-theme-dark .student-progress-track {
+  background: rgba(255,255,255,.10);
+}
+
+.student-theme-dark .student-progress-ring {
+  background: conic-gradient(var(--student-red) var(--progress), rgba(255,255,255,.10) 0);
+}
+
+.student-theme-dark .student-progress-ring::after {
+  background: #0d1828;
+}
+
+.student-theme-dark .student-secondary-button,
+.student-theme-dark .student-back-button,
+.student-theme-dark .student-date-tabs button,
+.student-theme-dark .student-waitlist-card button,
+.student-theme-dark .student-confirm-modal button:not(.confirm),
+.student-theme-dark .student-data-alert button {
+  background: rgba(255,255,255,.045);
+  border-color: rgba(255,255,255,.09);
+  color: #edf3fb;
+}
+
+.student-theme-dark .student-date-tabs button.active {
+  background: linear-gradient(135deg, rgba(255,51,75,.18), rgba(255,51,75,.055));
+  border-color: rgba(255,51,75,.22);
+}
+
+.student-theme-dark .student-booking-date-badge {
+  background: linear-gradient(145deg, #17345d, #0a192c);
+}
+
+.student-theme-dark .student-slot-card.full {
+  background: linear-gradient(180deg, #151923, #18141d);
+}
+
+.student-theme-dark .student-slot-card:not(.full) button {
+  background: linear-gradient(135deg, #245087, #102844);
+}
+
+.student-theme-dark .student-detail-hero {
+  background:
+    radial-gradient(circle at 90% 10%, rgba(255,51,75,.10), transparent 30%),
+    linear-gradient(135deg, #101d30, #0b1626);
+  border-color: rgba(255,51,75,.12);
+}
+
+.student-theme-dark .student-detail-hero.success {
+  background:
+    radial-gradient(circle at 90% 10%, rgba(52,191,127,.10), transparent 30%),
+    linear-gradient(135deg, #0f1d2b, #0b171f);
+  border-color: rgba(89,217,157,.13);
+}
+
+.student-theme-dark .student-profile-summary {
+  background:
+    radial-gradient(circle at 82% 12%, rgba(255,51,75,.08), transparent 30%),
+    linear-gradient(145deg, #101d30, #0b1626);
+}
+
+.student-theme-dark .student-evolution-chart-wrap {
+  background:
+    linear-gradient(rgba(255,255,255,.045) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(255,255,255,.045) 1px, transparent 1px),
+    #0a1524;
+  background-size: 44px 44px;
+}
+
+.student-theme-dark .student-chart-axis {
+  stroke: rgba(255,255,255,.13);
+}
+
+.student-theme-dark .student-history-row,
+.student-theme-dark .student-slot-row,
+.student-theme-dark .student-booking-item {
+  border-color: rgba(255,255,255,.075);
+}
+
+.student-theme-dark .student-data-alert {
+  color: #ffc2ca;
+  background: linear-gradient(90deg, rgba(255,51,75,.13), rgba(255,51,75,.045));
+  border-color: rgba(255,51,75,.13);
+}
+
+.student-theme-dark .student-booking-status.ok {
+  color: #8ce4b9;
+  background: rgba(41,168,111,.12);
+  border-color: rgba(89,217,157,.14);
+}
+
+.student-theme-dark .student-booking-status.blocked {
+  color: #ffb6bf;
+  background: rgba(255,51,75,.12);
+  border-color: rgba(255,51,75,.16);
+}
+
+.student-theme-dark .student-modal-backdrop {
+  background: rgba(0,5,13,.74);
+}
+
+.student-theme-dark .student-home-grid.is-loading .student-card::before {
+  background: linear-gradient(105deg, transparent 20%, rgba(255,255,255,.07) 42%, transparent 64%);
+}
+
+.student-theme-dark .student-plan-label,
+.student-theme-dark .student-workout-time span {
+  color: #dbe5f5;
+}
+
+.student-theme-dark .student-payment-pill:not(.confirmed),
+.student-theme-dark .student-status-badge:not(.confirmed) {
+  color: #ffc1c9;
+  background: rgba(255,51,75,.12);
+  border-color: rgba(255,51,75,.16);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .student-theme-dark .student-card:hover {
+    border-color: rgba(255,255,255,.13);
+    box-shadow: 0 18px 46px rgba(0,0,0,.28);
+  }
+
+  .student-theme-dark .student-secondary-button:hover,
+  .student-theme-dark .student-theme-toggle:hover,
+  .student-theme-dark .student-date-tabs button:hover {
+    background: rgba(255,255,255,.075);
+    border-color: rgba(255,255,255,.14);
+  }
+}
+
+@media (max-width: 920px) {
+  .student-theme-toggle {
+    width: 40px;
+    height: 40px;
+  }
+}
