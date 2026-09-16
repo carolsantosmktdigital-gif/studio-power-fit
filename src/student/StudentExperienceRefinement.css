@@ -1444,6 +1444,441 @@
   }
 }
 
+/* =========================================================
+   SISTEMA TIPOGRÁFICO ÚNICO
+   1. Página  2. Título  3. Corpo  4. Apoio  5. Tag
+========================================================= */
+
+.student-app {
+  --student-font-family: Inter, "Segoe UI Variable", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  --student-type-page: clamp(38px, 3.6vw, 52px);
+  --student-type-title: 20px;
+  --student-type-value: 18px;
+  --student-type-body: 14px;
+  --student-type-button: 13px;
+  --student-type-small: 11px;
+  --student-type-tag: 10px;
+  font-family: var(--student-font-family);
+}
+
+.student-app button,
+.student-app input,
+.student-app select,
+.student-app textarea {
+  font-family: var(--student-font-family);
+}
+
+/* Tags e estados: sempre compactos, legíveis e equivalentes. */
+.student-kicker,
+.student-status-badge,
+.student-payment-pill,
+.student-history-status,
+.student-booking-status,
+.student-card-context,
+.student-plan-label {
+  font-family: var(--student-font-family) !important;
+  font-size: var(--student-type-tag) !important;
+  font-weight: 750 !important;
+  line-height: 1.25 !important;
+}
+
+.student-kicker {
+  letter-spacing: .12em !important;
+  text-transform: uppercase;
+}
+
+.student-status-badge,
+.student-payment-pill,
+.student-history-status,
+.student-booking-status,
+.student-card-context,
+.student-plan-label {
+  letter-spacing: .015em !important;
+}
+
+/* Títulos de componentes: uma única escala em todos os cards e páginas internas. */
+.student-card h2,
+.student-finance-card h2,
+.student-detail-heading h2,
+.student-detail-hero h2,
+.student-profile-summary h2,
+.student-booking-intro h2,
+.student-booking-section-title h3,
+.student-confirm-modal h3,
+.student-section-placeholder h2 {
+  font-family: var(--student-font-family) !important;
+  font-size: var(--student-type-title) !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  letter-spacing: -.025em !important;
+}
+
+.student-welcome h1,
+.student-section-page h1 {
+  font-family: var(--student-font-family) !important;
+  font-size: var(--student-type-page) !important;
+  font-weight: 740 !important;
+  line-height: 1.02 !important;
+  letter-spacing: -.045em !important;
+}
+
+/* Texto de leitura: mesma densidade e altura de linha. */
+.student-welcome p,
+.student-workout-details > p,
+.student-finance-card > p,
+.student-section-page-heading > div > p,
+.student-detail-hero p,
+.student-booking-intro p,
+.student-section-placeholder p,
+.student-detail-empty,
+.student-day-limit,
+.student-empty-state,
+.student-booking-item-copy > span,
+.student-waitlist-card p,
+.student-slot-card p {
+  font-family: var(--student-font-family) !important;
+  font-size: var(--student-type-body) !important;
+  font-weight: 400 !important;
+  line-height: 1.55 !important;
+  letter-spacing: 0 !important;
+}
+
+/* Textos de apoio, rótulos e metadados. */
+.student-user-copy small,
+.student-help small,
+.student-workout-type span,
+.student-frequency-body > div:last-child span,
+.student-evolution-metrics span,
+.student-evolution-message small,
+.student-evolution-empty small,
+.student-due-date,
+.student-detail-metrics article > span,
+.student-profile-fields > div > span,
+.student-history-row > div > span,
+.student-booking-item-copy small,
+.student-slot-row span,
+.student-welcome-meta > span {
+  font-family: var(--student-font-family) !important;
+  font-size: var(--student-type-small) !important;
+  font-weight: 500 !important;
+  line-height: 1.4 !important;
+  letter-spacing: 0 !important;
+}
+
+/* Valores principais: números e informações que precisam ser lidos primeiro. */
+.student-workout-time strong,
+.student-frequency-body > div:last-child > strong,
+.student-evolution-metrics strong,
+.student-challenge-count strong,
+.student-payment-amount,
+.student-detail-metrics article > strong {
+  font-family: var(--student-font-family) !important;
+  font-size: var(--student-type-value) !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  letter-spacing: -.02em !important;
+}
+
+.student-progress-ring strong,
+.student-challenge-count span {
+  font-family: var(--student-font-family) !important;
+  font-size: 12px !important;
+  font-weight: 750 !important;
+  line-height: 1.2 !important;
+}
+
+.student-info-strip strong,
+.student-evolution-message strong,
+.student-evolution-empty strong {
+  font-family: var(--student-font-family) !important;
+  font-size: 11px !important;
+  font-weight: 650 !important;
+  line-height: 1.4 !important;
+  letter-spacing: 0 !important;
+}
+
+/* Ações textuais: mesma voz, peso e legibilidade. */
+.student-primary-button,
+.student-secondary-button,
+.student-link-button,
+.student-signout-button,
+.student-cancel-button,
+.student-data-alert button,
+.student-date-tabs button,
+.student-waitlist-card button,
+.student-slot-card button,
+.student-confirm-modal button,
+.student-shortcuts button {
+  font-family: var(--student-font-family) !important;
+  font-size: var(--student-type-button) !important;
+  font-weight: 700 !important;
+  line-height: 1.2 !important;
+  letter-spacing: 0 !important;
+}
+
+.student-sidebar-nav button strong,
+.student-profile-button strong {
+  font-family: var(--student-font-family) !important;
+  font-size: var(--student-type-button) !important;
+  font-weight: 700 !important;
+  line-height: 1.25 !important;
+}
+
+.student-bottom-nav button small {
+  font-family: var(--student-font-family) !important;
+  font-size: 10px !important;
+  font-weight: 700 !important;
+  line-height: 1.15 !important;
+  letter-spacing: 0 !important;
+}
+
+/* =========================================================
+   MOBILE CLARO — REMOVE O DARK MODE FORÇADO DO CSS LEGADO
+========================================================= */
+
+@media (max-width: 700px) {
+  .student-app {
+    --student-type-page: clamp(30px, 9vw, 38px);
+    --student-type-title: 18px;
+    --student-type-value: 17px;
+    --student-type-body: 13px;
+    --student-type-button: 13px;
+    --student-type-small: 10px;
+    --student-type-tag: 9px;
+  }
+
+  .student-card h2,
+  .student-finance-card h2,
+  .student-detail-heading h2,
+  .student-detail-hero h2,
+  .student-profile-summary h2,
+  .student-booking-intro h2,
+  .student-booking-section-title h3,
+  .student-confirm-modal h3,
+  .student-section-placeholder h2 {
+    font-size: var(--student-type-title) !important;
+  }
+
+  .student-welcome h1,
+  .student-section-page h1 {
+    font-size: var(--student-type-page) !important;
+  }
+
+  .student-kicker,
+  .student-frequency-card .student-kicker,
+  .student-evolution-card .student-kicker,
+  .student-next-workout .student-kicker,
+  .student-status-badge,
+  .student-payment-pill,
+  .student-history-status,
+  .student-booking-status,
+  .student-card-context,
+  .student-plan-label {
+    font-size: var(--student-type-tag) !important;
+  }
+
+  .student-welcome p,
+  .student-workout-details > p,
+  .student-finance-card > p,
+  .student-section-page-heading > div > p,
+  .student-detail-hero p,
+  .student-booking-intro p,
+  .student-section-placeholder p,
+  .student-detail-empty,
+  .student-day-limit,
+  .student-empty-state,
+  .student-booking-item-copy > span,
+  .student-waitlist-card p,
+  .student-slot-card p {
+    font-size: var(--student-type-body) !important;
+  }
+
+  .student-user-copy small,
+  .student-help small,
+  .student-workout-type span,
+  .student-frequency-body > div:last-child span,
+  .student-evolution-metrics span,
+  .student-evolution-message small,
+  .student-evolution-empty small,
+  .student-due-date,
+  .student-detail-metrics article > span,
+  .student-profile-fields > div > span,
+  .student-history-row > div > span,
+  .student-booking-item-copy small,
+  .student-slot-row span,
+  .student-welcome-meta > span {
+    font-size: var(--student-type-small) !important;
+  }
+
+  .student-workout-time strong,
+  .student-frequency-body > div:last-child > strong,
+  .student-evolution-metrics strong,
+  .student-challenge-count strong,
+  .student-payment-amount,
+  .student-detail-metrics article > strong {
+    font-size: var(--student-type-value) !important;
+  }
+
+  .student-primary-button,
+  .student-secondary-button,
+  .student-link-button,
+  .student-signout-button,
+  .student-cancel-button,
+  .student-data-alert button,
+  .student-date-tabs button,
+  .student-waitlist-card button,
+  .student-slot-card button,
+  .student-confirm-modal button,
+  .student-shortcuts button {
+    font-size: var(--student-type-button) !important;
+  }
+
+  .student-info-strip strong,
+  .student-evolution-message strong,
+  .student-evolution-empty strong {
+    font-size: 10px !important;
+  }
+
+  .student-bottom-nav button small {
+    font-size: 10px !important;
+  }
+
+  .student-app:not(.student-theme-dark) {
+    --student-bg: #f4f7fb;
+    --student-card: #fff;
+    --student-text: #08162f;
+    --student-soft: #60708a;
+    --student-muted: #8290a5;
+    --student-border: rgba(8, 22, 47, .10);
+    --student-navy: #08162f;
+    color: var(--student-text) !important;
+    background:
+      radial-gradient(circle at 94% 2%, rgba(16, 38, 74, .07), transparent 26%),
+      radial-gradient(circle at 3% 1%, rgba(255, 32, 56, .055), transparent 24%),
+      #f4f7fb !important;
+  }
+
+  .student-app:not(.student-theme-dark) .student-header {
+    border-bottom-color: rgba(8, 22, 47, .07) !important;
+    background: rgba(248, 250, 253, .94) !important;
+    box-shadow: 0 8px 24px rgba(8, 22, 47, .055) !important;
+  }
+
+  .student-app:not(.student-theme-dark) .student-theme-toggle,
+  .student-app:not(.student-theme-dark) .student-notification-indicator {
+    color: #10264a !important;
+    border-color: rgba(8, 22, 47, .10) !important;
+    background: #fff !important;
+    box-shadow: 0 7px 18px rgba(8, 22, 47, .07) !important;
+  }
+
+  .student-app:not(.student-theme-dark) .student-avatar {
+    color: #fff !important;
+    background: linear-gradient(145deg, #173b69, #081f3c) !important;
+  }
+
+  .student-app:not(.student-theme-dark) .student-welcome {
+    border-bottom-color: rgba(8, 22, 47, .07) !important;
+    background:
+      radial-gradient(circle at 95% 24%, rgba(255, 32, 56, .09), transparent 32%),
+      linear-gradient(135deg, #fff, #f2f6fb) !important;
+  }
+
+  .student-app:not(.student-theme-dark) .student-welcome h1,
+  .student-app:not(.student-theme-dark) .student-card h2,
+  .student-app:not(.student-theme-dark) .student-card strong,
+  .student-app:not(.student-theme-dark) .student-progress-ring strong,
+  .student-app:not(.student-theme-dark) .student-evolution-metrics strong,
+  .student-app:not(.student-theme-dark) .student-challenge-count strong {
+    color: var(--student-text) !important;
+  }
+
+  .student-app:not(.student-theme-dark) .student-welcome h1 strong {
+    color: var(--student-red) !important;
+  }
+
+  .student-app:not(.student-theme-dark) .student-welcome p,
+  .student-app:not(.student-theme-dark) .student-workout-details > p,
+  .student-app:not(.student-theme-dark) .student-frequency-body > div:last-child span,
+  .student-app:not(.student-theme-dark) .student-evolution-metrics span,
+  .student-app:not(.student-theme-dark) .student-card-context,
+  .student-app:not(.student-theme-dark) .student-info-strip {
+    color: var(--student-soft) !important;
+  }
+
+  .student-app:not(.student-theme-dark) .student-card {
+    color: var(--student-text) !important;
+    border-color: rgba(8, 22, 47, .085) !important;
+    background: #fff !important;
+    box-shadow: 0 11px 28px rgba(8, 22, 47, .075) !important;
+  }
+
+  .student-app:not(.student-theme-dark) .student-next-workout {
+    background:
+      radial-gradient(circle at 96% 4%, rgba(255, 32, 56, .045), transparent 31%),
+      #fff !important;
+  }
+
+  .student-app:not(.student-theme-dark) .student-card-icon {
+    border-color: rgba(255, 32, 56, .08) !important;
+    background: rgba(255, 32, 56, .075) !important;
+  }
+
+  .student-app:not(.student-theme-dark) .student-status-badge:not(.confirmed) {
+    color: #9d2332 !important;
+    border-color: rgba(255, 32, 56, .14) !important;
+    background: rgba(255, 32, 56, .07) !important;
+  }
+
+  .student-app:not(.student-theme-dark) .student-progress-ring {
+    background: conic-gradient(var(--student-red) var(--progress), #e7edf5 0) !important;
+  }
+
+  .student-app:not(.student-theme-dark) .student-progress-ring::after {
+    background: #fff !important;
+  }
+
+  .student-app:not(.student-theme-dark) .student-progress-track {
+    background: #e7edf5 !important;
+  }
+
+  .student-app:not(.student-theme-dark) .student-evolution-empty {
+    color: #12794d !important;
+    border-color: rgba(40, 194, 123, .13) !important;
+    background: linear-gradient(100deg, rgba(40, 194, 123, .10), rgba(40, 194, 123, .035)) !important;
+  }
+
+  .student-app:not(.student-theme-dark) .student-evolution-empty small {
+    color: #4e806b !important;
+  }
+
+  .student-app:not(.student-theme-dark) .student-bottom-nav {
+    border-color: rgba(8, 22, 47, .10) !important;
+    background: rgba(255, 255, 255, .975) !important;
+    box-shadow: 0 18px 42px rgba(8, 22, 47, .16) !important;
+  }
+
+  .student-app:not(.student-theme-dark) .student-bottom-nav button {
+    color: #728097 !important;
+  }
+
+  .student-app:not(.student-theme-dark) .student-bottom-nav button.active {
+    color: var(--student-red) !important;
+    background: rgba(255, 32, 56, .065) !important;
+  }
+
+  .student-app:not(.student-theme-dark) .student-detail-card,
+  .student-app:not(.student-theme-dark) .student-detail-hero,
+  .student-app:not(.student-theme-dark) .student-profile-summary,
+  .student-app:not(.student-theme-dark) .student-booking-panel,
+  .student-app:not(.student-theme-dark) .student-detail-metrics article {
+    color: var(--student-text) !important;
+    border-color: rgba(8, 22, 47, .09) !important;
+    background: #fff !important;
+    box-shadow: 0 11px 28px rgba(8, 22, 47, .07) !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .student-app *,
   .student-app *::before,
