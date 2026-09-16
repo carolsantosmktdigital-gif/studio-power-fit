@@ -4,49 +4,27 @@
   .student-finance-card {
     grid-column: 2 / -1;
     grid-row: 2;
-
     width: 100%;
     min-width: 0;
     min-height: 220px;
-
     box-sizing: border-box;
-
-    /* margem interna segura */
-    padding: 24px 24px;
-
+    padding: 24px 28px;
     display: grid;
-
-    /*
-      1 = título
-      2 = texto
-      3 = status + botão
-
-      IMPORTANTE:
-      minmax(0, ...) permite que as colunas diminuam
-      sem empurrar os botões para fora do card.
-    */
     grid-template-columns:
-      minmax(0, 0.95fr)
-      minmax(0, 1.05fr)
-      minmax(0, 0.78fr);
-
-    gap: 8px;
-
+      minmax(0, 1.02fr)
+      minmax(0, 1.08fr)
+      minmax(0, .66fr);
+    gap: 10px;
     align-items: center;
-
     overflow: hidden;
   }
 
-
-  /* Remove pseudo-elementos antigos */
   .student-finance-card::before,
   .student-finance-card::after {
     content: none !important;
     display: none !important;
   }
 
-
-  /* Todos os filhos podem encolher corretamente */
   .student-finance-card > .student-title-with-icon,
   .student-finance-card > p,
   .student-finance-card > .student-finance-actions,
@@ -56,325 +34,163 @@
     box-sizing: border-box;
   }
 
-
-  /* =========================
-     COLUNA 1
-     TÍTULO
-     ========================= */
-
   .student-finance-card > .student-title-with-icon {
     grid-column: 1;
     grid-row: 1;
-
     display: flex;
     align-items: flex-start;
-
     gap: 8px;
-
-    /*
-      Pouco espaço à direita para aproximar
-      o texto central do título
-    */
     padding-right: 6px;
-
     border-right: 1px solid rgba(115, 139, 169, .16);
   }
 
-
-  .student-finance-card
-  > .student-title-with-icon
-  .student-card-icon {
-
+  .student-finance-card > .student-title-with-icon .student-card-icon {
     flex: 0 0 40px;
-
     width: 40px;
     height: 40px;
-
     border-radius: 12px;
   }
 
-
   .student-finance-card h2 {
     margin: 6px 0 0;
-
-    max-width: 135px;
-
+    max-width: 132px;
     font-size: 20px;
     line-height: 1.05;
-
     letter-spacing: -.025em;
   }
-
-
-  /* =========================
-     COLUNA 2
-     TEXTO
-     ========================= */
 
   .student-finance-card > p {
     grid-column: 2;
     grid-row: 1;
-
     margin: 0;
-
-    /*
-      Quase nenhum espaço lateral.
-      Isso aproxima o texto do título.
-    */
-    padding: 0 6px;
-
+    padding: 0 8px;
     color: var(--student-soft);
-
     font-size: 11.5px;
     line-height: 1.5;
-
     align-self: center;
-
     border-right: 1px solid rgba(115, 139, 169, .16);
-
     overflow-wrap: anywhere;
   }
-
-
-  /* =========================
-     COLUNA 3
-     STATUS + BOTÃO
-     ========================= */
 
   .student-finance-actions {
     grid-column: 3;
     grid-row: 1;
-
-    width: 100%;
+    width: min(100%, 150px);
     min-width: 0;
-
-    /*
-      Limita o tamanho sem empurrar
-      o conteúdo para fora do card
-    */
-    max-width: 165px;
-
-    justify-self: end;
-
+    max-width: 150px;
+    justify-self: center;
     display: flex;
     flex-direction: column;
-
     align-items: stretch;
     justify-content: center;
-
-    /*
-      aproxima Pendente e Ver pagamentos
-    */
     gap: 4px;
+    box-sizing: border-box;
   }
-
-
-  /* STATUS */
 
   .student-finance-actions .student-payment-pill {
     position: static !important;
-
     inset: auto !important;
     transform: none !important;
     float: none !important;
-
     width: 100% !important;
     max-width: 100% !important;
     min-width: 0 !important;
-
-    min-height: 32px !important;
-
+    min-height: 30px !important;
     margin: 0 !important;
-
-    padding: 6px 10px !important;
-
+    padding: 5px 8px !important;
     box-sizing: border-box !important;
-
     display: flex !important;
-
     align-items: center !important;
     justify-content: center !important;
-
     text-align: center !important;
-
-    white-space: normal !important;
-
+    white-space: nowrap !important;
     border-radius: 999px !important;
-
     overflow: hidden !important;
+    font-size: 9px !important;
   }
-
-
-  /* BOTÃO VER PAGAMENTOS */
 
   .student-finance-actions .student-secondary-button {
     position: static !important;
-
     inset: auto !important;
     transform: none !important;
     float: none !important;
-
     width: 100% !important;
     max-width: 100% !important;
     min-width: 0 !important;
-
-    min-height: 42px !important;
-
+    min-height: 38px !important;
     margin: 0 !important;
-
-    padding: 0 11px !important;
-
+    padding: 0 9px !important;
     box-sizing: border-box !important;
-
     display: flex !important;
-
     align-items: center !important;
     justify-content: space-between !important;
-
-    gap: 6px !important;
-
+    gap: 4px !important;
     white-space: nowrap !important;
-
-    border-radius: 12px !important;
-
+    border-radius: 10px !important;
     overflow: hidden !important;
+    font-size: 10px !important;
   }
 
-
-  .student-finance-actions
-  .student-secondary-button span {
-
+  .student-finance-actions .student-secondary-button span {
     flex: 0 0 auto;
+    margin-left: 4px;
   }
 }
 
 
-/* ========================================
-   NOTEBOOK
-   921px até 1180px
-   ======================================== */
-
+/* NOTEBOOK */
 @media (min-width: 921px) and (max-width: 1180px) {
 
   .student-finance-card {
-
-    /*
-      Aqui nenhuma coluna tem mínimo fixo.
-      Isso evita o vazamento pela direita.
-    */
     grid-template-columns:
-      minmax(0, 0.92fr)
-      minmax(0, 1fr)
-      minmax(0, 0.72fr);
-
-    gap: 5px;
-
-    /*
-      Mais proteção na margem direita
-    */
-    padding:
-      22px
-      26px
-      22px
-      18px;
+      minmax(0, 1.08fr)
+      minmax(0, 1.02fr)
+      minmax(0, .58fr);
+    gap: 6px;
+    padding: 22px 30px 22px 18px;
   }
 
-
-  /* TÍTULO */
-
-  .student-finance-card
-  > .student-title-with-icon {
-
+  .student-finance-card > .student-title-with-icon {
     gap: 7px;
-
     padding-right: 4px;
   }
 
-
-  .student-finance-card
-  > .student-title-with-icon
-  .student-card-icon {
-
+  .student-finance-card > .student-title-with-icon .student-card-icon {
     flex: 0 0 36px;
-
     width: 36px;
     height: 36px;
   }
 
-
   .student-finance-card h2 {
-
-    max-width: 105px;
-
+    max-width: 104px;
     font-size: 16px;
-
     line-height: 1.05;
   }
 
-
-  /* TEXTO CENTRAL */
-
   .student-finance-card > p {
-
-    padding:
-      0
-      4px;
-
+    padding: 0 6px;
     font-size: 10px;
-
     line-height: 1.4;
   }
 
-
-  /* AÇÕES */
-
   .student-finance-actions {
-
-    /*
-      140px ainda comporta:
-      Pendente
-      Ver pagamentos
-
-      sem ocupar espaço exagerado.
-    */
-    width: 100%;
-
-    max-width: 122px;
-
-    /*
-      continua alinhado à direita,
-      MAS dentro da própria coluna
-    */
-    justify-self: end;
-
+    width: min(100%, 108px);
+    max-width: 108px;
+    justify-self: start;
+    margin-left: 4px;
     gap: 3px;
   }
 
-
-  .student-finance-actions
-  .student-payment-pill {
-
-    min-height: 28px !important;
-
-    padding:
-      4px
-      7px !important;
-
-    font-size: 8.5px !important;
+  .student-finance-actions .student-payment-pill {
+    min-height: 27px !important;
+    padding: 4px 6px !important;
+    font-size: 8px !important;
   }
 
-
-  .student-finance-actions
-  .student-secondary-button {
-
-    min-height: 36px !important;
-
-    padding:
-      0
-      6px !important;
-
-    font-size: 9px !important;
-
-    gap: 3px !important;
+  .student-finance-actions .student-secondary-button {
+    min-height: 34px !important;
+    padding: 0 6px !important;
+    font-size: 8.5px !important;
+    gap: 2px !important;
   }
 }
