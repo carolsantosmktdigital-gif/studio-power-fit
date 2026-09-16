@@ -26,6 +26,13 @@ const currentMonthDate = (day) => {
   const now = new Date()
   return isoDate(new Date(now.getFullYear(), now.getMonth(), Math.min(day, now.getDate()), 12))
 }
+const monthDate = (monthOffset, day) => {
+  const now = new Date()
+  const date = new Date(now.getFullYear(), now.getMonth() + monthOffset, 1, 12)
+  const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()
+  date.setDate(Math.min(day, lastDay))
+  return isoDate(date)
+}
 
 const createAccount = async (supabase, person) => {
   const { data, error } = await supabase.functions.invoke('dynamic-function', {
@@ -96,12 +103,39 @@ export async function seedDemoData(supabase) {
     if (error) warnings.push(`aluno ${person.full_name}: ${error.message}`)
   }
 
-  const paymentRows = [
-    ['ana', 189.9, relativeDate(-5), 'IDENTIFICADO', relativeDate(-7)], ['bruno', 0, relativeDate(8), 'IDENTIFICADO', relativeDate(-2)],
-    ['camila', 0, relativeDate(10), 'IDENTIFICADO', relativeDate(-1)], ['diego', 189.9, relativeDate(-8), 'PENDENTE', null],
-    ['elisa', 189.9, relativeDate(-18), 'PENDENTE', null], ['felipe', 0, relativeDate(12), 'IDENTIFICADO', relativeDate(-3)],
-    ['gabriela', 0, relativeDate(14), 'IDENTIFICADO', relativeDate(-4)], ['hugo', 189.9, relativeDate(-25), 'CANCELADO', null],
-  ].map(([key, amount, due_date, status, payment_date]) => ({ student_id: studentByKey.get(key), amount, due_date, status, payment_date, payment_type: ['bruno', 'felipe'].includes(key) ? 'WELLHUB' : ['camila', 'gabriela'].includes(key) ? 'TOTALPASS' : 'MENSALIDADE' })).filter((row) => row.student_id)
+  const paymentAmount = { ana: 189.9, bruno: 154.8, camila: 139.5, diego: 189.9, elisa: 189.9, felipe: 154.8, gabriela: 139.5, hugo: 189.9 }
+  const paymentType = (key) => ['bruno', 'felipe'].includes(key) ? 'WELLHUB' : ['camila', 'gabriela'].includes(key) ? 'TOTALPASS' : 'MENSALIDADE'
+  const paymentRows = []
+  ;[-3, -2, -1].forEach((monthOffset) => {
+    studentPeople.forEach((person, index) => {
+      const dueDate = monthDate(monthOffset, 5 + (index % 4) * 5)
+      paymentRows.push({
+        student_id: studentByKey.get(person.key),
+        amount: paymentAmount[person.key],
+        due_date: dueDate,
+        status: person.key === 'hugo' && monthOffset === -1 ? 'CANCELADO' : 'IDENTIFICADO',
+        payment_date: person.key === 'hugo' && monthOffset === -1 ? null : monthDate(monthOffset, 6 + (index % 4) * 5),
+        payment_type: paymentType(person.key),
+      })
+    })
+  })
+  ;[
+    ['ana', relativeDate(-11), 'IDENTIFICADO', relativeDate(-10)],
+    ['bruno', relativeDate(-8), 'IDENTIFICADO', relativeDate(-7)],
+    ['camila', relativeDate(-5), 'IDENTIFICADO', relativeDate(-4)],
+    ['diego', relativeDate(-8), 'PENDENTE', null],
+    ['elisa', relativeDate(-18), 'PENDENTE', null],
+    ['felipe', relativeDate(4), 'PENDENTE', null],
+    ['gabriela', relativeDate(6), 'PENDENTE', null],
+    ['hugo', relativeDate(-25), 'CANCELADO', null],
+  ].forEach(([key, due_date, status, payment_date]) => paymentRows.push({
+    student_id: studentByKey.get(key),
+    amount: paymentAmount[key],
+    due_date,
+    status,
+    payment_date,
+    payment_type: paymentType(key),
+  }))
 
   const assessmentRows = [
     ['ana', -110, 72.8], ['ana', -55, 70.6], ['ana', -3, 68.9], ['bruno', -95, 91.2], ['bruno', -12, 88.7],
@@ -110,13 +144,23 @@ export async function seedDemoData(supabase) {
   ].map(([key, days, weight_kg]) => ({ student_id: studentByKey.get(key), assessment_date: relativeDate(days), weight_kg })).filter((row) => row.student_id)
 
   const attendanceRows = []
-  const attendancePlan = { ana: 10, bruno: 8, camila: 12, diego: 5, felipe: 7, gabriela: 11 }
-  Object.entries(attendancePlan).forEach(([key, count]) => {
-    for (let index = 0; index < count; index += 1) attendanceRows.push({ student_id: studentByKey.get(key), attendance_date: currentMonthDate(Math.max(1, new Date().getDate() - index)), status: 'PRESENTE' })
+  const attendancePlan = {
+    ana: { present: 10, absent: 1 }, bruno: { present: 8, absent: 1 }, camila: { present: 12, absent: 0 },
+    diego: { present: 6, absent: 2 }, elisa: { present: 3, absent: 2 }, felipe: { present: 7, absent: 1 },
+    gabriela: { present: 11, absent: 1 }, hugo: { present: 1, absent: 3 },
+  }
+  Object.entries(attendancePlan).forEach(([key, totals]) => {
+    const statuses = [...Array(totals.present).fill('PRESENTE'), ...Array(totals.absent).fill('AUSENTE')]
+    statuses.forEach((status, index) => attendanceRows.push({
+      student_id: studentByKey.get(key),
+      attendance_date: currentMonthDate(Math.max(1, new Date().getDate() - index)),
+      status,
+    }))
   })
 
   const appointmentRows = [
-    ['ana', 0, '07:00:00'], ['bruno', 0, '08:00:00'], ['camila', 0, '09:00:00'], ['diego', 0, '18:00:00'],
+    ['ana', 0, '07:00:00'], ['bruno', 0, '07:00:00'], ['camila', 0, '07:00:00'], ['diego', 0, '07:00:00'],
+    ['elisa', 0, '12:00:00'], ['felipe', 0, '18:00:00'], ['gabriela', 0, '18:00:00'], ['hugo', 0, '18:00:00'],
     ['felipe', 1, '07:00:00'], ['gabriela', 1, '19:00:00'], ['ana', 2, '08:00:00'], ['camila', 2, '18:00:00'],
   ].map(([key, days, start_time]) => ({ student_id: studentByKey.get(key), appointment_date: relativeDate(days), start_time, status: 'CONFIRMADO' })).filter((row) => row.student_id)
 

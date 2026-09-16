@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 import { seedDemoData } from '../lib/demoSeed'
 import studioLogo from '../assets/studio-power-fit-logo.png'
 import './DemoSeed.css'
+import './ExecutiveDashboard.css'
 
 const emptyForm = { full_name: '', email: '', phone: '', notification_phone: '', password: '', role: 'ALUNO', position: '', hire_date: '', cpf: '', birth_date: '', address_zip_code: '', address_street: '', address_number: '', address_complement: '', address_district: '', address_city: '', address_state: '', employment_type: '', notes: '', payment_plan: 'MENSALISTA' }
 
@@ -10,6 +11,20 @@ const onlyDigits = (value) => String(value || '').replace(/\D/g, '')
 const formatCpf = (value) => onlyDigits(value).slice(0, 11).replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2')
 const formatPhone = (value) => onlyDigits(value).slice(0, 11).replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d{1,4})$/, '$1-$2')
 const formatCep = (value) => onlyDigits(value).slice(0, 8).replace(/(\d{5})(\d)/, '$1-$2')
+const formatCurrency = (value) => Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
+const formatPercent = (value) => `${Math.round(Number(value || 0))}%`
+
+const getPaymentPresentation = (payment) => {
+  const today = new Date().toISOString().slice(0, 10)
+  const sevenDaysFromNow = new Date()
+  sevenDaysFromNow.setDate(sevenDaysFromNow.getDate() + 7)
+  const soonLimit = sevenDaysFromNow.toISOString().slice(0, 10)
+  if (payment.status === 'IDENTIFICADO') return { label: 'Pago', tone: 'is-paid', priority: 3 }
+  if (payment.status === 'CANCELADO') return { label: 'Cancelado', tone: 'is-cancelled', priority: 4 }
+  if (payment.due_date < today) return { label: 'Vencido', tone: 'is-overdue', priority: 0 }
+  if (payment.due_date <= soonLimit) return { label: 'A vencer', tone: 'is-due-soon', priority: 1 }
+  return { label: 'Pendente', tone: 'is-pending', priority: 2 }
+}
 
 function AppShell({ profile, onLogout }) {
   const [darkMode, setDarkMode] = useState(true)
@@ -19,7 +34,27 @@ function AppShell({ profile, onLogout }) {
   const [auditLogs, setAuditLogs] = useState([])
   const [appointments, setAppointments] = useState([])
   const [payments, setPayments] = useState([])
-  const [health, setHealth] = useState({ activeStudents: 0, inactiveStudents: 0, activeEmployees: 0, revenue: 0, overdue: 0, todayAppointments: 0 })
+  const [health, setHealth] = useState({
+    activeStudents: 0,
+    inactiveStudents: 0,
+    activeEmployees: 0,
+    revenue: 0,
+    expectedRevenue: 0,
+    collectionRate: 0,
+    overdue: 0,
+    overdueAmount: 0,
+    dueSoon: 0,
+    dueSoonAmount: 0,
+    todayAppointments: 0,
+    activeTeachers: 0,
+    slotCapacity: 0,
+    peakBooked: 0,
+    occupancyRate: 0,
+    attendancePresent: 0,
+    attendanceAbsent: 0,
+    attendanceRate: 0,
+    planCounts: { MENSALISTA: 0, WELLHUB: 0, TOTALPASS: 0 },
+  })
   const [receptionPanel, setReceptionPanel] = useState({ appointments: [], present: 0, absent: 0, activeTeachers: 0, overdue: 0, waitlist: 0, birthdays: [] })
   const [notice, setNotice] = useState('')
   const [seedingDemo, setSeedingDemo] = useState(false)
@@ -60,16 +95,68 @@ function AppShell({ profile, onLogout }) {
   const loadHealth = async () => {
     const today = new Date().toISOString().slice(0, 10)
     const monthStart = `${today.slice(0, 7)}-01`
-    const [active, inactive, staff, payments, appointments] = await Promise.all([
-      supabase.from('students').select('*', { count: 'exact', head: true }).eq('status', 'ATIVO'),
-      supabase.from('students').select('*', { count: 'exact', head: true }).neq('status', 'ATIVO'),
+    const nextMonth = new Date(`${monthStart}T12:00:00`)
+    nextMonth.setMonth(nextMonth.getMonth() + 1)
+    const monthEnd = nextMonth.toISOString().slice(0, 10)
+    const dueSoonDate = new Date()
+    dueSoonDate.setDate(dueSoonDate.getDate() + 7)
+    const dueSoonLimit = dueSoonDate.toISOString().slice(0, 10)
+    const [studentResult, staff, paymentResult, appointmentResult, teacherResult, attendanceResult] = await Promise.all([
+      supabase.from('students').select('status, payment_plan'),
       supabase.from('employees').select('*', { count: 'exact', head: true }).eq('status', 'ATIVO'),
-      supabase.from('payments').select('amount, status, due_date, payment_date').gte('due_date', monthStart),
-      supabase.from('appointments').select('*', { count: 'exact', head: true }).eq('appointment_date', today).eq('status', 'CONFIRMADO'),
+      supabase.from('payments').select('amount, status, due_date, payment_date, payment_type'),
+      supabase.from('appointments').select('start_time, status').eq('appointment_date', today).eq('status', 'CONFIRMADO'),
+      supabase.from('teachers').select('*', { count: 'exact', head: true }).eq('status', 'ATIVO'),
+      supabase.from('attendance').select('status, attendance_date').gte('attendance_date', monthStart).lt('attendance_date', monthEnd),
     ])
-    const paid = (payments.data ?? []).filter((item) => item.status === 'IDENTIFICADO').reduce((sum, item) => sum + Number(item.amount || 0), 0)
-    const overdue = (payments.data ?? []).filter((item) => !['IDENTIFICADO', 'CANCELADO'].includes(item.status) && item.due_date < today).length
-    setHealth({ activeStudents: active.count ?? 0, inactiveStudents: inactive.count ?? 0, activeEmployees: staff.count ?? 0, revenue: paid, overdue, todayAppointments: appointments.count ?? 0 })
+    const studentRows = studentResult.data ?? []
+    const activeRows = studentRows.filter((item) => item.status === 'ATIVO')
+    const paymentRows = paymentResult.data ?? []
+    const currentPayments = paymentRows.filter((item) => item.due_date >= monthStart && item.due_date < monthEnd && item.status !== 'CANCELADO')
+    const paidRows = currentPayments.filter((item) => item.status === 'IDENTIFICADO')
+    const overdueRows = paymentRows.filter((item) => !['IDENTIFICADO', 'CANCELADO'].includes(item.status) && item.due_date < today)
+    const dueSoonRows = paymentRows.filter((item) => !['IDENTIFICADO', 'CANCELADO'].includes(item.status) && item.due_date >= today && item.due_date <= dueSoonLimit)
+    const attendanceRows = attendanceResult.data ?? []
+    const attendancePresent = attendanceRows.filter((item) => item.status === 'PRESENTE').length
+    const attendanceAbsent = attendanceRows.filter((item) => item.status === 'AUSENTE').length
+    const attendanceTotal = attendancePresent + attendanceAbsent
+    const appointmentRows = appointmentResult.data ?? []
+    const appointmentsByTime = appointmentRows.reduce((groups, item) => {
+      const time = String(item.start_time).slice(0, 5)
+      groups[time] = (groups[time] || 0) + 1
+      return groups
+    }, {})
+    const activeTeachers = teacherResult.count ?? 0
+    const slotCapacity = activeTeachers * 4
+    const peakBooked = Math.max(0, ...Object.values(appointmentsByTime))
+    const planCounts = activeRows.reduce((counts, item) => {
+      const plan = item.payment_plan || 'MENSALISTA'
+      counts[plan] = (counts[plan] || 0) + 1
+      return counts
+    }, { MENSALISTA: 0, WELLHUB: 0, TOTALPASS: 0 })
+    const revenue = paidRows.reduce((sum, item) => sum + Number(item.amount || 0), 0)
+    const expectedRevenue = currentPayments.reduce((sum, item) => sum + Number(item.amount || 0), 0)
+    setHealth({
+      activeStudents: activeRows.length,
+      inactiveStudents: studentRows.length - activeRows.length,
+      activeEmployees: staff.count ?? 0,
+      revenue,
+      expectedRevenue,
+      collectionRate: expectedRevenue ? (revenue / expectedRevenue) * 100 : 0,
+      overdue: overdueRows.length,
+      overdueAmount: overdueRows.reduce((sum, item) => sum + Number(item.amount || 0), 0),
+      dueSoon: dueSoonRows.length,
+      dueSoonAmount: dueSoonRows.reduce((sum, item) => sum + Number(item.amount || 0), 0),
+      todayAppointments: appointmentRows.length,
+      activeTeachers,
+      slotCapacity,
+      peakBooked,
+      occupancyRate: slotCapacity ? (peakBooked / slotCapacity) * 100 : 0,
+      attendancePresent,
+      attendanceAbsent,
+      attendanceRate: attendanceTotal ? (attendancePresent / attendanceTotal) * 100 : 0,
+      planCounts,
+    })
   }
 
   const loadAgenda = async () => {
@@ -92,7 +179,10 @@ function AppShell({ profile, onLogout }) {
     const { data: people } = profileIds.length ? await supabase.from('profiles').select('id, full_name').in('id', profileIds) : { data: [] }
     const profilesById = new Map((people ?? []).map((item) => [item.id, item]))
     const studentById = new Map((studentsData ?? []).map((item) => [item.id, profilesById.get(item.profile_id)]))
-    setPayments((data ?? []).map((item) => ({ ...item, student: studentById.get(item.student_id) })))
+    setPayments((data ?? []).map((item) => ({ ...item, student: studentById.get(item.student_id) })).sort((a, b) => {
+      const presentationDiff = getPaymentPresentation(a).priority - getPaymentPresentation(b).priority
+      return presentationDiff || String(a.due_date).localeCompare(String(b.due_date))
+    }))
   }
 
   const loadReceptionPanel = async () => {
@@ -246,6 +336,8 @@ function AppShell({ profile, onLogout }) {
   const title = page === 'Início' ? 'Visão geral' : page
   const rows = page === 'Alunos' ? students : employees
   const receptionSlots = Object.values(receptionPanel.appointments.reduce((groups, item) => { const key = String(item.start_time).slice(0, 5); groups[key] = [...(groups[key] || []), item]; return groups }, {}))
+  const activePlanTotal = Object.values(health.planCounts).reduce((total, amount) => total + amount, 0)
+  const planShare = (plan) => activePlanTotal ? (health.planCounts[plan] / activePlanTotal) * 100 : 0
 
   return <div className={`app-shell dashboard-shell ${darkMode ? 'theme-dark' : 'theme-light'} ${isAdmin ? 'is-admin' : 'is-reception'}`}>
     <aside className="app-sidebar"><div className="sidebar-brand sidebar-brand-logo"><img src={studioLogo} alt="Studio Power Fit" /></div><div className="sidebar-section-title">{isAdmin ? 'GESTÃO' : 'ATENDIMENTO'}</div><nav className="sidebar-menu">{navItems.map((item) => <button key={item} className={`sidebar-item ${page === navigationPage(item) ? 'active' : ''}`} onClick={() => setPage(navigationPage(item))} type="button"><span className="sidebar-icon">{item === 'Alunos' ? '◉' : item === 'Professores' || item === 'Funcionários' ? '♟' : item === 'Auditoria' || item === 'Relatórios' ? '◷' : item === 'Financeiro' ? '▣' : item === 'Lista de espera' ? '◌' : item === 'Comunicação' ? '✉' : '⌂'}</span><span>{item}</span></button>)}</nav><div className="sidebar-bottom"><button className="sidebar-item" onClick={onLogout} type="button"><span className="sidebar-icon">⇥</span><span>Sair da conta</span></button></div></aside>
@@ -254,8 +346,8 @@ function AppShell({ profile, onLogout }) {
       {isAdmin && page === 'Início' && notice && <div className="dashboard-notice demo-seed-notice">{notice}</div>}
       {!isAdmin && page === 'Início' && <section className="reception-dashboard"><div className="reception-welcome"><div><span className="placeholder-kicker">OPERAÇÃO DO DIA</span><h2>Bom trabalho,<br />Recepção.</h2><p>{new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}</p></div><button className="outline-action" onClick={loadReceptionPanel} type="button">Atualizar painel</button></div><div className="reception-stats"><article><small>AGENDADOS HOJE</small><strong>{receptionPanel.appointments.length}</strong><button onClick={() => setPage('Agenda')} type="button">Ver agenda</button></article><article><small>PRESENÇAS</small><strong>{receptionPanel.present}</strong><span>{receptionPanel.absent} falta(s)</span></article><article><small>PROFESSORES ATIVOS</small><strong>{receptionPanel.activeTeachers}</strong><span>em operação</span></article><article><small>INADIMPLENTES</small><strong>{receptionPanel.overdue}</strong><button onClick={() => setPage('Pagamentos')} type="button">Ver pagamentos</button></article><article><small>LISTA DE ESPERA</small><strong>{receptionPanel.waitlist}</strong><span>aguardando vaga</span></article></div><div className="reception-grid"><section className="reception-card"><div className="panel-heading"><div><span className="placeholder-kicker">PRÓXIMOS HORÁRIOS</span><h3>Agenda de hoje</h3></div><button className="outline-action" onClick={() => setPage('Agenda')} type="button">Abrir</button></div>{receptionSlots.length ? receptionSlots.slice(0, 5).map((slot) => <div className="slot-row" key={slot[0].start_time}><strong>{String(slot[0].start_time).slice(0, 5)}</strong><span>{slot.length} aluno(s) confirmado(s)</span><b>{slot.length >= 8 ? 'LOTADO' : 'COM VAGAS'}</b></div>) : <p>Nenhum horário confirmado para hoje.</p>}</section><section className="reception-card"><span className="placeholder-kicker">ALERTAS</span><h3>Atenção agora</h3><div className="reception-alert"><b>💳 Pagamentos pendentes</b><span>{receptionPanel.overdue} aluno(s) precisam de acompanhamento.</span><button onClick={() => setPage('Pagamentos')} type="button">Ver</button></div><div className="reception-alert"><b>📋 Lista de espera</b><span>{receptionPanel.waitlist} aluno(s) aguardando vaga.</span><button onClick={() => setPage('Agenda')} type="button">Ver</button></div></section><section className="reception-card birthdays"><span className="placeholder-kicker">ANIVERSARIANTES</span><h3>Hoje</h3>{receptionPanel.birthdays.length ? receptionPanel.birthdays.map((person) => <div className="birthday-row" key={person.full_name}><span>🎂</span><div><b>{person.full_name}</b><small>{person.notification_phone || person.phone || 'Sem telefone'}</small></div></div>) : <p>Nenhum aniversariante hoje.</p>}</section></div></section>}
       {page === 'Agenda' && <section className="students-page live-data-page"><div className="panel-heading"><div><span className="placeholder-kicker">PRÓXIMOS ATENDIMENTOS</span><h2>Agenda</h2></div><button className="outline-action" onClick={loadAgenda} type="button">Atualizar</button></div><div className="students-table-wrap"><table className="students-table"><thead><tr><th>Aluno</th><th>Data</th><th>Horário</th><th>Status</th></tr></thead><tbody>{appointments.length ? appointments.map((item) => <tr key={item.id}><td>{item.student?.full_name || 'Aluno'}</td><td>{new Date(`${item.appointment_date}T12:00:00`).toLocaleDateString('pt-BR')}</td><td>{String(item.start_time).slice(0, 5)}</td><td><span className="status-pill is-active">{item.status}</span></td></tr>) : <tr><td colSpan="4">Não há atendimentos futuros cadastrados.</td></tr>}</tbody></table></div></section>}
-      {page === 'Pagamentos' && <section className="students-page live-data-page"><div className="panel-heading"><div><span className="placeholder-kicker">CONTROLE FINANCEIRO</span><h2>Pagamentos</h2></div><button className="outline-action" onClick={loadPayments} type="button">Atualizar</button></div><div className="students-table-wrap"><table className="students-table"><thead><tr><th>Aluno</th><th>Vencimento</th><th>Valor</th><th>Status</th></tr></thead><tbody>{payments.length ? payments.map((item) => <tr key={item.id}><td>{item.student?.full_name || 'Aluno'}</td><td>{new Date(`${item.due_date}T12:00:00`).toLocaleDateString('pt-BR')}</td><td>{Number(item.amount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td><td><span className={`status-pill ${item.status === 'IDENTIFICADO' ? 'is-active' : ''}`}>{item.status.replaceAll('_', ' ')}</span></td></tr>) : <tr><td colSpan="4">Nenhum pagamento registrado.</td></tr>}</tbody></table></div></section>}
-      {page === 'Início' && <section className="dashboard-executive"><div className="executive-hero"><div><span className="placeholder-kicker">VISÃO EXECUTIVA</span><h2>Saúde do Studio<br />em tempo real.</h2><p>Acompanhe os indicadores que importam para a operação.</p></div><button className="outline-action" onClick={loadHealth} type="button">Atualizar indicadores</button></div><div className="metric-grid executive-metrics"><article className="metric-card accent-card"><small>ALUNOS ATIVOS</small><strong>{health.activeStudents}</strong><span>{health.inactiveStudents} inativos ou suspensos</span></article><article className="metric-card"><small>RECEITA DO MÊS</small><strong>{health.revenue.toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</strong><span>Pagamentos identificados</span></article><article className="metric-card"><small>INADIMPLÊNCIA</small><strong>{health.overdue}</strong><span>Pagamentos em atraso</span></article><article className="metric-card"><small>AGENDA DE HOJE</small><strong>{health.todayAppointments}</strong><span>Atendimentos confirmados</span></article><article className="metric-card"><small>EQUIPE ATIVA</small><strong>{health.activeEmployees}</strong><span>Funcionários em operação</span></article></div><div className="executive-alerts"><div><span className="placeholder-kicker">ATENÇÃO DO DIA</span><h3>{health.overdue ? `${health.overdue} pagamento(s) precisam de acompanhamento.` : 'Nenhum pagamento em atraso hoje.'}</h3></div><button className="dashboard-primary-action" onClick={() => setPage('Auditoria')} type="button">Abrir auditoria</button></div></section>}
+      {page === 'Pagamentos' && <section className="students-page live-data-page finance-page"><div className="panel-heading"><div><span className="placeholder-kicker">CONTROLE FINANCEIRO</span><h2>Pagamentos</h2></div><button className="outline-action" onClick={() => { loadPayments(); loadHealth() }} type="button">Atualizar</button></div><div className="finance-summary"><article><small>RECEBIDO NO MÊS</small><strong>{formatCurrency(health.revenue)}</strong><span>{formatPercent(health.collectionRate)} do previsto</span></article><article className="finance-due"><small>A VENCER EM 7 DIAS</small><strong>{formatCurrency(health.dueSoonAmount)}</strong><span>{health.dueSoon} cobrança(s)</span></article><article className="finance-overdue"><small>TOTAL VENCIDO</small><strong>{formatCurrency(health.overdueAmount)}</strong><span>{health.overdue} cobrança(s)</span></article></div><div className="students-table-wrap"><table className="students-table"><thead><tr><th>Aluno</th><th>Origem</th><th>Vencimento</th><th>Valor</th><th>Status</th></tr></thead><tbody>{payments.length ? payments.map((item) => { const paymentState = getPaymentPresentation(item); return <tr key={item.id}><td>{item.student?.full_name || 'Aluno'}</td><td>{item.payment_type === 'MENSALIDADE' ? 'Mensalista' : item.payment_type}</td><td>{new Date(`${item.due_date}T12:00:00`).toLocaleDateString('pt-BR')}</td><td>{formatCurrency(item.amount)}</td><td><span className={`status-pill ${paymentState.tone}`}>{paymentState.label}</span></td></tr> }) : <tr><td colSpan="5">Nenhum pagamento registrado.</td></tr>}</tbody></table></div></section>}
+      {page === 'Início' && <section className="dashboard-executive"><div className="executive-hero"><div><span className="placeholder-kicker">VISÃO EXECUTIVA</span><h2>Studio sob controle.</h2><p>Indicadores financeiros, comerciais e operacionais em uma única visão.</p></div><div className="executive-hero-actions"><span>{new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}</span><button className="outline-action" onClick={() => { loadHealth(); loadPayments() }} type="button">Atualizar indicadores</button></div></div><div className="executive-kpi-grid"><article className="executive-kpi is-revenue"><div><small>RECEBIDO NO MÊS</small><strong>{formatCurrency(health.revenue)}</strong><span>de {formatCurrency(health.expectedRevenue)} previstos</span></div><b>{formatPercent(health.collectionRate)}</b></article><article className="executive-kpi is-upcoming"><div><small>PAGAMENTOS A VENCER</small><strong>{formatCurrency(health.dueSoonAmount)}</strong><span>{health.dueSoon} cobrança(s) nos próximos 7 dias</span></div><b>{health.dueSoon}</b></article><article className="executive-kpi is-overdue"><div><small>PAGAMENTOS VENCIDOS</small><strong>{formatCurrency(health.overdueAmount)}</strong><span>{health.overdue} cobrança(s) exigem atenção</span></div><b>{health.overdue}</b></article><article className="executive-kpi is-frequency"><div><small>FREQUÊNCIA DO MÊS</small><strong>{formatPercent(health.attendanceRate)}</strong><span>{health.attendancePresent} presenças · {health.attendanceAbsent} faltas</span></div><b>{health.attendancePresent}</b></article></div><div className="executive-dashboard-grid"><section className="executive-panel plan-panel"><div className="executive-panel-heading"><div><span className="placeholder-kicker">BASE DE ALUNOS</span><h3>Distribuição por plano</h3></div><strong>{health.activeStudents}<small> ativos</small></strong></div><div className="plan-breakdown">{[['MENSALISTA', 'Mensalistas'], ['WELLHUB', 'Wellhub'], ['TOTALPASS', 'TotalPass']].map(([plan, label]) => <article key={plan}><div><span>{label}</span><strong>{health.planCounts[plan]}</strong></div><div className="progress-track"><i style={{ width: `${planShare(plan)}%` }} /></div><small>{formatPercent(planShare(plan))} da base ativa</small></article>)}</div><div className="student-status-line"><span><i className="status-dot is-active" />{health.activeStudents} ativos</span><span><i className="status-dot" />{health.inactiveStudents} inativos ou suspensos</span></div></section><section className="executive-panel capacity-panel"><div className="executive-panel-heading"><div><span className="placeholder-kicker">CAPACIDADE DA ACADEMIA</span><h3>Pico de ocupação hoje</h3></div><strong>{formatPercent(health.occupancyRate)}</strong></div><div className="capacity-visual" style={{ '--capacity-progress': `${health.occupancyRate * 3.6}deg` }}><div><strong>{health.peakBooked}</strong><span>de {health.slotCapacity}</span></div></div><div className="capacity-details"><span><b>{health.activeTeachers}</b> professores ativos</span><span><b>{health.todayAppointments}</b> treinos agendados</span><span><b>4</b> alunos por professor</span></div></section><section className="executive-panel movement-panel"><div className="executive-panel-heading"><div><span className="placeholder-kicker">MOVIMENTO DO MÊS</span><h3>Frequência dos alunos</h3></div><strong>{formatPercent(health.attendanceRate)}</strong></div><div className="attendance-bar"><i style={{ width: `${health.attendanceRate}%` }} /></div><div className="attendance-legend"><span><i className="status-dot is-present" />{health.attendancePresent} presenças</span><span><i className="status-dot is-absent" />{health.attendanceAbsent} faltas</span></div><p>{health.attendanceRate >= 85 ? 'Frequência saudável: a maioria dos alunos mantém regularidade.' : 'Atenção: há oportunidade de reativar alunos com baixa frequência.'}</p></section><section className="executive-panel attention-panel"><span className="placeholder-kicker">ATENÇÃO DA GESTÃO</span><h3>{health.overdue ? `${health.overdue} pagamento(s) vencido(s)` : 'Financeiro em dia'}</h3><p>{health.overdue ? `${formatCurrency(health.overdueAmount)} aguardando regularização. Priorize o contato com esses alunos.` : 'Não há cobranças vencidas neste momento.'}</p><button className="dashboard-primary-action" onClick={() => setPage('Pagamentos')} type="button">Ver financeiro</button></section></div></section>}
       {page === 'Auditoria' && <section className="students-page audit-page"><div className="panel-heading"><div><span className="placeholder-kicker">CONTROLE DO GESTOR</span><h2>Auditoria</h2></div><button className="outline-action" onClick={loadAudit} type="button">Atualizar</button></div><p className="audit-description">Ações realizadas por recepção e professores.</p><div className="students-table-wrap"><table className="students-table"><thead><tr><th>Responsável</th><th>Perfil</th><th>Ação</th><th>Módulo</th><th>Quando</th></tr></thead><tbody>{auditLogs.length === 0 ? <tr><td colSpan="5">Ainda não há ações registradas desses perfis.</td></tr> : auditLogs.map((item) => <tr key={item.id}><td>{item.person?.full_name || 'Usuário removido'}</td><td>{item.person?.role === 'RECEPCAO' ? 'Recepção' : 'Professor'}</td><td>{item.action}</td><td>{item.module}</td><td>{new Date(item.created_at).toLocaleString('pt-BR')}</td></tr>)}</tbody></table></div></section>}
       {page === 'Início' ? <section className="dashboard-hero"><div><span className="placeholder-kicker">PAINEL ADMINISTRATIVO</span><h2>Controle o Studio<br/>em um só lugar.</h2><p>{students.length} alunos e {employees.length} funcionários na demonstração.</p></div></section> : ['Alunos','Funcionários'].includes(page) ? <section className="students-page"><div className="panel-heading"><div><span className="placeholder-kicker">{page === 'Alunos' ? 'CADASTRO E ACOMPANHAMENTO' : 'EQUIPE E ACESSOS'}</span><h2>{page}</h2></div><button className="dashboard-primary-action" onClick={() => openForm(page === 'Alunos' ? 'ALUNO' : 'RECEPCAO')} type="button">+ Novo {page === 'Alunos' ? 'aluno' : 'funcionário'}</button></div>{notice && <div className="dashboard-notice">{notice}</div>}<div className="students-table-wrap"><table className="students-table"><thead><tr><th>{page === 'Alunos' ? 'Aluno' : 'Funcionário'}</th><th>{page === 'Alunos' ? 'Status' : 'Cargo'}</th><th>{page === 'Alunos' ? 'Contato' : 'Perfil'}</th><th>Ações</th></tr></thead><tbody>{rows.length === 0 ? <tr><td colSpan="4">Ainda não há registros.</td></tr> : rows.map((item) => <tr key={item.id}><td><strong>{item.profile?.full_name}</strong><span>{item.profile?.email}</span></td><td>{page === 'Alunos' ? <span className={`status-pill ${item.status === 'ATIVO' ? 'is-active' : ''}`}>{item.status}</span> : item.position}</td><td>{page === 'Alunos' ? item.profile?.phone || 'Não informado' : item.profile?.role}</td><td><button className="outline-action" onClick={() => page === 'Alunos' ? setEditingStudent(item) : setEditingEmployee({ ...item, profile: { ...item.profile } })} type="button">Editar</button></td></tr>)}</tbody></table></div></section> : <section className={`page-placeholder ${page === 'Auditoria' ? 'audit-placeholder' : ''}`}><span className="placeholder-kicker">EM CONSTRUÇÃO</span><h2>{page}</h2></section>}
     </main></div>
