@@ -1,0 +1,204 @@
+/* Refinamento visual final da área do aluno: tipografia e iconografia consistentes */
+.student-app {
+  font-family: "Segoe UI Variable", "Segoe UI", Inter, Roboto, Helvetica, Arial, sans-serif;
+  font-size: 14px;
+  line-height: 1.45;
+  letter-spacing: 0;
+  text-align: left;
+  font-feature-settings: "kern" 1, "liga" 1;
+}
+
+.student-app h1,
+.student-app h2,
+.student-app h3,
+.student-app strong,
+.student-app button {
+  font-family: inherit;
+}
+
+.student-welcome h1,
+.student-section-page h1 {
+  font-weight: 720;
+  letter-spacing: -.042em;
+  line-height: 1.02;
+}
+
+.student-card h2,
+.student-detail-heading h2,
+.student-booking-intro h2,
+.student-profile-summary h2 {
+  font-weight: 680;
+  letter-spacing: -.025em;
+}
+
+.student-kicker {
+  font-size: 10px;
+  font-weight: 760;
+  letter-spacing: .105em;
+}
+
+.student-sidebar-nav button strong,
+.student-primary-button,
+.student-secondary-button,
+.student-link-button,
+.student-signout-button {
+  font-weight: 650;
+}
+
+.student-welcome p,
+.student-section-page-heading > div > p {
+  letter-spacing: -.006em;
+}
+
+.student-card {
+  border-radius: 18px;
+}
+
+/* Ícones vetoriais monocromáticos. Os caracteres antigos ficam apenas como fallback semântico. */
+.student-sidebar-nav button > span,
+.student-card-icon,
+.student-bottom-nav button > span,
+.student-workout-time > span,
+.student-info-strip > span,
+.student-evolution-message > span,
+.student-notification-indicator > span {
+  position: relative;
+  color: transparent !important;
+  font-size: 0 !important;
+}
+
+.student-sidebar-nav button > span::before,
+.student-card-icon::before,
+.student-bottom-nav button > span::before,
+.student-workout-time > span::before,
+.student-info-strip > span::before,
+.student-evolution-message > span::before,
+.student-notification-indicator > span::before {
+  content: '';
+  display: block;
+  width: 20px;
+  height: 20px;
+  background-color: currentColor;
+  color: var(--student-navy);
+  -webkit-mask-repeat: no-repeat;
+  -webkit-mask-position: center;
+  -webkit-mask-size: contain;
+  mask-repeat: no-repeat;
+  mask-position: center;
+  mask-size: contain;
+}
+
+.student-sidebar-nav button.active > span::before,
+.student-card-icon::before,
+.student-info-strip > span::before {
+  color: var(--student-red);
+}
+
+/* home */
+.student-sidebar-nav button:nth-child(1) > span::before,
+.student-bottom-nav button:nth-child(1) > span::before {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M12 3.2 3.5 10v10.2h6v-6h5v6h6V10L12 3.2Zm6.5 15h-2v-6h-9v6h-2v-7.24L12 5.76l6.5 5.2v7.24Z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M12 3.2 3.5 10v10.2h6v-6h5v6h6V10L12 3.2Zm6.5 15h-2v-6h-9v6h-2v-7.24L12 5.76l6.5 5.2v7.24Z'/%3E%3C/svg%3E");
+}
+
+/* calendar */
+.student-sidebar-nav button:nth-child(2) > span::before,
+.student-bottom-nav button:nth-child(2) > span::before,
+.student-next-workout .student-card-icon::before {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M7 2h2v2h6V2h2v2h3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h3V2Zm13 8H4v10h16V10ZM4 8h16V6h-3v2h-2V6H9v2H7V6H4v2Z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M7 2h2v2h6V2h2v2h3a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2V6a2 2 0 0 1 2-2h3V2Zm13 8H4v10h16V10ZM4 8h16V6h-3v2h-2V6H9v2H7V6H4v2Z'/%3E%3C/svg%3E");
+}
+
+/* card / payments */
+.student-sidebar-nav button:nth-child(3) > span::before,
+.student-bottom-nav button:nth-child(3) > span::before,
+.student-finance-card .student-card-icon::before {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M3 5h18a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Zm18 4V7H3v2h18ZM3 11v6h18v-6H3Zm2 3h5v2H5v-2Z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M3 5h18a2 2 0 0 1 2 2v10a2 2 0 0 1-2 2H3a2 2 0 0 1-2-2V7a2 2 0 0 1 2-2Zm18 4V7H3v2h18ZM3 11v6h18v-6H3Zm2 3h5v2H5v-2Z'/%3E%3C/svg%3E");
+}
+
+/* trend */
+.student-sidebar-nav button:nth-child(4) > span::before,
+.student-evolution-card .student-card-icon::before,
+.student-evolution-message > span::before {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='m4.4 17.8-1.4-1.4 6.1-6.1 4 4L18.4 9H15V7h6v6h-2V9.6l-5.9 5.9-4-4-4.7 4.7Z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='m4.4 17.8-1.4-1.4 6.1-6.1 4 4L18.4 9H15V7h6v6h-2V9.6l-5.9 5.9-4-4-4.7 4.7Z'/%3E%3C/svg%3E");
+}
+
+/* profile */
+.student-sidebar-nav button:nth-child(5) > span::before {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0-2a3 3 0 1 1 0-6 3 3 0 0 1 0 6Zm0 3c-5 0-9 2.5-9 5.5V22h18v-3.5c0-3-4-5.5-9-5.5Zm7 7H5v-1.5C5 17 8 15 12 15s7 2 7 3.5V20Z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M12 12a5 5 0 1 0 0-10 5 5 0 0 0 0 10Zm0-2a3 3 0 1 1 0-6 3 3 0 0 1 0 6Zm0 3c-5 0-9 2.5-9 5.5V22h18v-3.5c0-3-4-5.5-9-5.5Zm7 7H5v-1.5C5 17 8 15 12 15s7 2 7 3.5V20Z'/%3E%3C/svg%3E");
+}
+
+/* activity / frequency */
+.student-frequency-card .student-card-icon::before {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M3 13h4l2-7 4 12 2-7h6v2h-4.5L13 22 9 10l-.5 5H3v-2Z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M3 13h4l2-7 4 12 2-7h6v2h-4.5L13 22 9 10l-.5 5H3v-2Z'/%3E%3C/svg%3E");
+}
+
+/* trophy */
+.student-challenge-card .student-card-icon::before {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M7 2h10v2h4v4a5 5 0 0 1-5 5h-.1A6 6 0 0 1 13 15.9V19h4v2H7v-2h4v-3.1A6 6 0 0 1 8.1 13H8a5 5 0 0 1-5-5V4h4V2Zm2 2v5a3 3 0 0 0 6 0V4H9Zm8 2v3c0 .6-.1 1.2-.3 1.8A3 3 0 0 0 19 8V6h-2ZM7 6H5v2a3 3 0 0 0 2.3 2.8A5.8 5.8 0 0 1 7 9V6Z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M7 2h10v2h4v4a5 5 0 0 1-5 5h-.1A6 6 0 0 1 13 15.9V19h4v2H7v-2h4v-3.1A6 6 0 0 1 8.1 13H8a5 5 0 0 1-5-5V4h4V2Zm2 2v5a3 3 0 0 0 6 0V4H9Zm8 2v3c0 .6-.1 1.2-.3 1.8A3 3 0 0 0 19 8V6h-2ZM7 6H5v2a3 3 0 0 0 2.3 2.8A5.8 5.8 0 0 1 7 9V6Z'/%3E%3C/svg%3E");
+}
+
+/* clock */
+.student-workout-time > span::before {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm1-13h-2v6l5 3 1-1.7-4-2.3V7Z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M12 2a10 10 0 1 0 0 20 10 10 0 0 0 0-20Zm0 18a8 8 0 1 1 0-16 8 8 0 0 1 0 16Zm1-13h-2v6l5 3 1-1.7-4-2.3V7Z'/%3E%3C/svg%3E");
+}
+
+/* notification */
+.student-notification-indicator > span::before {
+  -webkit-mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M12 22a2.5 2.5 0 0 0 2.4-2h-4.8a2.5 2.5 0 0 0 2.4 2Zm7-6v-5a7 7 0 0 0-5-6.7V3a2 2 0 1 0-4 0v1.3A7 7 0 0 0 5 11v5l-2 2v1h18v-1l-2-2Zm-12 .8V11a5 5 0 0 1 10 0v5.8l.2.2H6.8l.2-.2Z'/%3E%3C/svg%3E");
+  mask-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath fill='black' d='M12 22a2.5 2.5 0 0 0 2.4-2h-4.8a2.5 2.5 0 0 0 2.4 2Zm7-6v-5a7 7 0 0 0-5-6.7V3a2 2 0 1 0-4 0v1.3A7 7 0 0 0 5 11v5l-2 2v1h18v-1l-2-2Zm-12 .8V11a5 5 0 0 1 10 0v5.8l.2.2H6.8l.2-.2Z'/%3E%3C/svg%3E");
+}
+
+.student-card-icon::before { width: 19px; height: 19px; }
+.student-sidebar-nav button > span::before { width: 19px; height: 19px; }
+.student-bottom-nav button > span::before { width: 21px; height: 21px; color: currentColor; }
+.student-notification-indicator > span::before { width: 19px; height: 19px; }
+
+.student-card-icon {
+  border-radius: 10px;
+  background: rgba(255, 32, 56, .075);
+}
+
+.student-sidebar-nav button {
+  letter-spacing: -.005em;
+}
+
+.student-status-badge,
+.student-payment-pill,
+.student-history-status {
+  font-weight: 650;
+  letter-spacing: 0;
+}
+
+.student-primary-button,
+.student-secondary-button {
+  border-radius: 11px;
+}
+
+.student-theme-dark .student-sidebar-nav button > span::before,
+.student-theme-dark .student-notification-indicator > span::before,
+.student-theme-dark .student-workout-time > span::before {
+  color: #dce5f2;
+}
+
+.student-theme-dark .student-sidebar-nav button.active > span::before,
+.student-theme-dark .student-card-icon::before,
+.student-theme-dark .student-info-strip > span::before {
+  color: var(--student-red);
+}
+
+@media (max-width: 640px) {
+  .student-app { font-size: 14px; }
+  .student-welcome h1 { font-size: 30px; letter-spacing: -.035em; }
+  .student-welcome p { font-size: 14px; line-height: 1.45; }
+  .student-kicker { font-size: 9px; letter-spacing: .09em; }
+  .student-card h2 { font-size: 19px; }
+  .student-card { border-radius: 16px; }
+  .student-bottom-nav button small { font-size: 10px; font-weight: 600; letter-spacing: 0; }
+}
