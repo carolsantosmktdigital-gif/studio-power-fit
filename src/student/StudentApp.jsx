@@ -38,6 +38,22 @@ function StudentApp({ profile, onLogout }) {
   }, [darkMode])
 
   useEffect(() => {
+    const html = document.documentElement
+    const body = document.body
+    const root = document.getElementById('root')
+
+    html.classList.add('student-scroll-page')
+    body.classList.add('student-scroll-page')
+    root?.classList.add('student-scroll-root')
+
+    return () => {
+      html.classList.remove('student-scroll-page')
+      body.classList.remove('student-scroll-page')
+      root?.classList.remove('student-scroll-root')
+    }
+  }, [])
+
+  useEffect(() => {
     let cancelled = false
 
     async function loadStudentData() {
