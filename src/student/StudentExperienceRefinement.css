@@ -949,6 +949,501 @@
   }
 }
 
+/* =========================================================
+   MODO ESCURO — MESMA HIERARQUIA E CONFORTO DO MODO CLARO
+========================================================= */
+
+.student-theme-dark {
+  --student-red: #ff4058;
+  --student-red-strong: #e9243d;
+  --student-navy: #eaf1fb;
+  --student-navy-soft: #c8d5e7;
+  --student-bg: #050d17;
+  --student-card: #0d1929;
+  --student-border: rgba(151, 177, 211, .12);
+  --student-border-strong: rgba(174, 197, 226, .20);
+  --student-text: #f5f8fc;
+  --student-soft: #b4c0d2;
+  --student-muted: #8d9db4;
+  --student-success: #61dda5;
+  --student-shadow-sm: 0 12px 34px rgba(0, 4, 12, .30);
+  --student-shadow-md: 0 22px 60px rgba(0, 3, 10, .42);
+  background:
+    radial-gradient(circle at 92% -4%, rgba(45, 91, 153, .18), transparent 31%),
+    radial-gradient(circle at 1% 2%, rgba(255, 51, 75, .10), transparent 25%),
+    linear-gradient(180deg, #081321 0%, #050c16 78%);
+}
+
+.student-theme-dark .student-main {
+  position: relative;
+}
+
+.student-theme-dark .student-main::before {
+  content: '';
+  position: fixed;
+  z-index: 0;
+  inset: 0 0 auto 244px;
+  height: 280px;
+  pointer-events: none;
+  background: linear-gradient(180deg, rgba(19, 43, 72, .16), transparent);
+}
+
+.student-theme-dark .student-header,
+.student-theme-dark .student-content {
+  position: relative;
+  z-index: 1;
+}
+
+.student-theme-dark .student-sidebar {
+  background:
+    linear-gradient(180deg, rgba(10, 23, 39, .985), rgba(6, 15, 27, .985));
+  border-right-color: rgba(159, 183, 213, .10);
+  box-shadow: 14px 0 42px rgba(0, 3, 10, .22);
+}
+
+.student-theme-dark .student-sidebar-brand img {
+  filter: drop-shadow(0 12px 24px rgba(0, 0, 0, .30));
+}
+
+.student-theme-dark .student-sidebar-nav button {
+  color: #a9b6c9;
+}
+
+.student-theme-dark .student-sidebar-nav button:hover {
+  color: #f7f9fd;
+  background: rgba(142, 169, 203, .065);
+}
+
+.student-theme-dark .student-sidebar-nav button.active {
+  color: #fff;
+  background: linear-gradient(90deg, rgba(255, 55, 80, .20), rgba(255, 55, 80, .045));
+  box-shadow: inset 0 0 0 1px rgba(255, 70, 92, .055);
+}
+
+.student-theme-dark .student-help {
+  color: var(--student-text);
+  border-color: rgba(151, 177, 211, .12);
+  background: linear-gradient(145deg, rgba(17, 34, 55, .96), rgba(10, 23, 39, .96));
+  box-shadow: 0 12px 30px rgba(0, 4, 12, .24);
+}
+
+.student-theme-dark .student-help small {
+  color: var(--student-muted);
+}
+
+.student-theme-dark .student-help > span:first-child,
+.student-theme-dark .student-help b {
+  color: #dce6f4;
+}
+
+.student-theme-dark .student-theme-toggle,
+.student-theme-dark .student-notification-indicator {
+  color: #eef4fc;
+  border-color: rgba(151, 177, 211, .14);
+  background: linear-gradient(145deg, rgba(18, 36, 59, .94), rgba(11, 24, 41, .94));
+  box-shadow: 0 9px 24px rgba(0, 4, 12, .24);
+}
+
+.student-theme-dark .student-notification-indicator.is-empty {
+  opacity: .82;
+}
+
+.student-theme-dark .student-profile-button:hover {
+  background: rgba(146, 174, 209, .07);
+  box-shadow: inset 0 0 0 1px rgba(151, 177, 211, .09);
+}
+
+.student-theme-dark .student-avatar {
+  color: #fff;
+  background: linear-gradient(145deg, #285992, #102b4b);
+  box-shadow: 0 10px 28px rgba(0, 4, 12, .34), inset 0 1px 0 rgba(255,255,255,.10);
+}
+
+.student-theme-dark .student-user-copy small,
+.student-theme-dark .student-chevron,
+.student-theme-dark .student-welcome-meta > span {
+  color: var(--student-muted);
+}
+
+.student-theme-dark .student-welcome h1,
+.student-theme-dark .student-section-page h1 {
+  color: #f8faff;
+  text-shadow: 0 8px 30px rgba(0, 0, 0, .18);
+}
+
+.student-theme-dark .student-welcome p,
+.student-theme-dark .student-section-page-heading > div > p {
+  color: #b5c1d3;
+}
+
+.student-theme-dark .student-welcome-meta em {
+  color: #dce5f2;
+}
+
+.student-theme-dark .student-welcome-meta em::after {
+  box-shadow: 0 0 18px rgba(255, 64, 88, .30);
+}
+
+.student-theme-dark .student-card,
+.student-theme-dark .student-detail-card,
+.student-theme-dark .student-detail-metrics article,
+.student-theme-dark .student-profile-summary,
+.student-theme-dark .student-booking-panel,
+.student-theme-dark .student-booking-intro,
+.student-theme-dark .student-my-bookings,
+.student-theme-dark .student-waitlist-section,
+.student-theme-dark .student-slot-section,
+.student-theme-dark .student-booking-item,
+.student-theme-dark .student-waitlist-card,
+.student-theme-dark .student-slot-card,
+.student-theme-dark .student-confirm-modal {
+  border-color: rgba(151, 177, 211, .115);
+  background:
+    linear-gradient(145deg, rgba(16, 32, 52, .985), rgba(10, 22, 38, .985));
+  box-shadow:
+    0 14px 38px rgba(0, 4, 12, .30),
+    inset 0 1px 0 rgba(255, 255, 255, .025);
+}
+
+.student-theme-dark .student-next-workout {
+  background:
+    radial-gradient(circle at 95% 5%, rgba(255, 54, 78, .075), transparent 31%),
+    linear-gradient(145deg, #102038, #0a1728 72%);
+}
+
+.student-theme-dark .student-frequency-card,
+.student-theme-dark .student-evolution-card,
+.student-theme-dark .student-challenge-card {
+  background:
+    radial-gradient(circle at 100% 0%, rgba(63, 111, 172, .07), transparent 34%),
+    linear-gradient(150deg, #102036, #0a1728 74%);
+}
+
+.student-theme-dark .student-finance-card {
+  background:
+    radial-gradient(circle at 96% 8%, rgba(255, 55, 80, .085), transparent 30%),
+    linear-gradient(120deg, #102038, #0a1728 72%);
+}
+
+.student-theme-dark .student-finance-card > .student-title-with-icon,
+.student-theme-dark .student-finance-card > p {
+  border-color: rgba(151, 177, 211, .13);
+}
+
+.student-theme-dark .student-card-icon {
+  color: var(--student-red);
+  border: 1px solid rgba(255, 72, 94, .09);
+  background: rgba(255, 55, 80, .10);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, .025);
+}
+
+.student-theme-dark .student-kicker {
+  color: #ff5369;
+}
+
+.student-theme-dark .student-card h2,
+.student-theme-dark .student-card strong,
+.student-theme-dark .student-workout-time strong,
+.student-theme-dark .student-payment-amount,
+.student-theme-dark .student-detail-heading h2,
+.student-theme-dark .student-profile-summary h2 {
+  color: #f7f9fd;
+}
+
+.student-theme-dark .student-workout-details > p,
+.student-theme-dark .student-workout-type span,
+.student-theme-dark .student-finance-card > p,
+.student-theme-dark .student-evolution-metrics span,
+.student-theme-dark .student-card-context {
+  color: var(--student-soft);
+}
+
+.student-theme-dark .student-workout-type {
+  border-color: rgba(151, 177, 211, .13);
+}
+
+.student-theme-dark .student-primary-button {
+  color: #fff;
+  background: linear-gradient(135deg, #ff4058, #e8223b);
+  box-shadow: 0 12px 26px rgba(229, 29, 50, .24), inset 0 1px 0 rgba(255,255,255,.18);
+}
+
+.student-theme-dark .student-secondary-button,
+.student-theme-dark .student-back-button {
+  color: #edf3fb;
+  border-color: rgba(151, 177, 211, .15);
+  background: rgba(144, 171, 205, .065);
+}
+
+.student-theme-dark .student-link-button {
+  color: #ff6174;
+}
+
+.student-theme-dark .student-progress-ring {
+  background: conic-gradient(var(--student-red) var(--progress), rgba(151, 177, 211, .14) 0);
+  box-shadow: 0 10px 28px rgba(0, 4, 12, .20);
+}
+
+.student-theme-dark .student-progress-ring::after {
+  background: #0d1b2e;
+  box-shadow: inset 0 0 0 1px rgba(151, 177, 211, .055);
+}
+
+.student-theme-dark .student-progress-track {
+  background: rgba(151, 177, 211, .14);
+  box-shadow: inset 0 1px 2px rgba(0, 3, 10, .32);
+}
+
+.student-theme-dark .student-progress-track > span {
+  box-shadow: 0 0 14px rgba(255, 64, 88, .22);
+}
+
+.student-theme-dark .student-info-strip {
+  color: #ffc2ca;
+  border-color: rgba(255, 72, 94, .12);
+  background: linear-gradient(90deg, rgba(255, 55, 80, .13), rgba(255, 55, 80, .045));
+}
+
+.student-theme-dark .student-evolution-metrics > div,
+.student-theme-dark .student-profile-fields > div,
+.student-theme-dark .student-detail-empty,
+.student-theme-dark .student-day-limit {
+  border-color: rgba(151, 177, 211, .10);
+  background: rgba(151, 177, 211, .045);
+}
+
+.student-theme-dark .student-evolution-empty {
+  color: #9be7c1;
+  border-color: rgba(97, 221, 165, .14);
+  background: linear-gradient(100deg, rgba(47, 174, 117, .14), rgba(47, 174, 117, .04));
+}
+
+.student-theme-dark .student-evolution-empty > span {
+  background: rgba(97, 221, 165, .10);
+  box-shadow: inset 0 0 0 1px rgba(97, 221, 165, .08);
+}
+
+.student-theme-dark .student-evolution-empty small {
+  color: #a7cdbb;
+}
+
+.student-theme-dark .student-payment-pill.pending {
+  color: #f3ca7b;
+  border-color: rgba(243, 202, 123, .20);
+  background: rgba(243, 202, 123, .085);
+}
+
+.student-theme-dark .student-payment-pill.overdue {
+  color: #ffabb6;
+  border-color: rgba(255, 91, 111, .20);
+  background: rgba(255, 64, 88, .10);
+}
+
+.student-theme-dark .student-payment-pill.neutral {
+  color: #b4c0d2;
+  border-color: rgba(151, 177, 211, .14);
+  background: rgba(151, 177, 211, .06);
+}
+
+.student-theme-dark .student-detail-hero {
+  border-color: rgba(255, 72, 94, .14);
+  background:
+    radial-gradient(circle at 90% 10%, rgba(255, 55, 80, .11), transparent 31%),
+    linear-gradient(140deg, #112139, #0a1728 72%);
+  box-shadow: var(--student-shadow-sm);
+}
+
+.student-theme-dark .student-detail-hero.success {
+  border-color: rgba(97, 221, 165, .14);
+  background:
+    radial-gradient(circle at 90% 10%, rgba(47, 174, 117, .12), transparent 31%),
+    linear-gradient(140deg, #102238, #091923 72%);
+}
+
+.student-theme-dark .student-profile-summary {
+  background:
+    radial-gradient(circle at 88% 5%, rgba(255, 55, 80, .09), transparent 31%),
+    linear-gradient(145deg, #112139, #0a1728 74%);
+}
+
+.student-theme-dark .student-history-row,
+.student-theme-dark .student-slot-row,
+.student-theme-dark .student-booking-item {
+  border-color: rgba(151, 177, 211, .10);
+}
+
+.student-theme-dark .student-evolution-chart-wrap {
+  border-color: rgba(151, 177, 211, .10);
+  background:
+    linear-gradient(rgba(151, 177, 211, .055) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(151, 177, 211, .055) 1px, transparent 1px),
+    #091625;
+  background-size: 44px 44px;
+}
+
+.student-theme-dark .student-date-tabs button {
+  color: #b3bfd1;
+  border-color: rgba(151, 177, 211, .12);
+  background: rgba(151, 177, 211, .045);
+}
+
+.student-theme-dark .student-date-tabs button.active {
+  color: #fff;
+  border-color: rgba(255, 72, 94, .24);
+  background: linear-gradient(135deg, rgba(255, 55, 80, .20), rgba(255, 55, 80, .06));
+}
+
+.student-theme-dark .student-slot-card:not(.full) button {
+  color: #f4f8ff;
+  border-color: rgba(105, 158, 219, .16);
+  background: linear-gradient(135deg, #285b96, #153757);
+}
+
+.student-theme-dark .student-slot-card.full {
+  color: #929eb0;
+  background: linear-gradient(145deg, #131a25, #111720);
+}
+
+.student-theme-dark .student-data-alert {
+  color: #ffc3cb;
+  border-color: rgba(255, 72, 94, .15);
+  background: linear-gradient(90deg, rgba(255, 55, 80, .14), rgba(255, 55, 80, .045));
+}
+
+.student-theme-dark .student-theme-toggle:focus-visible,
+.student-theme-dark .student-notification-indicator:focus-visible,
+.student-theme-dark .student-profile-button:focus-visible,
+.student-theme-dark .student-sidebar-nav button:focus-visible,
+.student-theme-dark .student-primary-button:focus-visible,
+.student-theme-dark .student-secondary-button:focus-visible,
+.student-theme-dark .student-link-button:focus-visible,
+.student-theme-dark .student-back-button:focus-visible {
+  outline: none;
+  box-shadow: 0 0 0 4px rgba(255, 64, 88, .20);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .student-theme-dark .student-card:hover,
+  .student-theme-dark .student-detail-card:hover {
+    border-color: rgba(174, 197, 226, .18);
+    box-shadow:
+      0 20px 52px rgba(0, 3, 10, .40),
+      inset 0 1px 0 rgba(255, 255, 255, .04);
+  }
+
+  .student-theme-dark .student-primary-button:hover {
+    box-shadow: 0 16px 32px rgba(229, 29, 50, .30), inset 0 1px 0 rgba(255,255,255,.20);
+  }
+
+  .student-theme-dark .student-secondary-button:hover,
+  .student-theme-dark .student-theme-toggle:hover,
+  .student-theme-dark .student-notification-indicator:not(:disabled):hover,
+  .student-theme-dark .student-date-tabs button:hover {
+    color: #fff;
+    border-color: rgba(174, 197, 226, .20);
+    background: rgba(151, 177, 211, .095);
+  }
+}
+
+@media (min-width: 921px) and (max-width: 1220px) {
+  .student-theme-dark .student-main::before {
+    left: 220px;
+  }
+}
+
+@media (max-width: 920px) {
+  .student-theme-dark .student-main::before {
+    content: none;
+  }
+}
+
+@media (max-width: 700px) {
+  .student-theme-dark {
+    background:
+      radial-gradient(circle at 94% 3%, rgba(255, 55, 80, .10), transparent 26%),
+      linear-gradient(180deg, #071421 0%, #040d17 76%) !important;
+  }
+
+  .student-theme-dark .student-header {
+    border-bottom-color: rgba(151, 177, 211, .08) !important;
+    background: rgba(5, 16, 29, .94) !important;
+    box-shadow: 0 8px 26px rgba(0, 3, 10, .18) !important;
+  }
+
+  .student-theme-dark .student-theme-toggle,
+  .student-theme-dark .student-notification-indicator {
+    color: #eef4fc !important;
+    border-color: rgba(151, 177, 211, .15) !important;
+    background: linear-gradient(145deg, #10243a, #0a192a) !important;
+    box-shadow: 0 8px 20px rgba(0, 3, 10, .22) !important;
+  }
+
+  .student-theme-dark .student-welcome {
+    border-bottom-color: rgba(151, 177, 211, .07) !important;
+    background:
+      radial-gradient(circle at 94% 28%, rgba(255, 55, 80, .17), transparent 32%),
+      linear-gradient(135deg, #0b1b2d, #081725) !important;
+  }
+
+  .student-theme-dark .student-card {
+    border-color: rgba(151, 177, 211, .13) !important;
+    background: linear-gradient(145deg, #0e2034, #081725) !important;
+    box-shadow: 0 12px 30px rgba(0, 3, 10, .28), inset 0 1px 0 rgba(255,255,255,.025) !important;
+  }
+
+  .student-theme-dark .student-next-workout {
+    background:
+      radial-gradient(circle at 96% 4%, rgba(255, 55, 80, .075), transparent 31%),
+      linear-gradient(145deg, #10233a, #091827 75%) !important;
+  }
+
+  .student-theme-dark .student-card-icon {
+    border-color: rgba(255, 72, 94, .10) !important;
+    background: rgba(255, 55, 80, .11) !important;
+  }
+
+  .student-theme-dark .student-progress-ring {
+    background: conic-gradient(var(--student-red) var(--progress), rgba(151, 177, 211, .15) 0) !important;
+  }
+
+  .student-theme-dark .student-progress-ring::after {
+    background: #0c1c2e !important;
+  }
+
+  .student-theme-dark .student-progress-track {
+    background: rgba(151, 177, 211, .15) !important;
+  }
+
+  .student-theme-dark .student-evolution-empty {
+    border-color: rgba(97, 221, 165, .14) !important;
+    background: linear-gradient(100deg, rgba(47, 174, 117, .14), rgba(47, 174, 117, .035)) !important;
+  }
+
+  .student-theme-dark .student-bottom-nav {
+    border-color: rgba(151, 177, 211, .16) !important;
+    background: rgba(5, 16, 29, .975) !important;
+    box-shadow: 0 18px 44px rgba(0, 3, 10, .48), inset 0 1px 0 rgba(255,255,255,.025) !important;
+  }
+
+  .student-theme-dark .student-bottom-nav button {
+    color: #8e9db1 !important;
+  }
+
+  .student-theme-dark .student-bottom-nav button.active {
+    color: #ff5066 !important;
+    background: rgba(255, 55, 80, .075) !important;
+  }
+
+  .student-theme-dark .student-detail-card,
+  .student-theme-dark .student-detail-hero,
+  .student-theme-dark .student-profile-summary,
+  .student-theme-dark .student-booking-panel,
+  .student-theme-dark .student-detail-metrics article {
+    border-color: rgba(151, 177, 211, .12) !important;
+    box-shadow: 0 12px 30px rgba(0, 3, 10, .26) !important;
+  }
+}
+
 @media (prefers-reduced-motion: reduce) {
   .student-app *,
   .student-app *::before,
