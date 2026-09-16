@@ -1,0 +1,961 @@
+/* Refinamento sistêmico da experiência do aluno.
+   Este arquivo é carregado por último para consolidar o ritmo visual entre
+   home, páginas internas, desktop, tablet e mobile. */
+
+#root.student-scroll-root {
+  width: 100%;
+  max-width: none;
+  margin: 0;
+  border-inline: 0;
+}
+
+.student-app {
+  --student-space-1: 4px;
+  --student-space-2: 8px;
+  --student-space-3: 12px;
+  --student-space-4: 16px;
+  --student-space-5: 20px;
+  --student-space-6: 24px;
+  --student-space-7: 32px;
+  --student-space-8: 40px;
+  --student-radius-sm: 12px;
+  --student-radius-md: 16px;
+  --student-radius-lg: 22px;
+  --student-content-max: 1320px;
+  font-family: Inter, "Segoe UI Variable", "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  text-rendering: optimizeLegibility;
+  -webkit-font-smoothing: antialiased;
+}
+
+.student-app button,
+.student-app a {
+  -webkit-tap-highlight-color: transparent;
+}
+
+.student-app button {
+  transition:
+    background-color .18s ease,
+    border-color .18s ease,
+    color .18s ease,
+    box-shadow .18s ease,
+    transform .18s ease;
+}
+
+.student-sidebar {
+  width: auto;
+  padding: 20px 16px 22px;
+}
+
+.student-sidebar-brand {
+  min-height: 120px;
+}
+
+.student-sidebar-brand img {
+  width: 112px;
+  max-height: 106px;
+}
+
+.student-sidebar-nav {
+  gap: 6px;
+  margin-top: 12px;
+}
+
+.student-sidebar-nav button {
+  min-height: 52px;
+  padding-inline: 15px;
+  gap: 12px;
+}
+
+.student-sidebar-nav button strong {
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.student-help {
+  min-height: 72px;
+  padding: 14px;
+  gap: 10px;
+}
+
+.student-help strong {
+  font-size: 11px;
+}
+
+.student-help small {
+  font-size: 10px;
+  line-height: 1.3;
+}
+
+.student-main {
+  min-width: 0;
+  padding-bottom: 56px;
+}
+
+.student-header,
+.student-content {
+  width: min(var(--student-content-max), calc(100% - 64px));
+  margin-inline: auto;
+}
+
+.student-header {
+  min-height: 88px;
+}
+
+.student-header-actions {
+  gap: 10px;
+}
+
+.student-icon-button,
+.student-notification-indicator {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 14px;
+}
+
+.student-profile-button {
+  min-height: 52px;
+  padding: 4px 10px 4px 4px;
+  gap: 10px;
+}
+
+.student-avatar {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+}
+
+.student-user-copy {
+  gap: 1px;
+}
+
+.student-user-copy strong {
+  font-size: 13px;
+  line-height: 1.25;
+}
+
+.student-user-copy small {
+  font-size: 10px;
+  line-height: 1.3;
+}
+
+.student-welcome {
+  min-height: 116px;
+  padding: 24px 0 30px;
+  gap: 40px;
+}
+
+.student-welcome h1,
+.student-section-page h1 {
+  margin: 10px 0 8px;
+  font-size: clamp(38px, 3.6vw, 52px);
+  line-height: 1;
+  letter-spacing: -.045em;
+}
+
+.student-welcome p {
+  font-size: 16px;
+  line-height: 1.5;
+}
+
+.student-welcome-meta {
+  gap: 12px;
+}
+
+.student-welcome-meta > span {
+  font-size: 13px;
+}
+
+.student-welcome-meta em {
+  font-size: 13px;
+  line-height: 1.45;
+}
+
+.student-kicker {
+  font-size: 10px;
+  font-weight: 750;
+  line-height: 1.2;
+  letter-spacing: .12em;
+}
+
+.student-home-grid {
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  gap: 18px;
+}
+
+.student-card {
+  border-radius: var(--student-radius-lg);
+  box-shadow: 0 12px 34px rgba(8, 22, 47, .06);
+}
+
+.student-next-workout {
+  grid-column: span 6;
+  grid-row: 1;
+  min-height: 312px;
+  padding: 26px;
+}
+
+.student-frequency-card,
+.student-evolution-card {
+  grid-column: span 3;
+  grid-row: 1;
+  min-height: 312px;
+  padding: 22px;
+}
+
+.student-challenge-card {
+  grid-column: span 4;
+  grid-row: 2;
+  min-height: 220px;
+  padding: 24px;
+}
+
+.student-finance-card {
+  grid-column: span 8 !important;
+  grid-row: 2 !important;
+  min-height: 220px;
+  padding: 24px !important;
+  grid-template-columns: minmax(190px, .9fr) minmax(220px, 1.1fr) minmax(150px, .7fr) !important;
+  gap: 24px !important;
+}
+
+.student-card-heading {
+  gap: 16px;
+}
+
+.student-title-with-icon {
+  gap: 12px;
+}
+
+.student-card-icon {
+  width: 40px;
+  height: 40px;
+  border-radius: 12px;
+}
+
+.student-card h2 {
+  margin-top: 7px;
+  font-size: 21px;
+  line-height: 1.18;
+  letter-spacing: -.025em;
+}
+
+.student-status-badge,
+.student-payment-pill {
+  min-height: 30px;
+  padding: 7px 10px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 10px;
+  line-height: 1.25;
+}
+
+.student-workout-details {
+  min-height: 124px;
+  padding: 26px 0 22px;
+  gap: 18px;
+}
+
+.student-workout-details > p {
+  max-width: 520px;
+  font-size: 14px;
+  line-height: 1.6;
+}
+
+.student-workout-time strong {
+  font-size: 28px;
+  line-height: 1.15;
+}
+
+.student-primary-button,
+.student-secondary-button,
+.student-signout-button {
+  min-height: 48px;
+  border-radius: 13px;
+  font-size: 13px;
+}
+
+.student-frequency-body {
+  min-height: 126px;
+  gap: 16px;
+  padding: 20px 0 16px;
+}
+
+.student-frequency-body > div:last-child {
+  min-width: 0;
+}
+
+.student-frequency-body > div:last-child > strong {
+  font-size: 24px;
+  line-height: 1.1;
+}
+
+.student-frequency-body > div:last-child > span {
+  display: block;
+  margin-top: 4px;
+  font-size: 11px;
+  line-height: 1.35;
+}
+
+.student-info-strip {
+  min-height: 42px;
+  padding: 10px 12px;
+  gap: 9px;
+  border-radius: 12px;
+}
+
+.student-info-strip strong {
+  font-size: 10px;
+  line-height: 1.4;
+}
+
+.student-evolution-metrics {
+  margin: 20px 0 16px;
+  gap: 8px;
+}
+
+.student-evolution-metrics > div {
+  padding: 11px 10px;
+  border-radius: 12px;
+}
+
+.student-evolution-metrics span {
+  font-size: 9px;
+}
+
+.student-evolution-metrics strong {
+  margin-top: 4px;
+  font-size: 15px;
+  line-height: 1.25;
+}
+
+.student-evolution-empty {
+  min-height: 146px;
+  margin-top: 20px;
+  padding: 18px;
+  gap: 14px;
+}
+
+.student-evolution-empty strong {
+  font-size: 12px;
+}
+
+.student-evolution-empty small {
+  font-size: 10px;
+  line-height: 1.5;
+}
+
+.student-challenge-count {
+  margin: 30px 0 12px;
+}
+
+.student-challenge-count strong {
+  font-size: 18px;
+}
+
+.student-challenge-count span {
+  font-size: 13px;
+}
+
+.student-progress-track {
+  height: 9px;
+}
+
+.student-challenge-card .student-info-strip {
+  margin-top: 20px;
+}
+
+.student-finance-card > .student-title-with-icon {
+  gap: 12px;
+  padding-right: 24px;
+  border-right: 1px solid rgba(115, 139, 169, .16);
+}
+
+.student-finance-card h2 {
+  max-width: none;
+  margin-top: 7px;
+  font-size: 20px;
+  line-height: 1.16;
+}
+
+.student-finance-card > p {
+  margin: 0;
+  padding: 0 24px 0 0;
+  display: grid;
+  gap: 5px;
+  border-right: 1px solid rgba(115, 139, 169, .16);
+  font-size: 11px;
+  line-height: 1.45;
+}
+
+.student-plan-label {
+  font-size: 10px;
+}
+
+.student-payment-amount {
+  margin-block: 2px;
+  font-size: 19px;
+  line-height: 1.2;
+}
+
+.student-due-date {
+  margin-top: 2px;
+  font-size: 10px;
+}
+
+.student-finance-actions {
+  width: 100%;
+  max-width: 164px;
+  margin: 0;
+  justify-self: end;
+  gap: 8px;
+}
+
+.student-finance-actions .student-payment-pill {
+  width: 100% !important;
+  min-height: 32px !important;
+  padding: 6px 10px !important;
+  font-size: 10px !important;
+}
+
+.student-finance-actions .student-secondary-button {
+  width: 100% !important;
+  min-height: 44px !important;
+  padding: 0 12px !important;
+  gap: 8px !important;
+  justify-content: space-between !important;
+  font-size: 11px !important;
+}
+
+/* Páginas internas */
+.student-section-page {
+  padding-top: 18px;
+}
+
+.student-section-page-heading {
+  margin-bottom: 26px;
+  gap: 16px;
+}
+
+.student-section-page-heading > div > p {
+  max-width: 620px;
+  margin-top: 8px;
+  font-size: 14px;
+  line-height: 1.55;
+}
+
+.student-back-button {
+  width: 44px;
+  height: 44px;
+  min-width: 44px;
+  border-radius: 14px;
+}
+
+.student-detail-grid,
+.student-profile-page,
+.student-booking-panel {
+  gap: 18px;
+}
+
+.student-detail-card,
+.student-detail-hero,
+.student-profile-summary,
+.student-booking-panel,
+.student-detail-metrics article {
+  border-radius: var(--student-radius-lg);
+}
+
+.student-detail-card,
+.student-detail-hero,
+.student-profile-summary,
+.student-booking-panel {
+  padding: 24px;
+}
+
+.student-detail-heading {
+  gap: 16px;
+  margin-bottom: 20px;
+}
+
+.student-detail-heading h2 {
+  margin-top: 6px;
+  font-size: 21px;
+  line-height: 1.2;
+}
+
+.student-detail-metrics {
+  gap: 14px;
+}
+
+.student-detail-metrics article {
+  min-height: 116px;
+  padding: 20px;
+}
+
+.student-history-row,
+.student-profile-fields > div {
+  padding: 16px;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .student-sidebar-nav button:hover,
+  .student-icon-button:not(:disabled):hover,
+  .student-profile-button:hover,
+  .student-link-button:hover {
+    transform: translateY(-1px);
+  }
+
+  .student-primary-button:hover,
+  .student-secondary-button:hover {
+    transform: translateY(-2px);
+  }
+}
+
+@media (min-width: 921px) and (max-width: 1220px) {
+  .student-app {
+    grid-template-columns: 220px minmax(0, 1fr);
+  }
+
+  .student-header,
+  .student-content {
+    width: calc(100% - 48px);
+  }
+
+  .student-home-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .student-next-workout {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    min-height: 286px;
+  }
+
+  .student-frequency-card {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .student-evolution-card {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .student-challenge-card {
+    grid-column: 1;
+    grid-row: 3;
+    min-height: 218px;
+  }
+
+  .student-finance-card {
+    grid-column: 2 !important;
+    grid-row: 3 !important;
+    min-height: 218px;
+    padding: 22px !important;
+    grid-template-columns: minmax(0, 1fr) minmax(126px, .58fr) !important;
+    gap: 18px !important;
+  }
+
+  .student-finance-card > .student-title-with-icon {
+    padding-right: 0;
+    border-right: 0;
+  }
+
+  .student-finance-card > p {
+    grid-column: 1;
+    padding-right: 0;
+    border-right: 0;
+  }
+
+  .student-finance-actions {
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+    max-width: 140px;
+  }
+}
+
+@media (min-width: 701px) and (max-width: 920px) {
+  .student-app {
+    padding-bottom: 104px;
+  }
+
+  .student-header,
+  .student-content {
+    width: calc(100% - 40px);
+  }
+
+  .student-header {
+    min-height: 78px;
+  }
+
+  .student-welcome {
+    padding: 22px 0 26px;
+  }
+
+  .student-home-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 16px;
+  }
+
+  .student-next-workout {
+    grid-column: 1 / -1;
+    grid-row: 1;
+  }
+
+  .student-frequency-card {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  .student-evolution-card {
+    grid-column: 2;
+    grid-row: 2;
+  }
+
+  .student-challenge-card {
+    grid-column: 1 / -1;
+    grid-row: 3;
+  }
+
+  .student-finance-card {
+    grid-column: 1 / -1 !important;
+    grid-row: 4 !important;
+  }
+}
+
+@media (max-width: 700px) {
+  #root.student-scroll-root {
+    min-width: 0;
+  }
+
+  .student-app {
+    font-size: 14px;
+  }
+
+  .student-main {
+    padding-bottom: 118px !important;
+  }
+
+  .student-header {
+    height: 72px !important;
+    min-height: 72px !important;
+    padding: 9px 16px !important;
+  }
+
+  .student-mobile-brand {
+    width: 58px !important;
+  }
+
+  .student-mobile-brand img {
+    width: 52px !important;
+    height: 46px !important;
+  }
+
+  .student-header-actions {
+    gap: 8px !important;
+  }
+
+  .student-theme-toggle,
+  .student-notification-indicator {
+    width: 42px !important;
+    height: 42px !important;
+    min-width: 42px !important;
+  }
+
+  .student-profile-button,
+  .student-avatar {
+    width: 44px !important;
+    height: 44px !important;
+    min-width: 44px !important;
+  }
+
+  .student-content {
+    padding: 0 16px 38px !important;
+  }
+
+  .student-welcome {
+    margin: 0 -16px 16px !important;
+    padding: 28px 20px 26px !important;
+  }
+
+  .student-welcome .student-kicker {
+    font-size: 9px !important;
+    line-height: 1.2 !important;
+    letter-spacing: .15em !important;
+  }
+
+  .student-welcome h1 {
+    margin: 10px 0 9px !important;
+    font-size: clamp(30px, 9vw, 38px) !important;
+    line-height: 1.02 !important;
+  }
+
+  .student-welcome p {
+    max-width: 340px !important;
+    font-size: 14px !important;
+    line-height: 1.5 !important;
+  }
+
+  .student-home-grid {
+    gap: 12px !important;
+  }
+
+  .student-card {
+    border-radius: 20px !important;
+  }
+
+  .student-next-workout {
+    padding: 18px !important;
+  }
+
+  .student-next-workout .student-title-with-icon {
+    gap: 11px !important;
+  }
+
+  .student-next-workout h2 {
+    margin-top: 6px !important;
+    font-size: 20px !important;
+    line-height: 1.14 !important;
+  }
+
+  .student-card-icon {
+    width: 38px !important;
+    height: 38px !important;
+    min-width: 38px !important;
+  }
+
+  .student-kicker {
+    font-size: 9px !important;
+    line-height: 1.25 !important;
+    letter-spacing: .1em !important;
+  }
+
+  .student-status-badge {
+    min-height: 30px !important;
+    padding: 7px 9px !important;
+    font-size: 9px !important;
+    line-height: 1.25 !important;
+  }
+
+  .student-workout-details {
+    padding: 18px 0 !important;
+  }
+
+  .student-workout-details > p {
+    font-size: 13px !important;
+    line-height: 1.55 !important;
+  }
+
+  .student-primary-button {
+    min-height: 48px !important;
+    padding-inline: 16px !important;
+    border-radius: 14px !important;
+    font-size: 13px !important;
+  }
+
+  .student-frequency-card,
+  .student-evolution-card {
+    min-height: 158px !important;
+    padding: 15px !important;
+  }
+
+  .student-frequency-card .student-title-with-icon,
+  .student-evolution-card .student-title-with-icon {
+    gap: 8px !important;
+  }
+
+  .student-frequency-card .student-card-icon,
+  .student-evolution-card .student-card-icon {
+    width: 32px !important;
+    height: 32px !important;
+    min-width: 32px !important;
+  }
+
+  .student-frequency-card .student-kicker,
+  .student-evolution-card .student-kicker {
+    font-size: 8px !important;
+    line-height: 1.25 !important;
+  }
+
+  .student-frequency-body {
+    padding-top: 16px !important;
+    gap: 10px !important;
+  }
+
+  .student-frequency-body > div:last-child strong {
+    font-size: 18px !important;
+  }
+
+  .student-frequency-body > div:last-child span {
+    margin-top: 3px !important;
+    font-size: 9px !important;
+    line-height: 1.3 !important;
+  }
+
+  .student-evolution-empty {
+    min-height: 104px !important;
+    margin-top: 14px !important;
+    padding: 13px !important;
+    gap: 10px !important;
+  }
+
+  .student-evolution-empty strong {
+    font-size: 10px !important;
+    line-height: 1.35 !important;
+  }
+
+  .student-evolution-empty small {
+    font-size: 9px !important;
+    line-height: 1.4 !important;
+  }
+
+  .student-challenge-card {
+    padding: 17px !important;
+  }
+
+  .student-challenge-card .student-card-context {
+    font-size: 9px !important;
+  }
+
+  .student-challenge-count {
+    margin: 16px 0 9px !important;
+  }
+
+  .student-challenge-count strong {
+    font-size: 14px !important;
+  }
+
+  .student-challenge-count span {
+    font-size: 11px !important;
+  }
+
+  .student-challenge-card .student-info-strip {
+    margin-top: 11px !important;
+  }
+
+  .student-challenge-card .student-info-strip strong {
+    font-size: 9px !important;
+    line-height: 1.35 !important;
+  }
+
+  .student-bottom-nav {
+    bottom: max(10px, env(safe-area-inset-bottom)) !important;
+    width: calc(100vw - 24px) !important;
+    height: 72px !important;
+    padding: 6px !important;
+    border-radius: 23px !important;
+  }
+
+  .student-bottom-nav button {
+    height: 60px !important;
+    gap: 4px !important;
+  }
+
+  .student-bottom-nav button > small {
+    font-size: 9px !important;
+    line-height: 1.15 !important;
+  }
+
+  .student-section-page {
+    padding-top: 18px;
+  }
+
+  .student-section-page-heading {
+    margin-bottom: 20px;
+    gap: 12px;
+  }
+
+  .student-section-page h1 {
+    margin: 7px 0 5px;
+    font-size: 31px;
+    line-height: 1.05;
+  }
+
+  .student-section-page-heading > div > p {
+    margin-top: 6px;
+    font-size: 13px;
+    line-height: 1.5;
+  }
+
+  .student-back-button {
+    width: 42px;
+    height: 42px;
+    min-width: 42px;
+  }
+
+  .student-detail-grid,
+  .student-profile-page,
+  .student-booking-panel {
+    gap: 12px;
+  }
+
+  .student-detail-card,
+  .student-detail-hero,
+  .student-profile-summary,
+  .student-booking-panel {
+    padding: 18px;
+    border-radius: 19px;
+  }
+
+  .student-detail-metrics {
+    gap: 10px;
+  }
+
+  .student-detail-metrics article {
+    min-height: 100px;
+    padding: 15px;
+    border-radius: 17px;
+  }
+
+  .student-history-row,
+  .student-profile-fields > div {
+    padding: 14px;
+  }
+}
+
+@media (max-width: 374px) {
+  .student-content {
+    padding-inline: 12px !important;
+  }
+
+  .student-welcome {
+    margin-inline: -12px !important;
+    padding-inline: 16px !important;
+  }
+
+  .student-home-grid {
+    gap: 10px !important;
+  }
+
+  .student-frequency-card,
+  .student-evolution-card {
+    padding: 13px !important;
+  }
+
+  .student-frequency-card .student-card-icon,
+  .student-evolution-card .student-card-icon {
+    width: 30px !important;
+    height: 30px !important;
+    min-width: 30px !important;
+  }
+
+  .student-frequency-body {
+    gap: 7px !important;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .student-app *,
+  .student-app *::before,
+  .student-app *::after {
+    scroll-behavior: auto !important;
+    transition-duration: .01ms !important;
+    animation-duration: .01ms !important;
+    animation-iteration-count: 1 !important;
+  }
+}
