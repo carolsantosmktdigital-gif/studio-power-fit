@@ -46,13 +46,18 @@ function ReportsPage({ students, employees, payments }) {
   }, [])
 
   const studentById = useMemo(() => new Map(students.map((student) => [student.id, student])), [students])
+  const planByStudent = useMemo(() => payments.reduce((plans, payment) => {
+    const current = plans.get(payment.student_id)
+    if (!current || String(payment.due_date) > String(current.due_date)) plans.set(payment.student_id, { due_date: payment.due_date, plan: payment.payment_type === 'MENSALIDADE' ? 'MENSALISTA' : payment.payment_type })
+    return plans
+  }, new Map()), [payments])
   const sourceRows = useMemo(() => {
     if (type === 'financeiro') return payments.map((item) => ({ ...item, _name: item.student?.full_name || 'Aluno', _plan: item.payment_type === 'MENSALIDADE' ? 'MENSALISTA' : item.payment_type }))
-    if (type === 'alunos') return students.map((item) => ({ ...item, _name: item.profile?.full_name || 'Aluno', _plan: item.payment_plan || 'MENSALISTA' }))
-    if (type === 'agendamentos') return appointments.map((item) => ({ ...item, _name: studentById.get(item.student_id)?.profile?.full_name || 'Aluno', _plan: studentById.get(item.student_id)?.payment_plan || 'MENSALISTA' }))
-    if (type === 'frequencia') return attendance.map((item) => ({ ...item, _name: studentById.get(item.student_id)?.profile?.full_name || 'Aluno', _plan: studentById.get(item.student_id)?.payment_plan || 'MENSALISTA' }))
+    if (type === 'alunos') return students.map((item) => ({ ...item, _name: item.profile?.full_name || 'Aluno', _plan: planByStudent.get(item.id)?.plan || 'MENSALISTA' }))
+    if (type === 'agendamentos') return appointments.map((item) => ({ ...item, _name: studentById.get(item.student_id)?.profile?.full_name || 'Aluno', _plan: planByStudent.get(item.student_id)?.plan || 'MENSALISTA' }))
+    if (type === 'frequencia') return attendance.map((item) => ({ ...item, _name: studentById.get(item.student_id)?.profile?.full_name || 'Aluno', _plan: planByStudent.get(item.student_id)?.plan || 'MENSALISTA' }))
     return employees.map((item) => ({ ...item, _name: item.profile?.full_name || 'Profissional' }))
-  }, [type, payments, students, appointments, attendance, employees, studentById])
+  }, [type, payments, students, appointments, attendance, employees, studentById, planByStudent])
 
   const availableStatuses = useMemo(() => [...new Set(sourceRows.map((row) => row.status).filter(Boolean))].sort(), [sourceRows])
   const filteredRows = useMemo(() => {
