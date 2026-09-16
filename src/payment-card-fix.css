@@ -1,0 +1,45 @@
+/* Correção de contenção do botão no card de pagamentos da Recepção */
+.is-reception .reception-stats article:nth-child(4) {
+  overflow: hidden;
+}
+
+.is-reception .reception-stats article:nth-child(4) button {
+  display: inline-flex !important;
+  align-items: center;
+  justify-content: center;
+  width: auto !important;
+  max-width: 100% !important;
+  min-height: 30px;
+  margin-top: 8px !important;
+  padding: 6px 10px !important;
+  border: 1px solid rgba(255, 86, 95, .22) !important;
+  border-radius: 999px !important;
+  background: rgba(255, 86, 95, .08) !important;
+  color: #e74255 !important;
+  font-size: 11px !important;
+  font-weight: 800 !important;
+  line-height: 1 !important;
+  white-space: nowrap !important;
+  box-sizing: border-box !important;
+  overflow: hidden !important;
+  text-overflow: ellipsis !important;
+}
+
+.theme-dark.is-reception .reception-stats article:nth-child(4) button {
+  color: #ff8a96 !important;
+  border-color: rgba(255, 113, 128, .24) !important;
+  background: rgba(255, 70, 88, .09) !important;
+}
+
+@media (max-width: 700px) {
+  .is-reception .reception-stats article:nth-child(4) {
+    padding-right: 14px !important;
+  }
+
+  .is-reception .reception-stats article:nth-child(4) button {
+    width: 100% !important;
+    justify-content: flex-start !important;
+    padding: 6px 9px !important;
+    font-size: 10px !important;
+  }
+}
