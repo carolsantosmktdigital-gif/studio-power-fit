@@ -1,5 +1,7 @@
 const DEMO_PASSWORD = '12345678'
 const DEMO_DOMAIN = 'example.com'
+export const DEMO_BATCH_ID = 'studio-power-fit-demo-25m-v1'
+const DEMO_BATCH_MARKER = `[DEMO_BATCH:${DEMO_BATCH_ID}]`
 
 const people = [
   { key: 'ana', full_name: '[DEMO] Ana Martins', role: 'ALUNO', phone: '(11) 99101-1001', cpf: '90000000001', birth_date: '1994-09-16', payment_plan: 'MENSALISTA', status: 'ATIVO' },
@@ -59,10 +61,11 @@ const createAccount = async (supabase, person) => {
       address_zip_code: '01310-100',
       address_street: 'Avenida Paulista',
       address_number: String(100 + people.indexOf(person)),
+      address_complement: DEMO_BATCH_MARKER,
       address_district: 'Bela Vista',
       address_city: 'São Paulo',
       address_state: 'SP',
-      notes: 'Registro fictício criado para apresentação da plataforma.',
+      notes: `${DEMO_BATCH_MARKER} Registro fictício criado para apresentação da plataforma.`,
     },
   })
   if (error || data?.error) throw new Error(data?.error || error?.message || `Falha ao criar ${person.full_name}.`)
