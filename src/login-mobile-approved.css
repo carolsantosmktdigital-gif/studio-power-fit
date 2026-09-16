@@ -1,9 +1,9 @@
-/* Login mobile: alinhamento final da marca e do formulário */
+/* Login mobile: composição final alinhada, sem sobreposição entre logo e assinatura */
 @media (max-width: 700px) {
   .app-shell:has(.login-layout) .login-layout {
     height: 100dvh !important;
     min-height: 0 !important;
-    padding: max(50px, env(safe-area-inset-top)) 18px max(10px, env(safe-area-inset-bottom)) !important;
+    padding: max(48px, env(safe-area-inset-top)) 18px max(10px, env(safe-area-inset-bottom)) !important;
     justify-content: flex-start !important;
     align-items: center !important;
     gap: 0 !important;
@@ -20,53 +20,67 @@
   }
 
   .app-shell:has(.login-layout) .brand-column {
-    position: relative !important;
-    flex: 0 0 clamp(300px, 37dvh, 390px) !important;
-    height: clamp(300px, 37dvh, 390px) !important;
+    flex: 0 0 clamp(300px, 36dvh, 372px) !important;
+    height: clamp(300px, 36dvh, 372px) !important;
     min-height: 0 !important;
     padding: 0 !important;
-    display: flex !important;
-    flex-direction: column !important;
-    align-items: center !important;
-    justify-content: flex-end !important;
+    display: grid !important;
+    grid-template-rows: minmax(0, 1fr) auto !important;
+    align-items: end !important;
+    justify-items: center !important;
     text-align: center !important;
   }
 
-  .app-shell:has(.login-layout) .brand-hero,
+  .app-shell:has(.login-layout) .brand-hero {
+    width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
+    margin: 0 !important;
+    padding: 0 !important;
+    display: flex !important;
+    align-items: flex-end !important;
+    justify-content: center !important;
+    overflow: visible !important;
+  }
+
   .app-shell:has(.login-layout) .main-logo {
     width: 100% !important;
+    height: 100% !important;
+    min-height: 0 !important;
     margin: 0 !important;
     padding: 0 !important;
     display: flex !important;
     align-items: center !important;
     justify-content: center !important;
-    text-align: center !important;
+    overflow: visible !important;
   }
 
   .app-shell:has(.login-layout) .main-logo img {
     display: block !important;
-    width: clamp(310px, 72vw, 390px) !important;
-    max-width: 100% !important;
+    width: clamp(280px, 68vw, 350px) !important;
+    max-width: 88% !important;
     height: auto !important;
-    max-height: clamp(250px, 31dvh, 325px) !important;
+    max-height: 100% !important;
     margin: 0 auto !important;
     object-fit: contain !important;
-    object-position: center !important;
+    object-position: center bottom !important;
     transform: none !important;
-    filter: drop-shadow(0 16px 30px rgba(0,0,0,.34)) drop-shadow(0 0 20px rgba(255,30,52,.08)) !important;
+    filter: drop-shadow(0 15px 28px rgba(0,0,0,.34)) drop-shadow(0 0 18px rgba(255,30,52,.07)) !important;
   }
 
   .app-shell:has(.login-layout) .brand-column::after {
     content: 'SAÚDE   •   FOCO   •   EVOLUÇÃO';
-    display: block;
+    display: block !important;
+    position: relative !important;
+    z-index: 2 !important;
     width: 100% !important;
-    margin: -2px auto 13px !important;
+    margin: 8px auto 14px !important;
     padding: 0 !important;
-    color: rgba(220,228,239,.72);
-    font-size: 9px;
-    font-weight: 500;
-    line-height: 1;
-    letter-spacing: .24em;
+    color: rgba(220,228,239,.68);
+    font-size: 8.5px;
+    font-weight: 550;
+    line-height: 1.2;
+    letter-spacing: .22em;
     text-align: center !important;
     white-space: nowrap;
     box-sizing: border-box !important;
@@ -109,15 +123,14 @@
   .app-shell:has(.login-layout) .divider { width: 100% !important; margin: 11px 0 8px !important; }
   .app-shell:has(.login-layout) .reception-button { min-height: 40px !important; }
   .app-shell:has(.login-layout) .access-note { width: 100% !important; margin-top: 6px !important; text-align: center !important; }
-
   .theme-light .brand-column::after { color: rgba(38,54,76,.62) !important; }
 }
 
 @media (max-width: 700px) and (max-height: 820px) {
-  .app-shell:has(.login-layout) .login-layout { padding-top: 42px !important; }
+  .app-shell:has(.login-layout) .login-layout { padding-top: 40px !important; }
   .app-shell:has(.login-layout) .brand-column { flex-basis: 205px !important; height: 205px !important; }
-  .app-shell:has(.login-layout) .main-logo img { width: 245px !important; max-height: 178px !important; }
-  .app-shell:has(.login-layout) .brand-column::after { margin-bottom: 7px !important; font-size: 7.5px; }
+  .app-shell:has(.login-layout) .main-logo img { width: 225px !important; max-height: 165px !important; }
+  .app-shell:has(.login-layout) .brand-column::after { margin: 4px auto 7px !important; font-size: 7.2px; }
   .app-shell:has(.login-layout) .login-card { padding: 14px 17px 11px !important; border-radius: 18px !important; }
   .app-shell:has(.login-layout) .login-heading { margin-bottom: 8px !important; }
   .app-shell:has(.login-layout) .login-heading h2 { font-size: 21px !important; }
