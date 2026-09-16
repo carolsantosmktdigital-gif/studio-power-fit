@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import { seedDemoData } from '../lib/demoSeed'
 import studioLogo from '../assets/studio-power-fit-logo.png'
+import FinancialOperations from './FinancialOperations'
 import './DemoSeed.css'
 import './ExecutiveDashboard.css'
 
@@ -53,6 +54,14 @@ function AppShell({ profile, onLogout }) {
     attendancePresent: 0,
     attendanceAbsent: 0,
     attendanceRate: 0,
+    expenses: 0,
+    netResult: 0,
+    paidToday: 0,
+    paidTodayAmount: 0,
+    dueToday: 0,
+    dueTodayAmount: 0,
+    financialHistory: [],
+    expenseCategories: [],
     planCounts: { MENSALISTA: 0, WELLHUB: 0, TOTALPASS: 0 },
   })
   const [receptionPanel, setReceptionPanel] = useState({ appointments: [], present: 0, absent: 0, activeTeachers: 0, overdue: 0, waitlist: 0, birthdays: [] })
@@ -136,6 +145,34 @@ function AppShell({ profile, onLogout }) {
     }, { MENSALISTA: 0, WELLHUB: 0, TOTALPASS: 0 })
     const revenue = paidRows.reduce((sum, item) => sum + Number(item.amount || 0), 0)
     const expectedRevenue = currentPayments.reduce((sum, item) => sum + Number(item.amount || 0), 0)
+    const paidTodayRows = paymentRows.filter((item) => item.status === 'IDENTIFICADO' && item.payment_date === today)
+    const dueTodayRows = paymentRows.filter((item) => !['IDENTIFICADO', 'CANCELADO'].includes(item.status) && item.due_date === today)
+    const financialHistory = Array.from({ length: 25 }, (_, index) => {
+      const periodDate = new Date()
+      periodDate.setDate(1)
+      periodDate.setMonth(periodDate.getMonth() - 24 + index)
+      const period = `${periodDate.getFullYear()}-${String(periodDate.getMonth() + 1).padStart(2, '0')}`
+      const periodRevenue = paymentRows.filter((item) => item.status === 'IDENTIFICADO' && String(item.due_date).startsWith(period)).reduce((sum, item) => sum + Number(item.amount || 0), 0)
+      const growth = 0.72 + (index * 0.012)
+      const expenseCategories = [
+        { label: 'Equipe', amount: Math.round(720 * growth) },
+        { label: 'Aluguel', amount: Math.round(690 * growth) },
+        { label: 'Energia e água', amount: Math.round((185 + ((index % 4) * 17)) * growth) },
+        { label: 'Sistemas', amount: Math.round(95 * growth) },
+        { label: 'Marketing', amount: Math.round((110 + ((index % 3) * 25)) * growth) },
+        { label: 'Manutenção', amount: Math.round((70 + ((index % 5) * 18)) * growth) },
+      ]
+      const expenses = expenseCategories.reduce((sum, item) => sum + item.amount, 0)
+      return {
+        period,
+        label: periodDate.toLocaleDateString('pt-BR', { month: 'short', year: '2-digit' }).replace('.', ''),
+        revenue: periodRevenue,
+        expenses,
+        result: periodRevenue - expenses,
+        expenseCategories,
+      }
+    })
+    const currentFinancialPeriod = financialHistory.at(-1) ?? { expenses: 0, expenseCategories: [] }
     setHealth({
       activeStudents: activeRows.length,
       inactiveStudents: studentRows.length - activeRows.length,
@@ -155,6 +192,14 @@ function AppShell({ profile, onLogout }) {
       attendancePresent,
       attendanceAbsent,
       attendanceRate: attendanceTotal ? (attendancePresent / attendanceTotal) * 100 : 0,
+      expenses: currentFinancialPeriod.expenses,
+      netResult: revenue - currentFinancialPeriod.expenses,
+      paidToday: paidTodayRows.length,
+      paidTodayAmount: paidTodayRows.reduce((sum, item) => sum + Number(item.amount || 0), 0),
+      dueToday: dueTodayRows.length,
+      dueTodayAmount: dueTodayRows.reduce((sum, item) => sum + Number(item.amount || 0), 0),
+      financialHistory,
+      expenseCategories: currentFinancialPeriod.expenseCategories,
       planCounts,
     })
   }
@@ -172,7 +217,7 @@ function AppShell({ profile, onLogout }) {
   }
 
   const loadPayments = async () => {
-    const { data } = await supabase.from('payments').select('id, student_id, amount, due_date, status, payment_type').order('due_date').limit(50)
+    const { data } = await supabase.from('payments').select('id, student_id, amount, due_date, payment_date, status, payment_type').order('due_date', { ascending: false }).limit(250)
     const studentIds = [...new Set((data ?? []).map((item) => item.student_id))]
     const { data: studentsData } = studentIds.length ? await supabase.from('students').select('id, profile_id').in('id', studentIds) : { data: [] }
     const profileIds = (studentsData ?? []).map((item) => item.profile_id)
@@ -181,7 +226,7 @@ function AppShell({ profile, onLogout }) {
     const studentById = new Map((studentsData ?? []).map((item) => [item.id, profilesById.get(item.profile_id)]))
     setPayments((data ?? []).map((item) => ({ ...item, student: studentById.get(item.student_id) })).sort((a, b) => {
       const presentationDiff = getPaymentPresentation(a).priority - getPaymentPresentation(b).priority
-      return presentationDiff || String(a.due_date).localeCompare(String(b.due_date))
+      return presentationDiff || String(b.due_date).localeCompare(String(a.due_date))
     }))
   }
 
@@ -348,6 +393,7 @@ function AppShell({ profile, onLogout }) {
       {page === 'Agenda' && <section className="students-page live-data-page"><div className="panel-heading"><div><span className="placeholder-kicker">PRÓXIMOS ATENDIMENTOS</span><h2>Agenda</h2></div><button className="outline-action" onClick={loadAgenda} type="button">Atualizar</button></div><div className="students-table-wrap"><table className="students-table"><thead><tr><th>Aluno</th><th>Data</th><th>Horário</th><th>Status</th></tr></thead><tbody>{appointments.length ? appointments.map((item) => <tr key={item.id}><td>{item.student?.full_name || 'Aluno'}</td><td>{new Date(`${item.appointment_date}T12:00:00`).toLocaleDateString('pt-BR')}</td><td>{String(item.start_time).slice(0, 5)}</td><td><span className="status-pill is-active">{item.status}</span></td></tr>) : <tr><td colSpan="4">Não há atendimentos futuros cadastrados.</td></tr>}</tbody></table></div></section>}
       {page === 'Pagamentos' && <section className="students-page live-data-page finance-page"><div className="panel-heading"><div><span className="placeholder-kicker">CONTROLE FINANCEIRO</span><h2>Pagamentos</h2></div><button className="outline-action" onClick={() => { loadPayments(); loadHealth() }} type="button">Atualizar</button></div><div className="finance-summary"><article><small>RECEBIDO NO MÊS</small><strong>{formatCurrency(health.revenue)}</strong><span>{formatPercent(health.collectionRate)} do previsto</span></article><article className="finance-due"><small>A VENCER EM 7 DIAS</small><strong>{formatCurrency(health.dueSoonAmount)}</strong><span>{health.dueSoon} cobrança(s)</span></article><article className="finance-overdue"><small>TOTAL VENCIDO</small><strong>{formatCurrency(health.overdueAmount)}</strong><span>{health.overdue} cobrança(s)</span></article></div><div className="students-table-wrap"><table className="students-table"><thead><tr><th>Aluno</th><th>Origem</th><th>Vencimento</th><th>Valor</th><th>Status</th></tr></thead><tbody>{payments.length ? payments.map((item) => { const paymentState = getPaymentPresentation(item); return <tr key={item.id}><td>{item.student?.full_name || 'Aluno'}</td><td>{item.payment_type === 'MENSALIDADE' ? 'Mensalista' : item.payment_type}</td><td>{new Date(`${item.due_date}T12:00:00`).toLocaleDateString('pt-BR')}</td><td>{formatCurrency(item.amount)}</td><td><span className={`status-pill ${paymentState.tone}`}>{paymentState.label}</span></td></tr> }) : <tr><td colSpan="5">Nenhum pagamento registrado.</td></tr>}</tbody></table></div></section>}
       {page === 'Início' && <section className="dashboard-executive"><div className="executive-hero"><div><span className="placeholder-kicker">VISÃO EXECUTIVA</span><h2>Studio sob controle.</h2><p>Indicadores financeiros, comerciais e operacionais em uma única visão.</p></div><div className="executive-hero-actions"><span>{new Date().toLocaleDateString('pt-BR', { month: 'long', year: 'numeric' })}</span><button className="outline-action" onClick={() => { loadHealth(); loadPayments() }} type="button">Atualizar indicadores</button></div></div><div className="executive-kpi-grid"><article className="executive-kpi is-revenue"><div><small>RECEBIDO NO MÊS</small><strong>{formatCurrency(health.revenue)}</strong><span>de {formatCurrency(health.expectedRevenue)} previstos</span></div><b>{formatPercent(health.collectionRate)}</b></article><article className="executive-kpi is-upcoming"><div><small>PAGAMENTOS A VENCER</small><strong>{formatCurrency(health.dueSoonAmount)}</strong><span>{health.dueSoon} cobrança(s) nos próximos 7 dias</span></div><b>{health.dueSoon}</b></article><article className="executive-kpi is-overdue"><div><small>PAGAMENTOS VENCIDOS</small><strong>{formatCurrency(health.overdueAmount)}</strong><span>{health.overdue} cobrança(s) exigem atenção</span></div><b>{health.overdue}</b></article><article className="executive-kpi is-frequency"><div><small>FREQUÊNCIA DO MÊS</small><strong>{formatPercent(health.attendanceRate)}</strong><span>{health.attendancePresent} presenças · {health.attendanceAbsent} faltas</span></div><b>{health.attendancePresent}</b></article></div><div className="executive-dashboard-grid"><section className="executive-panel plan-panel"><div className="executive-panel-heading"><div><span className="placeholder-kicker">BASE DE ALUNOS</span><h3>Distribuição por plano</h3></div><strong>{health.activeStudents}<small> ativos</small></strong></div><div className="plan-breakdown">{[['MENSALISTA', 'Mensalistas'], ['WELLHUB', 'Wellhub'], ['TOTALPASS', 'TotalPass']].map(([plan, label]) => <article key={plan}><div><span>{label}</span><strong>{health.planCounts[plan]}</strong></div><div className="progress-track"><i style={{ width: `${planShare(plan)}%` }} /></div><small>{formatPercent(planShare(plan))} da base ativa</small></article>)}</div><div className="student-status-line"><span><i className="status-dot is-active" />{health.activeStudents} ativos</span><span><i className="status-dot" />{health.inactiveStudents} inativos ou suspensos</span></div></section><section className="executive-panel capacity-panel"><div className="executive-panel-heading"><div><span className="placeholder-kicker">CAPACIDADE DA ACADEMIA</span><h3>Pico de ocupação hoje</h3></div><strong>{formatPercent(health.occupancyRate)}</strong></div><div className="capacity-visual" style={{ '--capacity-progress': `${health.occupancyRate * 3.6}deg` }}><div><strong>{health.peakBooked}</strong><span>de {health.slotCapacity}</span></div></div><div className="capacity-details"><span><b>{health.activeTeachers}</b> professores ativos</span><span><b>{health.todayAppointments}</b> treinos agendados</span><span><b>4</b> alunos por professor</span></div></section><section className="executive-panel movement-panel"><div className="executive-panel-heading"><div><span className="placeholder-kicker">MOVIMENTO DO MÊS</span><h3>Frequência dos alunos</h3></div><strong>{formatPercent(health.attendanceRate)}</strong></div><div className="attendance-bar"><i style={{ width: `${health.attendanceRate}%` }} /></div><div className="attendance-legend"><span><i className="status-dot is-present" />{health.attendancePresent} presenças</span><span><i className="status-dot is-absent" />{health.attendanceAbsent} faltas</span></div><p>{health.attendanceRate >= 85 ? 'Frequência saudável: a maioria dos alunos mantém regularidade.' : 'Atenção: há oportunidade de reativar alunos com baixa frequência.'}</p></section><section className="executive-panel attention-panel"><span className="placeholder-kicker">ATENÇÃO DA GESTÃO</span><h3>{health.overdue ? `${health.overdue} pagamento(s) vencido(s)` : 'Financeiro em dia'}</h3><p>{health.overdue ? `${formatCurrency(health.overdueAmount)} aguardando regularização. Priorize o contato com esses alunos.` : 'Não há cobranças vencidas neste momento.'}</p><button className="dashboard-primary-action" onClick={() => setPage('Pagamentos')} type="button">Ver financeiro</button></section></div></section>}
+      {isAdmin && page === 'Início' && <FinancialOperations health={health} payments={payments} onOpenPayments={() => setPage('Pagamentos')} />}
       {page === 'Auditoria' && <section className="students-page audit-page"><div className="panel-heading"><div><span className="placeholder-kicker">CONTROLE DO GESTOR</span><h2>Auditoria</h2></div><button className="outline-action" onClick={loadAudit} type="button">Atualizar</button></div><p className="audit-description">Ações realizadas por recepção e professores.</p><div className="students-table-wrap"><table className="students-table"><thead><tr><th>Responsável</th><th>Perfil</th><th>Ação</th><th>Módulo</th><th>Quando</th></tr></thead><tbody>{auditLogs.length === 0 ? <tr><td colSpan="5">Ainda não há ações registradas desses perfis.</td></tr> : auditLogs.map((item) => <tr key={item.id}><td>{item.person?.full_name || 'Usuário removido'}</td><td>{item.person?.role === 'RECEPCAO' ? 'Recepção' : 'Professor'}</td><td>{item.action}</td><td>{item.module}</td><td>{new Date(item.created_at).toLocaleString('pt-BR')}</td></tr>)}</tbody></table></div></section>}
       {page === 'Início' ? <section className="dashboard-hero"><div><span className="placeholder-kicker">PAINEL ADMINISTRATIVO</span><h2>Controle o Studio<br/>em um só lugar.</h2><p>{students.length} alunos e {employees.length} funcionários na demonstração.</p></div></section> : ['Alunos','Funcionários'].includes(page) ? <section className="students-page"><div className="panel-heading"><div><span className="placeholder-kicker">{page === 'Alunos' ? 'CADASTRO E ACOMPANHAMENTO' : 'EQUIPE E ACESSOS'}</span><h2>{page}</h2></div><button className="dashboard-primary-action" onClick={() => openForm(page === 'Alunos' ? 'ALUNO' : 'RECEPCAO')} type="button">+ Novo {page === 'Alunos' ? 'aluno' : 'funcionário'}</button></div>{notice && <div className="dashboard-notice">{notice}</div>}<div className="students-table-wrap"><table className="students-table"><thead><tr><th>{page === 'Alunos' ? 'Aluno' : 'Funcionário'}</th><th>{page === 'Alunos' ? 'Status' : 'Cargo'}</th><th>{page === 'Alunos' ? 'Contato' : 'Perfil'}</th><th>Ações</th></tr></thead><tbody>{rows.length === 0 ? <tr><td colSpan="4">Ainda não há registros.</td></tr> : rows.map((item) => <tr key={item.id}><td><strong>{item.profile?.full_name}</strong><span>{item.profile?.email}</span></td><td>{page === 'Alunos' ? <span className={`status-pill ${item.status === 'ATIVO' ? 'is-active' : ''}`}>{item.status}</span> : item.position}</td><td>{page === 'Alunos' ? item.profile?.phone || 'Não informado' : item.profile?.role}</td><td><button className="outline-action" onClick={() => page === 'Alunos' ? setEditingStudent(item) : setEditingEmployee({ ...item, profile: { ...item.profile } })} type="button">Editar</button></td></tr>)}</tbody></table></div></section> : <section className={`page-placeholder ${page === 'Auditoria' ? 'audit-placeholder' : ''}`}><span className="placeholder-kicker">EM CONSTRUÇÃO</span><h2>{page}</h2></section>}
     </main></div>
