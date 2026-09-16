@@ -1,0 +1,819 @@
+.student-app {
+  --student-red: #ff2038;
+  --student-red-strong: #e51d32;
+  --student-navy: #08162f;
+  --student-navy-soft: #10264a;
+  --student-bg: #f5f7fb;
+  --student-card: rgba(255, 255, 255, 0.92);
+  --student-border: rgba(8, 22, 47, 0.08);
+  --student-text: #08162f;
+  --student-soft: #66748a;
+  --student-muted: #96a0b0;
+
+  min-height: 100svh;
+  color: var(--student-text);
+  background:
+    radial-gradient(circle at 8% 2%, rgba(255, 32, 56, 0.08), transparent 32%),
+    radial-gradient(circle at 95% 10%, rgba(16, 38, 74, 0.08), transparent 28%),
+    var(--student-bg);
+  position: relative;
+  overflow-x: hidden;
+  padding-bottom: 104px;
+}
+
+.student-bg-glow {
+  position: fixed;
+  width: 360px;
+  height: 360px;
+  border-radius: 999px;
+  filter: blur(100px);
+  opacity: 0.15;
+  pointer-events: none;
+}
+
+.student-bg-glow-one {
+  top: -180px;
+  left: -140px;
+  background: var(--student-red);
+}
+
+.student-bg-glow-two {
+  right: -180px;
+  bottom: 20%;
+  background: var(--student-navy-soft);
+}
+
+.student-header {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+  min-height: 88px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  position: relative;
+  z-index: 2;
+}
+
+.student-brand {
+  border: 0;
+  background: transparent;
+  display: inline-flex;
+  align-items: center;
+  gap: 11px;
+  padding: 0;
+  cursor: pointer;
+  color: inherit;
+}
+
+.student-brand img {
+  width: 46px;
+  height: 46px;
+  object-fit: contain;
+}
+
+.student-brand span {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  line-height: 1;
+}
+
+.student-brand small {
+  color: var(--student-red);
+  font-size: 8px;
+  font-weight: 900;
+  letter-spacing: .26em;
+  margin-bottom: 5px;
+}
+
+.student-brand strong {
+  font-size: 15px;
+  letter-spacing: .05em;
+}
+
+.student-header-actions {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.student-icon-button,
+.student-profile-button,
+.student-outline-button,
+.student-text-button,
+.student-back-button {
+  font: inherit;
+}
+
+.student-icon-button {
+  width: 42px;
+  height: 42px;
+  border: 1px solid var(--student-border);
+  background: rgba(255,255,255,.72);
+  border-radius: 14px;
+  cursor: pointer;
+}
+
+.student-profile-button {
+  border: 0;
+  background: transparent;
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.student-avatar {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  color: #fff;
+  background: linear-gradient(135deg, var(--student-navy), #174782);
+  font-weight: 900;
+  box-shadow: 0 8px 22px rgba(8, 22, 47, .16);
+}
+
+.student-user-copy {
+  display: flex;
+  flex-direction: column;
+  text-align: left;
+  gap: 2px;
+}
+
+.student-user-copy strong {
+  font-size: 13px;
+}
+
+.student-user-copy small {
+  color: var(--student-muted);
+  font-size: 10px;
+}
+
+.student-content {
+  width: min(1180px, calc(100% - 40px));
+  margin: 0 auto;
+  position: relative;
+  z-index: 1;
+}
+
+.student-welcome {
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-end;
+  gap: 20px;
+  padding: 34px 0 28px;
+}
+
+.student-kicker {
+  color: var(--student-red);
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .2em;
+}
+
+.student-welcome h1,
+.student-section-page h1 {
+  margin: 8px 0 6px;
+  font-size: clamp(34px, 5vw, 54px);
+  line-height: 1;
+  letter-spacing: -.045em;
+}
+
+.student-welcome p {
+  color: var(--student-soft);
+  text-transform: capitalize;
+}
+
+.student-outline-button {
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 14px;
+  border: 1px solid var(--student-border);
+  color: var(--student-text);
+  background: rgba(255,255,255,.72);
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.student-hero-grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1.55fr) minmax(300px, .75fr);
+  gap: 18px;
+}
+
+.student-next-workout,
+.student-frequency-card,
+.student-panel {
+  border: 1px solid var(--student-border);
+  border-radius: 26px;
+  background: var(--student-card);
+  box-shadow: 0 18px 55px rgba(8, 22, 47, .06);
+}
+
+.student-next-workout {
+  padding: 28px;
+  color: #fff;
+  background:
+    linear-gradient(135deg, rgba(8,22,47,.98), rgba(16,38,74,.94)),
+    #08162f;
+  position: relative;
+  overflow: hidden;
+}
+
+.student-next-workout::after {
+  content: '';
+  position: absolute;
+  width: 260px;
+  height: 260px;
+  right: -100px;
+  bottom: -130px;
+  border-radius: 999px;
+  background: rgba(255, 32, 56, .22);
+  filter: blur(8px);
+}
+
+.student-card-heading {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+  position: relative;
+  z-index: 1;
+}
+
+.student-card-heading h2,
+.student-panel h2,
+.student-frequency-card h2 {
+  margin: 7px 0 0;
+  font-size: 20px;
+  letter-spacing: -.025em;
+}
+
+.student-next-workout h2 {
+  color: #fff;
+}
+
+.student-status-badge,
+.student-payment-pill {
+  border-radius: 999px;
+  padding: 8px 12px;
+  font-size: 10px;
+  font-weight: 800;
+  white-space: nowrap;
+}
+
+.student-status-badge {
+  color: #ffc6cd;
+  background: rgba(255, 32, 56, .13);
+  border: 1px solid rgba(255, 32, 56, .28);
+}
+
+.student-next-workout-body {
+  display: flex;
+  align-items: center;
+  gap: 18px;
+  padding: 36px 0 30px;
+  position: relative;
+  z-index: 1;
+}
+
+.student-calendar-mark {
+  width: 74px;
+  height: 74px;
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 1px;
+  background: rgba(255,255,255,.08);
+  border: 1px solid rgba(255,255,255,.11);
+}
+
+.student-calendar-mark span {
+  font-size: 9px;
+  font-weight: 900;
+  letter-spacing: .18em;
+  color: rgba(255,255,255,.7);
+}
+
+.student-calendar-mark strong {
+  font-size: 30px;
+  line-height: 1;
+  color: var(--student-red);
+}
+
+.student-next-workout-body h3 {
+  margin: 0 0 7px;
+  font-size: 20px;
+}
+
+.student-next-workout-body p {
+  color: rgba(255,255,255,.68);
+  margin: 0;
+  max-width: 520px;
+  line-height: 1.5;
+}
+
+.student-primary-button,
+.student-secondary-button {
+  min-height: 48px;
+  border-radius: 15px;
+  font-weight: 900;
+  cursor: pointer;
+  font: inherit;
+}
+
+.student-primary-button {
+  width: 100%;
+  border: 0;
+  color: #fff;
+  background: linear-gradient(135deg, var(--student-red), var(--student-red-strong));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 18px;
+  position: relative;
+  z-index: 1;
+  box-shadow: 0 12px 28px rgba(255,32,56,.22);
+}
+
+.student-frequency-card {
+  padding: 28px;
+}
+
+.student-mini-icon {
+  width: 42px;
+  height: 42px;
+  border-radius: 14px;
+  display: grid;
+  place-items: center;
+  background: rgba(255,32,56,.08);
+  color: var(--student-red);
+  font-size: 22px;
+}
+
+.student-frequency-score {
+  padding: 30px 0 22px;
+  display: flex;
+  align-items: baseline;
+  gap: 10px;
+}
+
+.student-frequency-score strong {
+  font-size: 54px;
+  line-height: 1;
+  letter-spacing: -.05em;
+}
+
+.student-frequency-score span,
+.student-frequency-card p,
+.student-panel p {
+  color: var(--student-soft);
+  line-height: 1.5;
+}
+
+.student-progress-track {
+  height: 8px;
+  background: rgba(8,22,47,.07);
+  border-radius: 999px;
+  overflow: hidden;
+}
+
+.student-progress-track span {
+  display: block;
+  height: 100%;
+  border-radius: inherit;
+  background: linear-gradient(90deg, var(--student-red), #ff6f7f);
+}
+
+.student-frequency-card p {
+  margin: 18px 0 0;
+  font-size: 12px;
+}
+
+.student-dashboard-grid {
+  margin-top: 18px;
+  display: grid;
+  grid-template-columns: 1.45fr .8fr .85fr;
+  gap: 18px;
+}
+
+.student-panel {
+  padding: 24px;
+}
+
+.student-text-button {
+  border: 0;
+  background: transparent;
+  color: var(--student-red);
+  font-size: 12px;
+  font-weight: 900;
+  cursor: pointer;
+}
+
+.student-evolution-metrics {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 10px;
+  margin: 25px 0 18px;
+}
+
+.student-evolution-metrics div {
+  padding: 16px;
+  border-radius: 17px;
+  background: rgba(8,22,47,.035);
+}
+
+.student-evolution-metrics span {
+  display: block;
+  color: var(--student-muted);
+  font-size: 10px;
+  font-weight: 800;
+  margin-bottom: 6px;
+}
+
+.student-evolution-metrics strong {
+  font-size: 20px;
+}
+
+.student-chart-placeholder {
+  height: 116px;
+  position: relative;
+  border-radius: 18px;
+  overflow: hidden;
+  background:
+    linear-gradient(rgba(8,22,47,.04) 1px, transparent 1px),
+    linear-gradient(90deg, rgba(8,22,47,.04) 1px, transparent 1px);
+  background-size: 28px 28px;
+  display: flex;
+  align-items: flex-end;
+  padding: 15px;
+  box-sizing: border-box;
+}
+
+.student-chart-line {
+  position: absolute;
+  left: 7%;
+  right: 7%;
+  top: 48%;
+  height: 2px;
+  background: linear-gradient(90deg, transparent, var(--student-red), transparent);
+  transform: rotate(-6deg);
+}
+
+.student-chart-placeholder small {
+  color: var(--student-muted);
+  position: relative;
+  z-index: 1;
+}
+
+.student-challenge-card {
+  background: linear-gradient(145deg, #fff, #fff6f7);
+}
+
+.student-challenge-card p {
+  font-size: 12px;
+}
+
+.student-challenge-ring {
+  width: 118px;
+  height: 118px;
+  margin: 20px auto 0;
+  border-radius: 999px;
+  border: 10px solid rgba(255,32,56,.11);
+  display: grid;
+  place-items: center;
+  align-content: center;
+  box-shadow: inset 0 0 0 1px rgba(255,32,56,.05);
+}
+
+.student-challenge-ring strong {
+  font-size: 24px;
+}
+
+.student-challenge-ring span {
+  font-size: 9px;
+  color: var(--student-muted);
+}
+
+.student-payment-pill {
+  color: var(--student-navy);
+  background: rgba(8,22,47,.06);
+}
+
+.student-finance-card p {
+  margin: 20px 0;
+  font-size: 12px;
+}
+
+.student-secondary-button {
+  width: 100%;
+  border: 1px solid var(--student-border);
+  background: #fff;
+  color: var(--student-text);
+}
+
+.student-shortcuts {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: 12px;
+  margin: 18px 0 6px;
+}
+
+.student-shortcuts button {
+  min-width: 0;
+  border: 1px solid var(--student-border);
+  border-radius: 19px;
+  background: rgba(255,255,255,.82);
+  padding: 17px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  color: inherit;
+  cursor: pointer;
+  text-align: left;
+  box-shadow: 0 10px 30px rgba(8,22,47,.04);
+}
+
+.student-shortcuts button > span {
+  width: 40px;
+  height: 40px;
+  border-radius: 13px;
+  display: grid;
+  place-items: center;
+  flex: 0 0 auto;
+  background: rgba(255,32,56,.08);
+  color: var(--student-red);
+  font-weight: 900;
+}
+
+.student-shortcuts button div {
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: 3px;
+}
+
+.student-shortcuts strong {
+  font-size: 12px;
+}
+
+.student-shortcuts small {
+  color: var(--student-muted);
+  font-size: 9px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.student-bottom-nav {
+  position: fixed;
+  z-index: 30;
+  left: 50%;
+  bottom: 18px;
+  transform: translateX(-50%);
+  width: min(520px, calc(100% - 28px));
+  height: 70px;
+  padding: 7px;
+  border-radius: 23px;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 4px;
+  background: rgba(8,22,47,.94);
+  border: 1px solid rgba(255,255,255,.08);
+  box-shadow: 0 18px 50px rgba(8,22,47,.28);
+  backdrop-filter: blur(18px);
+}
+
+.student-bottom-nav button {
+  border: 0;
+  border-radius: 17px;
+  background: transparent;
+  color: rgba(255,255,255,.58);
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 4px;
+  cursor: pointer;
+  font: inherit;
+}
+
+.student-bottom-nav button span {
+  font-size: 20px;
+  line-height: 1;
+}
+
+.student-bottom-nav button small {
+  font-size: 9px;
+  font-weight: 800;
+}
+
+.student-bottom-nav button.active {
+  color: #fff;
+  background: linear-gradient(135deg, rgba(255,32,56,.28), rgba(255,32,56,.12));
+  box-shadow: inset 0 0 0 1px rgba(255,32,56,.16);
+}
+
+.student-section-page {
+  padding: 24px 0 20px;
+}
+
+.student-section-page-heading {
+  display: flex;
+  align-items: center;
+  gap: 16px;
+}
+
+.student-back-button {
+  width: 44px;
+  height: 44px;
+  border: 1px solid var(--student-border);
+  border-radius: 14px;
+  background: #fff;
+  cursor: pointer;
+}
+
+.student-section-placeholder {
+  min-height: 480px;
+  margin-top: 22px;
+  border: 1px solid var(--student-border);
+  border-radius: 26px;
+  background: rgba(255,255,255,.84);
+  display: grid;
+  place-items: center;
+  align-content: center;
+  gap: 12px;
+  padding: 36px;
+  text-align: center;
+}
+
+.student-placeholder-icon {
+  width: 64px;
+  height: 64px;
+  border-radius: 20px;
+  display: grid;
+  place-items: center;
+  color: var(--student-red);
+  background: rgba(255,32,56,.08);
+  font-size: 28px;
+}
+
+.student-section-placeholder h2 {
+  margin: 4px 0 0;
+}
+
+.student-section-placeholder p {
+  max-width: 520px;
+  color: var(--student-soft);
+  line-height: 1.6;
+}
+
+.student-section-placeholder .student-secondary-button {
+  width: auto;
+  min-width: 180px;
+  padding: 0 20px;
+}
+
+@media (max-width: 960px) {
+  .student-dashboard-grid {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .student-evolution-card {
+    grid-column: 1 / -1;
+  }
+
+  .student-shortcuts {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+@media (max-width: 760px) {
+  .student-app {
+    padding-bottom: 94px;
+  }
+
+  .student-header,
+  .student-content {
+    width: min(100% - 28px, 1180px);
+  }
+
+  .student-header {
+    min-height: 74px;
+  }
+
+  .student-brand img {
+    width: 40px;
+    height: 40px;
+  }
+
+  .student-brand span,
+  .student-user-copy {
+    display: none;
+  }
+
+  .student-welcome {
+    padding: 24px 0 20px;
+  }
+
+  .student-welcome h1 {
+    font-size: 38px;
+  }
+
+  .student-outline-button {
+    display: none;
+  }
+
+  .student-hero-grid,
+  .student-dashboard-grid {
+    grid-template-columns: 1fr;
+  }
+
+  .student-evolution-card {
+    grid-column: auto;
+  }
+
+  .student-next-workout,
+  .student-frequency-card,
+  .student-panel {
+    border-radius: 22px;
+  }
+
+  .student-next-workout {
+    padding: 22px;
+  }
+
+  .student-card-heading {
+    gap: 10px;
+  }
+
+  .student-status-badge {
+    white-space: normal;
+    text-align: center;
+  }
+
+  .student-evolution-metrics {
+    grid-template-columns: repeat(3, 1fr);
+  }
+
+  .student-shortcuts {
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .student-shortcuts button {
+    align-items: flex-start;
+    flex-direction: column;
+  }
+
+  .student-bottom-nav {
+    bottom: 10px;
+    width: calc(100% - 20px);
+    height: 68px;
+    border-radius: 21px;
+  }
+}
+
+@media (max-width: 460px) {
+  .student-content,
+  .student-header {
+    width: calc(100% - 22px);
+  }
+
+  .student-welcome h1 {
+    font-size: 34px;
+  }
+
+  .student-next-workout-body {
+    align-items: flex-start;
+  }
+
+  .student-calendar-mark {
+    width: 64px;
+    height: 64px;
+  }
+
+  .student-evolution-metrics {
+    gap: 7px;
+  }
+
+  .student-evolution-metrics div {
+    padding: 12px 10px;
+  }
+
+  .student-evolution-metrics strong {
+    font-size: 17px;
+  }
+
+  .student-shortcuts {
+    grid-template-columns: 1fr;
+  }
+
+  .student-shortcuts button {
+    flex-direction: row;
+    align-items: center;
+  }
+}
