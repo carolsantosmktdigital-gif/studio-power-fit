@@ -10,7 +10,7 @@
     padding: 26px 28px;
     display: grid;
     grid-template-columns: minmax(185px, .92fr) minmax(190px, 1fr) minmax(175px, .78fr);
-    gap: 10px;
+    gap: 14px;
     align-items: center;
     overflow: hidden;
   }
@@ -34,7 +34,7 @@
     grid-column: 1;
     grid-row: 1;
     align-items: flex-start;
-    gap: 12px;
+    gap: 8px;
     padding-right: 8px;
     border-right: 1px solid rgba(115,139,169,.16);
   }
