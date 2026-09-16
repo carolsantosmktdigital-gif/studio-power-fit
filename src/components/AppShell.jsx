@@ -1,6 +1,8 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
+import { seedDemoData } from '../lib/demoSeed'
 import studioLogo from '../assets/studio-power-fit-logo.png'
+import './DemoSeed.css'
 
 const emptyForm = { full_name: '', email: '', phone: '', notification_phone: '', password: '', role: 'ALUNO', position: '', hire_date: '', cpf: '', birth_date: '', address_zip_code: '', address_street: '', address_number: '', address_complement: '', address_district: '', address_city: '', address_state: '', employment_type: '', notes: '', payment_plan: 'MENSALISTA' }
 
@@ -20,6 +22,7 @@ function AppShell({ profile, onLogout }) {
   const [health, setHealth] = useState({ activeStudents: 0, inactiveStudents: 0, activeEmployees: 0, revenue: 0, overdue: 0, todayAppointments: 0 })
   const [receptionPanel, setReceptionPanel] = useState({ appointments: [], present: 0, absent: 0, activeTeachers: 0, overdue: 0, waitlist: 0, birthdays: [] })
   const [notice, setNotice] = useState('')
+  const [seedingDemo, setSeedingDemo] = useState(false)
   const [form, setForm] = useState(null)
   const [editingStudent, setEditingStudent] = useState(null)
   const [editingEmployee, setEditingEmployee] = useState(null)
@@ -221,6 +224,23 @@ function AppShell({ profile, onLogout }) {
   }
 
   const openForm = (role) => setForm({ ...emptyForm, role, position: role === 'PROFESSOR' ? 'Professor(a)' : role === 'RECEPCAO' ? 'Recepcionista' : '' })
+  const createDemoData = async () => {
+    const approved = window.confirm('Criar ou completar os dados fictícios da demonstração? Nenhum registro real será apagado ou sobrescrito.')
+    if (!approved) return
+    setSeedingDemo(true)
+    setNotice('Preparando os dados da demonstração…')
+    try {
+      const result = await seedDemoData(supabase)
+      const inserted = Object.values(result.inserted).reduce((total, amount) => total + amount, 0)
+      const warning = result.warnings.length ? ` ${result.warnings.length} grupo(s) opcional(is) não puderam ser incluídos.` : ''
+      setNotice(`Demonstração pronta: ${result.totalAccounts} contas verificadas, ${result.createdAccounts} nova(s) e ${inserted} registro(s) operacional(is) incluído(s).${warning}`)
+      await Promise.all([loadStudents(), loadEmployees(), loadHealth(), loadAgenda(), loadPayments(), loadReceptionPanel()])
+    } catch (error) {
+      setNotice(`Não foi possível concluir a demonstração: ${error.message}`)
+    } finally {
+      setSeedingDemo(false)
+    }
+  }
   const navItems = isAdmin ? ['Início', 'Alunos', 'Funcionários', 'Agenda', 'Pagamentos', 'Auditoria'] : ['Início', 'Agendamentos', 'Alunos', 'Professores', 'Financeiro', 'Lista de espera', 'Comunicação', 'Relatórios', 'Configurações']
   const navigationPage = (item) => item === 'Agendamentos' ? 'Agenda' : item === 'Financeiro' ? 'Pagamentos' : item
   const title = page === 'Início' ? 'Visão geral' : page
@@ -230,6 +250,8 @@ function AppShell({ profile, onLogout }) {
   return <div className={`app-shell dashboard-shell ${darkMode ? 'theme-dark' : 'theme-light'} ${isAdmin ? 'is-admin' : 'is-reception'}`}>
     <aside className="app-sidebar"><div className="sidebar-brand sidebar-brand-logo"><img src={studioLogo} alt="Studio Power Fit" /></div><div className="sidebar-section-title">{isAdmin ? 'GESTÃO' : 'ATENDIMENTO'}</div><nav className="sidebar-menu">{navItems.map((item) => <button key={item} className={`sidebar-item ${page === navigationPage(item) ? 'active' : ''}`} onClick={() => setPage(navigationPage(item))} type="button"><span className="sidebar-icon">{item === 'Alunos' ? '◉' : item === 'Professores' || item === 'Funcionários' ? '♟' : item === 'Auditoria' || item === 'Relatórios' ? '◷' : item === 'Financeiro' ? '▣' : item === 'Lista de espera' ? '◌' : item === 'Comunicação' ? '✉' : '⌂'}</span><span>{item}</span></button>)}</nav><div className="sidebar-bottom"><button className="sidebar-item" onClick={onLogout} type="button"><span className="sidebar-icon">⇥</span><span>Sair da conta</span></button></div></aside>
     <div className="app-main"><header className="app-header"><div><span className="header-kicker">STUDIO POWER FIT · DEMONSTRAÇÃO</span><h1>{title}</h1></div><div className="header-actions"><button className="header-theme-button" onClick={() => setDarkMode(!darkMode)} type="button">{darkMode ? '☀️' : '🌙'}</button><div className="header-user"><div className="user-avatar">{(profile.full_name || 'A')[0]}</div><div className="user-info"><strong>{profile.full_name}</strong><span>{profile.role}</span></div></div></div></header><main className="app-content">
+      {isAdmin && page === 'Início' && <div className="demo-seed-toolbar"><div><strong>Apresentação com dados realistas</strong><span>Crie contas e históricos fictícios identificados como DEMO, sem alterar os registros reais.</span></div><button className="dashboard-primary-action" disabled={seedingDemo} onClick={createDemoData} type="button">{seedingDemo ? 'Criando demonstração…' : 'Criar dados da demo'}</button></div>}
+      {isAdmin && page === 'Início' && notice && <div className="dashboard-notice demo-seed-notice">{notice}</div>}
       {!isAdmin && page === 'Início' && <section className="reception-dashboard"><div className="reception-welcome"><div><span className="placeholder-kicker">OPERAÇÃO DO DIA</span><h2>Bom trabalho,<br />Recepção.</h2><p>{new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}</p></div><button className="outline-action" onClick={loadReceptionPanel} type="button">Atualizar painel</button></div><div className="reception-stats"><article><small>AGENDADOS HOJE</small><strong>{receptionPanel.appointments.length}</strong><button onClick={() => setPage('Agenda')} type="button">Ver agenda</button></article><article><small>PRESENÇAS</small><strong>{receptionPanel.present}</strong><span>{receptionPanel.absent} falta(s)</span></article><article><small>PROFESSORES ATIVOS</small><strong>{receptionPanel.activeTeachers}</strong><span>em operação</span></article><article><small>INADIMPLENTES</small><strong>{receptionPanel.overdue}</strong><button onClick={() => setPage('Pagamentos')} type="button">Ver pagamentos</button></article><article><small>LISTA DE ESPERA</small><strong>{receptionPanel.waitlist}</strong><span>aguardando vaga</span></article></div><div className="reception-grid"><section className="reception-card"><div className="panel-heading"><div><span className="placeholder-kicker">PRÓXIMOS HORÁRIOS</span><h3>Agenda de hoje</h3></div><button className="outline-action" onClick={() => setPage('Agenda')} type="button">Abrir</button></div>{receptionSlots.length ? receptionSlots.slice(0, 5).map((slot) => <div className="slot-row" key={slot[0].start_time}><strong>{String(slot[0].start_time).slice(0, 5)}</strong><span>{slot.length} aluno(s) confirmado(s)</span><b>{slot.length >= 8 ? 'LOTADO' : 'COM VAGAS'}</b></div>) : <p>Nenhum horário confirmado para hoje.</p>}</section><section className="reception-card"><span className="placeholder-kicker">ALERTAS</span><h3>Atenção agora</h3><div className="reception-alert"><b>💳 Pagamentos pendentes</b><span>{receptionPanel.overdue} aluno(s) precisam de acompanhamento.</span><button onClick={() => setPage('Pagamentos')} type="button">Ver</button></div><div className="reception-alert"><b>📋 Lista de espera</b><span>{receptionPanel.waitlist} aluno(s) aguardando vaga.</span><button onClick={() => setPage('Agenda')} type="button">Ver</button></div></section><section className="reception-card birthdays"><span className="placeholder-kicker">ANIVERSARIANTES</span><h3>Hoje</h3>{receptionPanel.birthdays.length ? receptionPanel.birthdays.map((person) => <div className="birthday-row" key={person.full_name}><span>🎂</span><div><b>{person.full_name}</b><small>{person.notification_phone || person.phone || 'Sem telefone'}</small></div></div>) : <p>Nenhum aniversariante hoje.</p>}</section></div></section>}
       {page === 'Agenda' && <section className="students-page live-data-page"><div className="panel-heading"><div><span className="placeholder-kicker">PRÓXIMOS ATENDIMENTOS</span><h2>Agenda</h2></div><button className="outline-action" onClick={loadAgenda} type="button">Atualizar</button></div><div className="students-table-wrap"><table className="students-table"><thead><tr><th>Aluno</th><th>Data</th><th>Horário</th><th>Status</th></tr></thead><tbody>{appointments.length ? appointments.map((item) => <tr key={item.id}><td>{item.student?.full_name || 'Aluno'}</td><td>{new Date(`${item.appointment_date}T12:00:00`).toLocaleDateString('pt-BR')}</td><td>{String(item.start_time).slice(0, 5)}</td><td><span className="status-pill is-active">{item.status}</span></td></tr>) : <tr><td colSpan="4">Não há atendimentos futuros cadastrados.</td></tr>}</tbody></table></div></section>}
       {page === 'Pagamentos' && <section className="students-page live-data-page"><div className="panel-heading"><div><span className="placeholder-kicker">CONTROLE FINANCEIRO</span><h2>Pagamentos</h2></div><button className="outline-action" onClick={loadPayments} type="button">Atualizar</button></div><div className="students-table-wrap"><table className="students-table"><thead><tr><th>Aluno</th><th>Vencimento</th><th>Valor</th><th>Status</th></tr></thead><tbody>{payments.length ? payments.map((item) => <tr key={item.id}><td>{item.student?.full_name || 'Aluno'}</td><td>{new Date(`${item.due_date}T12:00:00`).toLocaleDateString('pt-BR')}</td><td>{Number(item.amount).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })}</td><td><span className={`status-pill ${item.status === 'IDENTIFICADO' ? 'is-active' : ''}`}>{item.status.replaceAll('_', ' ')}</span></td></tr>) : <tr><td colSpan="4">Nenhum pagamento registrado.</td></tr>}</tbody></table></div></section>}
