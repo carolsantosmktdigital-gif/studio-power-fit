@@ -1,4 +1,5 @@
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
+import { supabase } from '../lib/supabase'
 import studioLogo from '../assets/studio-power-fit-logo.png'
 import './StudentApp.css'
 
@@ -12,6 +13,74 @@ const pages = {
 
 function StudentApp({ profile, onLogout }) {
   const [page, setPage] = useState(pages.HOME)
+  const [student, setStudent] = useState(null)
+  const [nextWorkout, setNextWorkout] = useState(null)
+  const [latestPayment, setLatestPayment] = useState(null)
+  const [loadingData, setLoadingData] = useState(true)
+  const [dataError, setDataError] = useState('')
+
+  useEffect(() => {
+    let cancelled = false
+
+    async function loadStudentData() {
+      if (!profile?.id) return
+
+      setLoadingData(true)
+      setDataError('')
+
+      const { data: studentRow, error: studentError } = await supabase
+        .from('students')
+        .select('id, profile_id, status, payment_plan')
+        .eq('profile_id', profile.id)
+        .single()
+
+      if (cancelled) return
+
+      if (studentError) {
+        setDataError('Não foi possível carregar seus dados agora.')
+        setLoadingData(false)
+        return
+      }
+
+      setStudent(studentRow)
+
+      const today = new Date().toISOString().slice(0, 10)
+
+      const [{ data: appointments, error: appointmentsError }, { data: payments, error: paymentsError }] = await Promise.all([
+        supabase
+          .from('appointments')
+          .select('id, student_id, appointment_date, start_time, status')
+          .eq('student_id', studentRow.id)
+          .gte('appointment_date', today)
+          .eq('status', 'CONFIRMADO')
+          .order('appointment_date', { ascending: true })
+          .order('start_time', { ascending: true })
+          .limit(1),
+        supabase
+          .from('payments')
+          .select('id, student_id, amount, due_date, status, payment_type')
+          .eq('student_id', studentRow.id)
+          .order('due_date', { ascending: false })
+          .limit(1),
+      ])
+
+      if (cancelled) return
+
+      if (appointmentsError || paymentsError) {
+        setDataError('Algumas informações podem estar temporariamente indisponíveis.')
+      }
+
+      setNextWorkout(appointments?.[0] ?? null)
+      setLatestPayment(payments?.[0] ?? null)
+      setLoadingData(false)
+    }
+
+    loadStudentData()
+
+    return () => {
+      cancelled = true
+    }
+  }, [profile?.id])
 
   const firstName = useMemo(() => {
     return String(profile?.full_name || 'Aluno').trim().split(/\s+/)[0]
@@ -26,6 +95,18 @@ function StudentApp({ profile, onLogout }) {
   }, [])
 
   const goHome = () => setPage(pages.HOME)
+
+  const formattedWorkoutDate = useMemo(() => {
+    if (!nextWorkout?.appointment_date) return ''
+    const date = new Date(`${nextWorkout.appointment_date}T12:00:00`)
+    return new Intl.DateTimeFormat('pt-BR', {
+      weekday: 'short',
+      day: '2-digit',
+      month: '2-digit',
+    }).format(date)
+  }, [nextWorkout?.appointment_date])
+
+  const paymentConfirmed = latestPayment?.status === 'IDENTIFICADO'
 
   return (
     <main className="student-app">
@@ -68,6 +149,8 @@ function StudentApp({ profile, onLogout }) {
               </button>
             </section>
 
+            {dataError && <div className="student-data-alert">{dataError}</div>}
+
             <section className="student-hero-grid">
               <article className="student-next-workout">
                 <div className="student-card-heading">
@@ -75,22 +158,26 @@ function StudentApp({ profile, onLogout }) {
                     <span className="student-kicker">PRÓXIMO TREINO</span>
                     <h2>Seu próximo passo começa aqui.</h2>
                   </div>
-                  <span className="student-status-badge">Sem treino agendado</span>
+                  <span className="student-status-badge">{nextWorkout ? 'Treino confirmado' : 'Sem treino agendado'}</span>
                 </div>
 
                 <div className="student-next-workout-body">
                   <div className="student-calendar-mark">
-                    <span>HOJE</span>
-                    <strong>+</strong>
+                    <span>{nextWorkout ? formattedWorkoutDate : 'HOJE'}</span>
+                    <strong>{nextWorkout ? String(nextWorkout.start_time || '').slice(0, 5) : '+'}</strong>
                   </div>
                   <div>
-                    <h3>Escolha seu horário</h3>
-                    <p>Veja as vagas disponíveis para hoje, amanhã e depois de amanhã.</p>
+                    <h3>{nextWorkout ? 'Seu treino está confirmado' : 'Escolha seu horário'}</h3>
+                    <p>
+                      {nextWorkout
+                        ? 'Consulte os detalhes ou gerencie seu agendamento.'
+                        : 'Veja as vagas disponíveis para hoje, amanhã e depois de amanhã.'}
+                    </p>
                   </div>
                 </div>
 
                 <button className="student-primary-button" type="button" onClick={() => setPage(pages.APPOINTMENTS)}>
-                  Agendar treino
+                  {nextWorkout ? 'Ver meu agendamento' : 'Agendar treino'}
                   <span>→</span>
                 </button>
               </article>
@@ -167,10 +254,16 @@ function StudentApp({ profile, onLogout }) {
                     <span className="student-kicker">PAGAMENTOS</span>
                     <h2>Situação financeira</h2>
                   </div>
-                  <span className="student-payment-pill">Consultar</span>
+                  <span className="student-payment-pill">{loadingData ? 'Carregando' : paymentConfirmed ? 'Confirmado' : 'Pendente'}</span>
                 </div>
 
-                <p>Acompanhe vencimento, histórico e comprovantes em um só lugar.</p>
+                <p>
+                  {latestPayment
+                    ? paymentConfirmed
+                      ? 'Pagamento identificado com sucesso.'
+                      : 'Aguarde confirmação de pagamento da recepção.'
+                    : 'Acompanhe vencimento, histórico e comprovantes em um só lugar.'}
+                </p>
 
                 <button className="student-secondary-button" type="button" onClick={() => setPage(pages.PAYMENTS)}>
                   Ver pagamentos
