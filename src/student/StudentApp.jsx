@@ -1,6 +1,7 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
 import studioLogo from '../assets/studio-power-fit-logo.png'
+import StudentAppointments from './StudentAppointments'
 import './StudentApp.css'
 
 const pages = {
@@ -18,6 +19,7 @@ function StudentApp({ profile, onLogout }) {
   const [latestPayment, setLatestPayment] = useState(null)
   const [loadingData, setLoadingData] = useState(true)
   const [dataError, setDataError] = useState('')
+  const [refreshKey, setRefreshKey] = useState(0)
 
   useEffect(() => {
     let cancelled = false
@@ -80,7 +82,7 @@ function StudentApp({ profile, onLogout }) {
     return () => {
       cancelled = true
     }
-  }, [profile?.id])
+  }, [profile?.id, refreshKey])
 
   const firstName = useMemo(() => {
     return String(profile?.full_name || 'Aluno').trim().split(/\s+/)[0]
@@ -296,7 +298,25 @@ function StudentApp({ profile, onLogout }) {
           </>
         )}
 
-        {page !== pages.HOME && (
+        {page === pages.APPOINTMENTS && (
+          <section className="student-section-page">
+            <div className="student-section-page-heading">
+              <button className="student-back-button" type="button" onClick={goHome}>←</button>
+              <div>
+                <span className="student-kicker">STUDIO POWER FIT</span>
+                <h1>{pages.APPOINTMENTS}</h1>
+              </div>
+            </div>
+
+            <StudentAppointments
+              student={student}
+              latestPayment={latestPayment}
+              onChanged={() => setRefreshKey((value) => value + 1)}
+            />
+          </section>
+        )}
+
+        {page !== pages.HOME && page !== pages.APPOINTMENTS && (
           <section className="student-section-page">
             <div className="student-section-page-heading">
               <button className="student-back-button" type="button" onClick={goHome}>←</button>
