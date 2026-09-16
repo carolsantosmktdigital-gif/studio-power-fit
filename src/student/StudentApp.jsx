@@ -4,6 +4,7 @@ import studioLogo from '../assets/studio-power-fit-logo.png'
 import StudentAppointments from './StudentAppointments'
 import './StudentApp.css'
 import './StudentDesktopRefinements.css'
+import './StudentHomePolish.css'
 
 const pages = {
   HOME: 'Início',
@@ -88,8 +89,12 @@ function StudentApp({ profile, onLogout }) {
   const [loadingData, setLoadingData] = useState(true)
   const [dataError, setDataError] = useState('')
   const [refreshKey, setRefreshKey] = useState(0)
-  const [darkMode, setDarkMode] = useState(false)
+  const [darkMode, setDarkMode] = useState(() => localStorage.getItem('power-fit-student-theme') === 'dark')
   const [greeting, setGreeting] = useState(() => getGreeting())
+
+  useEffect(() => {
+    localStorage.setItem('power-fit-student-theme', darkMode ? 'dark' : 'light')
+  }, [darkMode])
 
   useEffect(() => {
     const updateGreeting = () => setGreeting(getGreeting())
@@ -106,7 +111,7 @@ function StudentApp({ profile, onLogout }) {
       weekday: 'long',
       day: '2-digit',
       month: 'long',
-    }).format(new Date())
+    }).format(new Date()).replace(/^./, (letter) => letter.toLocaleLowerCase('pt-BR'))
   }, [])
 
   useEffect(() => {
@@ -175,11 +180,30 @@ function StudentApp({ profile, onLogout }) {
 
   const frequencyGoal = 12
   const frequencyPercent = Math.min(100, Math.round((attendanceCount / frequencyGoal) * 100))
-  const challengeGoal = 30
-  const challengeDays = Math.min(challengeGoal, attendanceCount)
-  const challengePercent = Math.min(100, Math.round((challengeDays / challengeGoal) * 100))
-  const challengeRemaining = Math.max(0, challengeGoal - challengeDays)
+  const challengeGoal = frequencyGoal
+  const challengeProgress = Math.min(challengeGoal, attendanceCount)
+  const challengePercent = Math.min(100, Math.round((challengeProgress / challengeGoal) * 100))
+  const challengeRemaining = Math.max(0, challengeGoal - challengeProgress)
   const paymentConfirmed = latestPayment?.status === 'IDENTIFICADO'
+  const paymentCancelled = latestPayment?.status === 'CANCELADO'
+
+  const paymentOverdue = useMemo(() => {
+    if (!latestPayment?.due_date || paymentConfirmed || paymentCancelled) return false
+    const dueDate = new Date(`${latestPayment.due_date}T23:59:59`)
+    return dueDate < new Date()
+  }, [latestPayment?.due_date, paymentCancelled, paymentConfirmed])
+
+  const paymentStatus = loadingData
+    ? { label: 'Carregando', tone: 'neutral' }
+    : !latestPayment
+      ? { label: 'Sem cobrança', tone: 'neutral' }
+      : paymentConfirmed
+        ? { label: 'Confirmado', tone: 'confirmed' }
+        : paymentCancelled
+          ? { label: 'Cancelado', tone: 'neutral' }
+          : paymentOverdue
+            ? { label: 'Em atraso', tone: 'overdue' }
+            : { label: 'Aguardando', tone: 'pending' }
 
   const initialWeight = useMemo(() => {
     const values = assessments.map((item) => Number(item.weight_kg)).filter(Number.isFinite)
@@ -192,6 +216,7 @@ function StudentApp({ profile, onLogout }) {
   }, [assessments, student?.current_weight_kg])
 
   const weightDifference = initialWeight != null && currentWeight != null ? currentWeight - initialWeight : null
+  const hasWeightData = initialWeight != null || currentWeight != null
 
   const formattedWorkoutDate = useMemo(() => {
     if (!nextWorkout?.appointment_date) return ''
@@ -220,7 +245,7 @@ function StudentApp({ profile, onLogout }) {
   }
 
   return (
-    <main className={`student-app ${darkMode ? 'student-dark' : ''}`}>
+    <main className={`student-app ${darkMode ? 'student-theme-dark' : ''}`}>
       <aside className="student-sidebar">
         <button className="student-sidebar-brand" type="button" onClick={goHome} aria-label="Voltar para o início"><img src={studioLogo} alt="Studio Power Fit" /></button>
         <nav className="student-sidebar-nav" aria-label="Navegação do aluno">
@@ -233,9 +258,9 @@ function StudentApp({ profile, onLogout }) {
         <header className="student-header">
           <button className="student-mobile-brand" type="button" onClick={goHome} aria-label="Voltar para o início"><img src={studioLogo} alt="Studio Power Fit" /></button>
           <div className="student-header-actions">
-            <button className="student-icon-button student-theme-toggle" type="button" onClick={() => setDarkMode((value) => !value)} aria-label="Alternar tema">{darkMode ? '☀' : '☾'}</button>
-            <button className="student-icon-button student-notification-indicator" type="button" aria-label="Notificações">♧<i /></button>
-            <button className="student-profile-button" type="button" onClick={() => setPage(pages.PROFILE)}><span className="student-avatar">{firstName.slice(0, 1).toUpperCase()}</span><span className="student-user-copy"><strong>{firstName}</strong><small>Aluno(a)</small></span><span className="student-chevron">⌄</span></button>
+            <button className="student-icon-button student-theme-toggle" type="button" onClick={() => setDarkMode((value) => !value)} aria-label={darkMode ? 'Ativar tema claro' : 'Ativar tema escuro'} aria-pressed={darkMode} title={darkMode ? 'Ativar tema claro' : 'Ativar tema escuro'}>{darkMode ? '☀' : '☾'}</button>
+            <button className="student-icon-button student-notification-indicator is-empty" type="button" aria-label="Nenhuma notificação nova" title="Nenhuma notificação nova" disabled><span aria-hidden="true">♧</span></button>
+            <button className="student-profile-button" type="button" onClick={() => setPage(pages.PROFILE)} title="Abrir meu perfil"><span className="student-avatar">{firstName.slice(0, 1).toUpperCase()}</span><span className="student-user-copy"><strong>{firstName}</strong><small>Área do aluno</small></span><span className="student-chevron">⌄</span></button>
           </div>
         </header>
 
@@ -246,7 +271,7 @@ function StudentApp({ profile, onLogout }) {
               <div className="student-welcome-meta"><span>{todayLabel}</span><em>Disciplina hoje, resultados amanhã.</em></div>
             </section>
             {dataError && <div className="student-data-alert">{dataError}<button type="button" onClick={() => setRefreshKey((value) => value + 1)}>Tentar novamente</button></div>}
-            <section className="student-home-grid">
+            <section className={`student-home-grid ${loadingData ? 'is-loading' : ''}`} aria-busy={loadingData}>
               <article className="student-card student-next-workout">
                 <div className="student-card-heading"><div className="student-title-with-icon"><span className="student-card-icon">▣</span><div><span className="student-kicker">PRÓXIMO TREINO</span><h2>{nextWorkout ? formattedWorkoutDate : 'Seu próximo treino começa aqui.'}</h2></div></div><span className={`student-status-badge ${nextWorkout ? 'confirmed' : ''}`}>{nextWorkout ? '✓ Confirmado' : 'Sem treino agendado'}</span></div>
                 <div className="student-workout-details">{nextWorkout ? <><div className="student-workout-time"><span>◷</span><strong>{String(nextWorkout.start_time || '').slice(0, 5)}</strong></div><div className="student-workout-type"><span>Modalidade</span><strong>Musculação</strong></div></> : <p>Veja as vagas disponíveis para hoje, amanhã e depois de amanhã.</p>}</div>
@@ -255,21 +280,23 @@ function StudentApp({ profile, onLogout }) {
               <article className="student-card student-frequency-card">
                 <div className="student-card-heading"><div className="student-title-with-icon"><span className="student-card-icon">▥</span><span className="student-kicker">FREQUÊNCIA DO MÊS</span></div><button className="student-link-button" type="button" onClick={() => setPage(pages.EVOLUTION)}>Ver detalhes</button></div>
                 <div className="student-frequency-body"><div className="student-progress-ring" style={{ '--progress': `${frequencyPercent}%` }}><strong>{frequencyPercent}%</strong></div><div><strong>{attendanceCount}/{frequencyGoal}</strong><span>treinos realizados</span></div></div>
-                <div className="student-info-strip"><span>▣</span><strong>{attendanceCount >= frequencyGoal ? 'Meta mensal concluída!' : `Faltam ${frequencyGoal - attendanceCount} treinos para sua meta mensal.`}</strong></div>
+                <div className="student-info-strip"><span>▣</span><strong>{attendanceCount >= frequencyGoal ? 'Meta mensal concluída. Excelente ritmo!' : attendanceCount === 0 ? 'Comece o mês agendando seu primeiro treino.' : `Você já concluiu ${frequencyPercent}% da sua meta mensal.`}</strong></div>
               </article>
               <article className="student-card student-evolution-card">
                 <div className="student-card-heading"><div className="student-title-with-icon"><span className="student-card-icon">↗</span><span className="student-kicker">MINHA EVOLUÇÃO</span></div><button className="student-link-button" type="button" onClick={() => setPage(pages.EVOLUTION)}>Ver histórico</button></div>
-                <div className="student-evolution-metrics"><div><span>Peso inicial</span><strong>{formatWeight(initialWeight)}</strong></div><div><span>Peso atual</span><strong>{formatWeight(currentWeight)}</strong></div><div><span>Diferença</span><strong className={weightDifference != null && weightDifference <= 0 ? 'positive' : ''}>{weightDifference == null ? '— kg' : `${weightDifference > 0 ? '+' : ''}${weightDifference.toLocaleString('pt-BR', { maximumFractionDigits: 1 })} kg`}</strong></div></div>
-                <div className="student-evolution-message"><span>↗</span><div><strong>{weightDifference != null && weightDifference < 0 ? 'Excelente progresso!' : 'Sua evolução começa aqui.'}</strong><small>{weightDifference != null ? 'Continue acompanhando seus resultados.' : 'Suas avaliações aparecerão neste espaço.'}</small></div></div>
+                {hasWeightData ? <>
+                  <div className="student-evolution-metrics"><div><span>Peso inicial</span><strong className={initialWeight == null ? 'student-metric-empty' : ''}>{initialWeight == null ? 'Não informado' : formatWeight(initialWeight)}</strong></div><div><span>Peso atual</span><strong className={currentWeight == null ? 'student-metric-empty' : ''}>{currentWeight == null ? 'Não informado' : formatWeight(currentWeight)}</strong></div><div><span>Diferença</span><strong className={`${weightDifference != null && weightDifference <= 0 ? 'positive' : ''} ${weightDifference == null ? 'student-metric-empty' : ''}`.trim()}>{weightDifference == null ? 'Aguardando dados' : `${weightDifference > 0 ? '+' : ''}${weightDifference.toLocaleString('pt-BR', { maximumFractionDigits: 1 })} kg`}</strong></div></div>
+                  <div className="student-evolution-message"><span>↗</span><div><strong>{weightDifference != null && weightDifference < 0 ? 'Excelente progresso!' : 'Acompanhe sua evolução.'}</strong><small>{weightDifference != null ? 'Continue acompanhando seus resultados.' : 'Uma nova avaliação completará este comparativo.'}</small></div></div>
+                </> : <div className="student-evolution-empty"><span aria-hidden="true">↗</span><div><strong>Avaliação ainda não realizada</strong><small>Sua primeira avaliação será registrada pela equipe e aparecerá aqui.</small></div></div>}
               </article>
               <article className="student-card student-challenge-card">
-                <div className="student-card-heading"><div className="student-title-with-icon"><span className="student-card-icon">🏆</span><span className="student-kicker">DESAFIO DO MÊS</span></div><span className="student-card-context">Meta mensal</span></div>
-                <div className="student-challenge-count"><strong>{challengeDays} de {challengeGoal} dias</strong><span>{challengePercent}%</span></div><div className="student-progress-track"><span style={{ width: `${challengePercent}%` }} /></div><div className="student-info-strip"><span>◎</span><strong>{challengeRemaining === 0 ? 'Desafio concluído. Excelente!' : `Continue assim! Faltam ${challengeRemaining} dias para sua meta.`}</strong></div>
+                <div className="student-card-heading"><div className="student-title-with-icon"><span className="student-card-icon">🏆</span><span className="student-kicker">DESAFIO DO MÊS</span></div><span className="student-card-context">12 treinos</span></div>
+                <div className="student-challenge-count"><strong>{challengeProgress} de {challengeGoal} treinos</strong><span>{challengePercent}%</span></div><div className="student-progress-track"><span style={{ width: `${challengePercent}%` }} /></div><div className="student-info-strip"><span>◎</span><strong>{challengeRemaining === 0 ? 'Desafio concluído. Excelente!' : challengeProgress === 0 ? 'Seu desafio começa no primeiro treino do mês.' : `Continue assim! Faltam ${challengeRemaining} treinos para concluir.`}</strong></div>
               </article>
               <article className="student-card student-finance-card">
                 <div className="student-title-with-icon"><span className="student-card-icon">▤</span><div><span className="student-kicker">PAGAMENTOS</span><h2>Situação financeira</h2></div></div>
-                <p>{student?.payment_plan && <strong className="student-plan-label">{student.payment_plan}</strong>}{latestPayment ? paymentConfirmed ? 'Pagamento identificado com sucesso.' : 'Aguarde confirmação de pagamento da recepção.' : 'Acompanhe vencimento, histórico e comprovantes em um só lugar.'}{latestPayment?.due_date && <span className="student-due-date">Vencimento: {new Intl.DateTimeFormat('pt-BR').format(new Date(`${latestPayment.due_date}T12:00:00`))}</span>}</p>
-                <div className="student-finance-actions"><span className={`student-payment-pill ${paymentConfirmed ? 'confirmed' : ''}`}>{loadingData ? 'Carregando' : paymentConfirmed ? 'Confirmado' : 'Pendente'}</span><button className="student-secondary-button" type="button" onClick={() => setPage(pages.PAYMENTS)}>Ver pagamentos <span>→</span></button></div>
+                <p>{student?.payment_plan && <strong className="student-plan-label">{student.payment_plan}</strong>}<strong className="student-payment-amount">{latestPayment ? formatCurrency(latestPayment.amount) : 'Nenhuma cobrança disponível'}</strong><span>{latestPayment ? paymentConfirmed ? 'Pagamento identificado pela recepção.' : paymentCancelled ? 'Esta cobrança foi cancelada.' : paymentOverdue ? 'Pagamento vencido. Consulte os detalhes.' : 'Aguardando identificação pela recepção.' : 'Quando houver uma cobrança, os detalhes aparecerão aqui.'}</span>{latestPayment?.due_date && <span className="student-due-date">Vencimento: {formatDate(latestPayment.due_date)}</span>}</p>
+                <div className="student-finance-actions"><span className={`student-payment-pill ${paymentStatus.tone}`}>{paymentStatus.label}</span><button className="student-secondary-button" type="button" onClick={() => setPage(pages.PAYMENTS)}>Ver pagamentos <span>→</span></button></div>
               </article>
             </section>
           </>)}
