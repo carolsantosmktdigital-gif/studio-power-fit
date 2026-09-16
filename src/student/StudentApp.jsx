@@ -197,15 +197,6 @@ function StudentApp({ profile, onLogout }) {
             </button>
           ))}
         </nav>
-
-        <button className="student-help" type="button">
-          <span>◉</span>
-          <span>
-            <strong>Precisa de ajuda?</strong>
-            <small>Fale com a recepção</small>
-          </span>
-          <b>›</b>
-        </button>
       </aside>
 
       <div className="student-main">
@@ -215,7 +206,10 @@ function StudentApp({ profile, onLogout }) {
           </button>
 
           <div className="student-header-actions">
-            <button className="student-icon-button" type="button" aria-label="Notificações">⌁</button>
+            <span className="student-notification-indicator" aria-label="Central de notificações">
+              <span>◌</span>
+              <i />
+            </span>
             <button className="student-profile-button" type="button" onClick={() => setPage(pages.PROFILE)}>
               <span className="student-avatar">{firstName.slice(0, 1).toUpperCase()}</span>
               <span className="student-user-copy">
@@ -243,9 +237,14 @@ function StudentApp({ profile, onLogout }) {
                 </div>
               </section>
 
-              {dataError && <div className="student-data-alert">{dataError}</div>}
+              {dataError && (
+                <div className="student-data-alert" role="status">
+                  <span>{dataError}</span>
+                  <button type="button" onClick={() => setRefreshKey((value) => value + 1)}>Tentar novamente</button>
+                </div>
+              )}
 
-              <section className="student-home-grid">
+              <section className={`student-home-grid ${loadingData ? 'is-loading' : ''}`} aria-busy={loadingData}>
                 <article className="student-card student-next-workout">
                   <div className="student-card-heading">
                     <div className="student-title-with-icon">
@@ -255,7 +254,7 @@ function StudentApp({ profile, onLogout }) {
                         <h2>
                           {nextWorkout
                             ? formattedWorkoutDate
-                            : 'Seu próximo passo começa aqui.'}
+                            : 'Seu próximo treino começa aqui.'}
                         </h2>
                       </div>
                     </div>
@@ -376,9 +375,7 @@ function StudentApp({ profile, onLogout }) {
                       <span className="student-card-icon">🏆</span>
                       <span className="student-kicker">DESAFIO DO MÊS</span>
                     </div>
-                    <button className="student-link-button" type="button">
-                      Ver detalhes
-                    </button>
+                    <span className="student-card-context">Meta mensal</span>
                   </div>
 
                   <div className="student-challenge-count">
@@ -448,6 +445,11 @@ function StudentApp({ profile, onLogout }) {
                         ? 'Pagamento identificado com sucesso.'
                         : 'Aguarde confirmação de pagamento da recepção.'
                       : 'Acompanhe vencimento, histórico e comprovantes em um só lugar.'}
+                    {latestPayment?.due_date && (
+                      <span className="student-due-date">
+                        Vencimento: {new Intl.DateTimeFormat('pt-BR').format(new Date(`${latestPayment.due_date}T12:00:00`))}
+                      </span>
+                    )}
                   </p>
 
                   <div className="student-finance-actions">
@@ -496,7 +498,7 @@ function StudentApp({ profile, onLogout }) {
                   {page === pages.PAYMENTS ? '▤' : page === pages.EVOLUTION ? '↗' : '◎'}
                 </span>
                 <h2>{page}</h2>
-                <p>Esta área será conectada aos dados completos do aluno nas próximas etapas.</p>
+                <p>Estamos preparando esta área para concentrar suas informações com a mesma experiência do restante do aplicativo.</p>
 
                 {page === pages.PROFILE && (
                   <button className="student-secondary-button student-logout-button" type="button" onClick={onLogout}>
