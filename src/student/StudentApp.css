@@ -817,3 +817,23 @@
     align-items: center;
   }
 }
+
+
+.student-data-alert {
+  margin: -4px 0 18px;
+  padding: 12px 14px;
+  border: 1px solid rgba(255, 32, 56, .14);
+  border-radius: 14px;
+  color: #9d2332;
+  background: rgba(255, 32, 56, .06);
+  font-size: 12px;
+  font-weight: 700;
+}
+
+.student-plan-label {
+  display: block;
+  margin-bottom: 6px;
+  color: var(--student-navy);
+  font-size: 10px;
+  letter-spacing: .08em;
+}
