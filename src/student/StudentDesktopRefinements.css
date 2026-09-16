@@ -80,7 +80,7 @@
     flex-direction: column;
     align-items: stretch;
     justify-content: center;
-    gap: 6px;
+    gap:4px;
   }
 
   .student-finance-actions .student-payment-pill {
@@ -134,12 +134,12 @@
 @media (min-width: 921px) and (max-width: 1180px) {
   .student-finance-card {
     grid-template-columns: minmax(155px, .88fr) minmax(165px, .96fr) minmax(150px, .72fr);
-    gap: 10px;
+    gap: 8px;
     padding: 22px 20px;
   }
 
   .student-finance-card > .student-title-with-icon {
-    gap: 9px;
+    gap: 7px;
     padding-right: 6px;
   }
 
