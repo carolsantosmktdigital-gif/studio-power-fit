@@ -15,12 +15,17 @@ const onlyDigits = (value) => String(value || '').replace(/\D/g, '')
 const formatCpf = (value) => onlyDigits(value).slice(0, 11).replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2')
 const formatPhone = (value) => onlyDigits(value).slice(0, 11).replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d{1,4})$/, '$1-$2')
 const formatCep = (value) => onlyDigits(value).slice(0, 8).replace(/(\d{5})(\d)/, '$1-$2')
-const formatPlan = (value) => {
+const normalizePlan = (value) => {
   const plan = String(value || '').toUpperCase().replace(/[\s_-]/g, '')
-  if (plan === 'MENSALIDADE' || plan === 'MENSALISTA') return 'Mensalista'
+  if (plan === 'WELLHUB' || plan === 'GYMPASS') return 'WELLHUB'
+  if (plan === 'TOTALPASS') return 'TOTALPASS'
+  return 'MENSALISTA'
+}
+const formatPlan = (value) => {
+  const plan = normalizePlan(value)
+  if (plan === 'MENSALISTA') return 'Mensalista'
   if (plan === 'TOTALPASS') return 'TotalPass'
-  if (plan === 'WELLHUB' || plan === 'GYMPASS') return 'Wellhub'
-  return 'Plano não informado'
+  return 'Wellhub'
 }
 const maskedProfile = (profile = {}) => ({ ...profile, cpf: formatCpf(profile.cpf), phone: formatPhone(profile.phone), address_zip_code: formatCep(profile.address_zip_code) })
 const formatCurrency = (value) => Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
@@ -91,7 +96,12 @@ function AppShell({ profile, onLogout }) {
   const isAdmin = profile.role === 'ADMIN'
 
   const loadStudents = async () => {
-    const { data, error } = await supabase.from('students').select('id, profile_id, status, created_at').order('created_at', { ascending: false })
+    let { data, error } = await supabase.from('students').select('id, profile_id, status, payment_plan, created_at').order('created_at', { ascending: false })
+    if (error && /payment_plan|schema cache|column/i.test(error.message || '')) {
+      const fallback = await supabase.from('students').select('id, profile_id, status, created_at').order('created_at', { ascending: false })
+      data = fallback.data
+      error = fallback.error
+    }
     if (error) return setNotice(error.message)
     const ids = data.map((item) => item.profile_id)
     const { data: profiles, error: profilesError } = ids.length ? await supabase.from('profiles').select('id, full_name, email, phone, cpf, birth_date, address_zip_code, address_street, address_number, address_complement, address_district, address_city, address_state').in('id', ids) : { data: [], error: null }
@@ -431,6 +441,27 @@ function AppShell({ profile, onLogout }) {
     return { saved }
   }
 
+  const updateStudentPlan = async (studentId, requestedPlan) => {
+    const plan = normalizePlan(requestedPlan)
+    const canonicalResult = await supabase.from('students').update({ payment_plan: plan }).eq('id', studentId).select('payment_plan').maybeSingle()
+    if (!canonicalResult.error && canonicalResult.data?.payment_plan === plan) return { plan }
+    const missingColumn = canonicalResult.error && /payment_plan|schema cache|column/i.test(canonicalResult.error.message || '')
+    if (canonicalResult.error && !missingColumn) return { error: canonicalResult.error.message }
+
+    const paymentType = plan === 'MENSALISTA' ? 'MENSALIDADE' : plan
+    const today = new Date().toISOString().slice(0, 10)
+    const futureResult = await supabase.from('payments').update({ payment_type: paymentType }).eq('student_id', studentId).gte('due_date', today).neq('status', 'CANCELADO').select('id, payment_type')
+    if (futureResult.error) return { error: futureResult.error.message }
+    if (futureResult.data?.length && futureResult.data.every((payment) => payment.payment_type === paymentType)) return { plan }
+
+    const latestPayment = payments.find((payment) => payment.student_id === studentId && payment.status !== 'CANCELADO') || payments.find((payment) => payment.student_id === studentId)
+    if (!latestPayment) return { error: 'Cadastre a primeira cobrança do aluno antes de alterar o plano.' }
+    const { data: savedPayment, error } = await supabase.from('payments').update({ payment_type: paymentType }).eq('id', latestPayment.id).select('payment_type').single()
+    if (error) return { error: error.message }
+    if (savedPayment?.payment_type !== paymentType) return { error: 'O banco não confirmou a alteração do plano.' }
+    return { plan }
+  }
+
   const saveStudent = async (event) => {
     event.preventDefault()
     setNotice('')
@@ -442,9 +473,11 @@ function AppShell({ profile, onLogout }) {
     if (profileResult.error) { setModalError(profileResult.error); return setNotice(profileResult.error) }
     const { data: savedStudent, error } = await supabase.from('students').update({ status: editingStudent.status }).eq('id', editingStudent.id).select('status').single()
     if (error || savedStudent?.status !== editingStudent.status) { const message = error?.message || 'O banco não confirmou a alteração do status.'; setModalError(message); return setNotice(message) }
+    const planResult = await updateStudentPlan(editingStudent.id, editingStudent.plan_code)
+    if (planResult.error) { setModalError(planResult.error); return setNotice(planResult.error) }
     setEditingStudent(null)
-    setNotice('Dados e contato do aluno atualizados com sucesso.')
-    await loadStudents()
+    setNotice('Dados, contato e plano do aluno atualizados com sucesso.')
+    await Promise.all([loadStudents(), loadPayments(), loadHealth()])
   }
 
   const saveEmployee = async (event) => {
@@ -505,9 +538,10 @@ function AppShell({ profile, onLogout }) {
   const title = page === 'Início' ? 'Visão geral' : page
   const rows = page === 'Alunos' ? students : employees
   const studentPlan = (student) => formatPlan(student?.payment_plan || payments.find((payment) => payment.student_id === student?.id)?.payment_type)
+  const studentPlanCode = (student) => normalizePlan(student?.payment_plan || payments.find((payment) => payment.student_id === student?.id)?.payment_type)
   const directoryQuery = normalizeDirectorySearch(directorySearch[page] || '')
   const filteredRows = directoryQuery ? rows.filter((item) => [item.profile?.full_name, item.profile?.cpf, item.profile?.email, page === 'Alunos' ? studentPlan(item) : item.position].some((value) => normalizeDirectorySearch(value).includes(directoryQuery))) : rows
-  const openStudentEditor = (student) => setEditingStudent({ ...student, plan_label: studentPlan(student), profile: maskedProfile(student.profile) })
+  const openStudentEditor = (student) => setEditingStudent({ ...student, plan_code: studentPlanCode(student), profile: maskedProfile(student.profile) })
   const openEmployeeEditor = (employee) => setEditingEmployee({ ...employee, profile: maskedProfile(employee.profile) })
   const receptionSlots = Object.values(receptionPanel.appointments.reduce((groups, item) => { const key = String(item.start_time).slice(0, 5); groups[key] = [...(groups[key] || []), item]; return groups }, {}))
 
@@ -529,7 +563,7 @@ function AppShell({ profile, onLogout }) {
     <nav className="management-mobile-nav" aria-label="Navegação da gestão">{mobilePrimaryItems.map((item) => <button key={item} className={page === navigationPage(item) ? 'active' : ''} onClick={() => navigateMobile(item)} type="button"><span><ManagementIcon name={navIcon(item)} size={20} /></span><small>{navLabel(item)}</small></button>)}<button className={mobileMoreItems.some((item) => page === navigationPage(item)) || mobileMenuOpen ? 'active' : ''} onClick={() => setMobileMenuOpen((current) => !current)} type="button"><span><ManagementIcon name="menu" size={20} /></span><small>Mais</small></button></nav>
     {modalError && (form || editingStudent || editingEmployee) && <div className="modal-floating-notice" role="alert"><ManagementIcon name="alert" size={18} /><span>{modalError}</span></div>}
     {form && <div className="modal-backdrop"><form className="student-modal" onSubmit={createAccount}><div className="panel-heading"><h3>Novo acesso</h3><button className="modal-close" onClick={() => setForm(null)} type="button">×</button></div><label>Nome completo<input value={form.full_name} onChange={(e) => setForm({...form,full_name:e.target.value})} required/></label><label>E-mail<input type="email" value={form.email} onChange={(e) => setForm({...form,email:e.target.value})} required/></label><label>Telefone<input value={form.phone} onChange={(e) => setForm({...form,phone:e.target.value})}/></label><label>Senha inicial<input type="password" minLength="8" value={form.password} onChange={(e) => setForm({...form,password:e.target.value})} required/></label>{form.role === 'ALUNO' && <><label>CPF<input value={form.cpf} onChange={(e) => setForm({...form,cpf:e.target.value})} required/></label><label>CEP<input value={form.address_zip_code} onChange={(e) => setForm({...form,address_zip_code:e.target.value})}/></label><label>Endereço<input value={form.address_street} onChange={(e) => setForm({...form,address_street:e.target.value})}/></label><label>Número<input value={form.address_number} onChange={(e) => setForm({...form,address_number:e.target.value})}/></label><label>Complemento<input value={form.address_complement} onChange={(e) => setForm({...form,address_complement:e.target.value})}/></label><label>Bairro<input value={form.address_district} onChange={(e) => setForm({...form,address_district:e.target.value})}/></label><label>Cidade<input value={form.address_city} onChange={(e) => setForm({...form,address_city:e.target.value})}/></label><label>Estado<input value={form.address_state} onChange={(e) => setForm({...form,address_state:e.target.value})}/></label><label>Pagamento<select value={form.payment_plan} onChange={(e) => setForm({...form,payment_plan:e.target.value})}><option value="MENSALISTA">Mensalista</option><option value="TOTALPASS">TotalPass</option><option value="WELLHUB">Wellhub</option></select></label></>}{form.role !== 'ALUNO' && <><label>CPF<input value={form.cpf} onChange={(e) => setForm({...form,cpf:e.target.value})}/></label><label>Data de admissão<input type="date" value={form.hire_date} onChange={(e) => setForm({...form,hire_date:e.target.value})}/></label><label>CEP<input value={form.address_zip_code} onChange={(e) => setForm({...form,address_zip_code:e.target.value})}/></label><label>Endereço<input value={form.address_street} onChange={(e) => setForm({...form,address_street:e.target.value})}/></label><label>Número<input value={form.address_number} onChange={(e) => setForm({...form,address_number:e.target.value})}/></label><label>Complemento<input value={form.address_complement} onChange={(e) => setForm({...form,address_complement:e.target.value})}/></label><label>Bairro<input value={form.address_district} onChange={(e) => setForm({...form,address_district:e.target.value})}/></label><label>Cidade<input value={form.address_city} onChange={(e) => setForm({...form,address_city:e.target.value})}/></label><label>Estado<input value={form.address_state} onChange={(e) => setForm({...form,address_state:e.target.value})}/></label><label>Perfil<select value={form.role} onChange={(e) => setForm({...form,role:e.target.value})}><option value="RECEPCAO">Recepção</option><option value="PROFESSOR">Professor</option></select></label><label>Cargo<input value={form.position} onChange={(e) => setForm({...form,position:e.target.value})} required/></label><label>Tipo de vínculo<input value={form.employment_type} onChange={(e) => setForm({...form,employment_type:e.target.value})}/></label><label>Observações<input value={form.notes} onChange={(e) => setForm({...form,notes:e.target.value})}/></label></>}<button className="dashboard-primary-action full-action" type="submit">Criar acesso</button></form></div>}
-    {editingStudent && <div className="modal-backdrop"><form className="student-modal" onSubmit={saveStudent}><div className="panel-heading"><div><span className="placeholder-kicker">DADOS CADASTRAIS</span><h3>Editar aluno</h3></div><button className="modal-close" onClick={() => setEditingStudent(null)} type="button">×</button></div>{[['full_name','Nome completo'],['email','E-mail de acesso'],['phone','Telefone'],['cpf','CPF']].map(([field,label]) => <label key={field}>{label}<input type={field === 'email' ? 'email' : 'text'} value={editingStudent.profile?.[field] || ''} onChange={(event) => setEditingStudent((current) => ({ ...current, profile: { ...current.profile, [field]: event.target.value } }))} readOnly={field === 'email'} required={['full_name','email'].includes(field)} title={field === 'email' ? 'O e-mail de acesso não é alterado nesta tela.' : undefined} /></label>)}<label>Plano<input value={editingStudent.plan_label} readOnly title="Modalidade identificada pelo cadastro financeiro do aluno." /></label><label>Status<select value={editingStudent.status} onChange={(e) => setEditingStudent({...editingStudent,status:e.target.value})}><option value="ATIVO">Ativo</option><option value="INATIVO">Inativo</option><option value="SUSPENSO">Suspenso</option><option value="CANCELADO">Cancelado</option></select></label><button className="dashboard-primary-action full-action" type="submit">Salvar dados e contato</button></form></div>}
+    {editingStudent && <div className="modal-backdrop"><form className="student-modal" onSubmit={saveStudent}><div className="panel-heading"><div><span className="placeholder-kicker">DADOS CADASTRAIS</span><h3>Editar aluno</h3></div><button className="modal-close" onClick={() => setEditingStudent(null)} type="button">×</button></div>{[['full_name','Nome completo'],['email','E-mail de acesso'],['phone','Telefone'],['cpf','CPF']].map(([field,label]) => <label key={field}>{label}<input type={field === 'email' ? 'email' : 'text'} value={editingStudent.profile?.[field] || ''} onChange={(event) => setEditingStudent((current) => ({ ...current, profile: { ...current.profile, [field]: event.target.value } }))} readOnly={field === 'email'} required={['full_name','email'].includes(field)} title={field === 'email' ? 'O e-mail de acesso não é alterado nesta tela.' : undefined} /></label>)}<label>Plano<select value={editingStudent.plan_code} onChange={(event) => setEditingStudent((current) => ({ ...current, plan_code: event.target.value }))}><option value="MENSALISTA">Mensalista</option><option value="TOTALPASS">TotalPass</option><option value="WELLHUB">Wellhub</option></select></label><label>Status<select value={editingStudent.status} onChange={(e) => setEditingStudent({...editingStudent,status:e.target.value})}><option value="ATIVO">Ativo</option><option value="INATIVO">Inativo</option><option value="SUSPENSO">Suspenso</option><option value="CANCELADO">Cancelado</option></select></label><button className="dashboard-primary-action full-action" type="submit">Salvar dados, contato e plano</button></form></div>}
     {editingEmployee && <div className="modal-backdrop"><form className="student-modal employee-modal" onSubmit={saveEmployee}><div className="panel-heading"><h3>Editar funcionário</h3><button className="modal-close" onClick={() => setEditingEmployee(null)} type="button">×</button></div>{[['full_name','Nome completo'],['email','E-mail de acesso'],['phone','Telefone'],['cpf','CPF'],['birth_date','Data de nascimento'],['address_zip_code','CEP'],['address_street','Rua'],['address_number','Número'],['address_complement','Complemento'],['address_district','Bairro'],['address_city','Cidade'],['address_state','Estado']].map(([field,label]) => <label key={field}>{label}<input type={field === 'birth_date' ? 'date' : field === 'email' ? 'email' : 'text'} value={editingEmployee.profile[field] || ''} onChange={(e) => setEditingEmployee({...editingEmployee, profile: {...editingEmployee.profile, [field]: e.target.value}})} readOnly={field === 'email'} title={field === 'email' ? 'O e-mail de acesso não é alterado nesta tela.' : undefined} /></label>)}<label>Cargo<input value={editingEmployee.position || ''} onChange={(e) => setEditingEmployee({...editingEmployee,position:e.target.value})} required /></label><label>Data de admissão<input type="date" value={editingEmployee.hire_date || ''} onChange={(e) => setEditingEmployee({...editingEmployee,hire_date:e.target.value})} /></label><label>Tipo de vínculo<input value={editingEmployee.employment_type || ''} onChange={(e) => setEditingEmployee({...editingEmployee,employment_type:e.target.value})} /></label><label>Observações<input value={editingEmployee.notes || ''} onChange={(e) => setEditingEmployee({...editingEmployee,notes:e.target.value})} /></label><button className="dashboard-primary-action full-action" type="submit">Salvar dados</button><label>Nova senha<input type="password" minLength="8" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} /></label><button className="outline-action full-action" type="button" onClick={resetEmployeePassword}>Redefinir senha</button><button className="outline-action full-action" type="button" onClick={deleteEmployee}>Excluir conta</button></form></div>}
   </div>
 }
