@@ -19,7 +19,7 @@
   .report-search{grid-column:auto}
   .report-filters label{font-size:8px}
   .report-filters input,.report-filters select{min-height:44px;font-size:12px}
-  .report-presets{flex-wrap:nowrap;margin-right:-12px;padding-right:12px;overflow-x:auto;scrollbar-width:none}
+  .report-presets{width:100%;max-width:100%;min-width:0;flex-wrap:nowrap;margin:0;padding:0;overflow-x:auto;scrollbar-width:none}
   .report-presets::-webkit-scrollbar{display:none}
   .report-presets>span,.report-presets button{flex:0 0 auto}
   .report-summary{gap:8px}
