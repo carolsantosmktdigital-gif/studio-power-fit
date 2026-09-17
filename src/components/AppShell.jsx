@@ -77,6 +77,7 @@ function AppShell({ profile, onLogout }) {
   const [editingEmployee, setEditingEmployee] = useState(null)
   const [newPassword, setNewPassword] = useState('')
   const [directorySearch, setDirectorySearch] = useState({ Alunos: '', Funcionários: '' })
+  const [modalError, setModalError] = useState('')
   const hour = new Date().getHours()
   const receptionGreeting = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite'
   const isAdmin = profile.role === 'ADMIN'
@@ -273,6 +274,10 @@ function AppShell({ profile, onLogout }) {
   }, [page])
 
   useEffect(() => {
+    if (!form && !editingStudent && !editingEmployee) setModalError('')
+  }, [form, editingStudent, editingEmployee])
+
+  useEffect(() => {
     if (isAdmin) return undefined
     const timer = window.setInterval(() => { loadReceptionPanel(); loadAgenda(); loadPayments() }, 30000)
     return () => window.clearInterval(timer)
@@ -337,7 +342,9 @@ function AppShell({ profile, onLogout }) {
           message = details?.error || details?.message || message
         } catch (_) {}
       }
-      return setNotice(message)
+      setNotice(message)
+      setModalError(message)
+      return
     }
     setForm(null)
     setNotice('Cadastro criado com sucesso.')
@@ -355,18 +362,32 @@ function AppShell({ profile, onLogout }) {
         } catch (_) {}
       }
       setNotice(message)
+      setModalError(message)
       return false
     }
+    setModalError('')
     return true
+  }
+
+  const validateCpf = (cpf, currentProfileId) => {
+    const digits = onlyDigits(cpf)
+    if (!digits) return { valid: true, value: null }
+    if (digits.length !== 11) return { valid: false, message: 'O CPF precisa ter 11 dígitos.' }
+    const duplicate = [...students, ...employees].find((item) => item.profile_id !== currentProfileId && onlyDigits(item.profile?.cpf) === digits)
+    if (duplicate) return { valid: false, message: 'Este CPF já está vinculado a outro cadastro.' }
+    return { valid: true, value: digits }
   }
 
   const saveStudent = async (event) => {
     event.preventDefault()
     setNotice('')
-    const ok = await manageAccount({ action: 'update', user_id: editingStudent.profile_id, ...editingStudent.profile })
+    setModalError('')
+    const cpf = validateCpf(editingStudent.profile?.cpf, editingStudent.profile_id)
+    if (!cpf.valid) return setModalError(cpf.message)
+    const ok = await manageAccount({ action: 'update', user_id: editingStudent.profile_id, ...editingStudent.profile, cpf: cpf.value })
     if (!ok) return
     const { error } = await supabase.from('students').update({ status: editingStudent.status }).eq('id', editingStudent.id)
-    if (error) return setNotice(error.message)
+    if (error) { setModalError(error.message); return setNotice(error.message) }
     setEditingStudent(null)
     setNotice('Dados e contato do aluno atualizados com sucesso.')
     await loadStudents()
@@ -375,12 +396,15 @@ function AppShell({ profile, onLogout }) {
   const saveEmployee = async (event) => {
     event.preventDefault()
     setNotice('')
-    const ok = await manageAccount({ action: 'update', user_id: editingEmployee.profile_id, employee_id: editingEmployee.id, ...editingEmployee, ...editingEmployee.profile })
+    setModalError('')
+    const cpf = validateCpf(editingEmployee.profile?.cpf, editingEmployee.profile_id)
+    if (!cpf.valid) return setModalError(cpf.message)
+    const ok = await manageAccount({ action: 'update', user_id: editingEmployee.profile_id, employee_id: editingEmployee.id, ...editingEmployee, ...editingEmployee.profile, cpf: cpf.value })
     if (ok) { setEditingEmployee(null); setNotice('Dados e contato do funcionário atualizados com sucesso.'); await loadEmployees() }
   }
 
   const resetEmployeePassword = async () => {
-    if (newPassword.length < 8) return setNotice('A nova senha deve ter ao menos 8 caracteres.')
+    if (newPassword.length < 8) return setModalError('A nova senha deve ter ao menos 8 caracteres.')
     const ok = await manageAccount({ action: 'reset_password', user_id: editingEmployee.profile_id, password: newPassword })
     if (ok) { setNewPassword(''); setNotice('Senha redefinida com sucesso.') }
   }
@@ -391,7 +415,7 @@ function AppShell({ profile, onLogout }) {
     if (ok) { setEditingEmployee(null); setNotice('Conta excluída com sucesso.'); await loadEmployees() }
   }
 
-  const openForm = (role) => setForm({ ...emptyForm, role, position: role === 'PROFESSOR' ? 'Professor(a)' : role === 'RECEPCAO' ? 'Recepcionista' : '' })
+  const openForm = (role) => { setModalError(''); setForm({ ...emptyForm, role, position: role === 'PROFESSOR' ? 'Professor(a)' : role === 'RECEPCAO' ? 'Recepcionista' : '' }) }
   const createDemoData = async () => {
     const approved = window.confirm('Criar ou completar os dados fictícios da demonstração? Nenhum registro real será apagado ou sobrescrito.')
     if (!approved) return
@@ -438,6 +462,7 @@ function AppShell({ profile, onLogout }) {
     {mobileMenuOpen && <button className="management-mobile-backdrop" aria-label="Fechar menu" onClick={() => setMobileMenuOpen(false)} type="button" />}
     {mobileMenuOpen && <section className="management-mobile-sheet" aria-label="Mais opções"><div className="management-mobile-sheet-heading"><div><span>GESTÃO</span><strong>Mais opções</strong></div><button aria-label="Fechar menu" onClick={() => setMobileMenuOpen(false)} type="button"><ManagementIcon name="close" size={19} /></button></div><div className="management-mobile-sheet-grid">{mobileMoreItems.map((item) => <button key={item} className={page === navigationPage(item) ? 'active' : ''} onClick={() => navigateMobile(item)} type="button"><span><ManagementIcon name={navIcon(item)} size={19} /></span><strong>{navLabel(item)}</strong></button>)}</div><button className="management-mobile-logout" onClick={onLogout} type="button"><ManagementIcon name="logout" size={17} />Sair da conta</button></section>}
     <nav className="management-mobile-nav" aria-label="Navegação da gestão">{mobilePrimaryItems.map((item) => <button key={item} className={page === navigationPage(item) ? 'active' : ''} onClick={() => navigateMobile(item)} type="button"><span><ManagementIcon name={navIcon(item)} size={20} /></span><small>{navLabel(item)}</small></button>)}<button className={mobileMoreItems.some((item) => page === navigationPage(item)) || mobileMenuOpen ? 'active' : ''} onClick={() => setMobileMenuOpen((current) => !current)} type="button"><span><ManagementIcon name="menu" size={20} /></span><small>Mais</small></button></nav>
+    {modalError && (form || editingStudent || editingEmployee) && <div className="modal-floating-notice" role="alert"><ManagementIcon name="alert" size={18} /><span>{modalError}</span></div>}
     {form && <div className="modal-backdrop"><form className="student-modal" onSubmit={createAccount}><div className="panel-heading"><h3>Novo acesso</h3><button className="modal-close" onClick={() => setForm(null)} type="button">×</button></div><label>Nome completo<input value={form.full_name} onChange={(e) => setForm({...form,full_name:e.target.value})} required/></label><label>E-mail<input type="email" value={form.email} onChange={(e) => setForm({...form,email:e.target.value})} required/></label><label>Telefone<input value={form.phone} onChange={(e) => setForm({...form,phone:e.target.value})}/></label><label>Senha inicial<input type="password" minLength="8" value={form.password} onChange={(e) => setForm({...form,password:e.target.value})} required/></label>{form.role === 'ALUNO' && <><label>CPF<input value={form.cpf} onChange={(e) => setForm({...form,cpf:e.target.value})} required/></label><label>CEP<input value={form.address_zip_code} onChange={(e) => setForm({...form,address_zip_code:e.target.value})}/></label><label>Endereço<input value={form.address_street} onChange={(e) => setForm({...form,address_street:e.target.value})}/></label><label>Número<input value={form.address_number} onChange={(e) => setForm({...form,address_number:e.target.value})}/></label><label>Complemento<input value={form.address_complement} onChange={(e) => setForm({...form,address_complement:e.target.value})}/></label><label>Bairro<input value={form.address_district} onChange={(e) => setForm({...form,address_district:e.target.value})}/></label><label>Cidade<input value={form.address_city} onChange={(e) => setForm({...form,address_city:e.target.value})}/></label><label>Estado<input value={form.address_state} onChange={(e) => setForm({...form,address_state:e.target.value})}/></label><label>Pagamento<select value={form.payment_plan} onChange={(e) => setForm({...form,payment_plan:e.target.value})}><option value="MENSALISTA">Mensalista</option><option value="TOTALPASS">TotalPass</option><option value="WELLHUB">Wellhub</option></select></label></>}{form.role !== 'ALUNO' && <><label>CPF<input value={form.cpf} onChange={(e) => setForm({...form,cpf:e.target.value})}/></label><label>Data de admissão<input type="date" value={form.hire_date} onChange={(e) => setForm({...form,hire_date:e.target.value})}/></label><label>CEP<input value={form.address_zip_code} onChange={(e) => setForm({...form,address_zip_code:e.target.value})}/></label><label>Endereço<input value={form.address_street} onChange={(e) => setForm({...form,address_street:e.target.value})}/></label><label>Número<input value={form.address_number} onChange={(e) => setForm({...form,address_number:e.target.value})}/></label><label>Complemento<input value={form.address_complement} onChange={(e) => setForm({...form,address_complement:e.target.value})}/></label><label>Bairro<input value={form.address_district} onChange={(e) => setForm({...form,address_district:e.target.value})}/></label><label>Cidade<input value={form.address_city} onChange={(e) => setForm({...form,address_city:e.target.value})}/></label><label>Estado<input value={form.address_state} onChange={(e) => setForm({...form,address_state:e.target.value})}/></label><label>Perfil<select value={form.role} onChange={(e) => setForm({...form,role:e.target.value})}><option value="RECEPCAO">Recepção</option><option value="PROFESSOR">Professor</option></select></label><label>Cargo<input value={form.position} onChange={(e) => setForm({...form,position:e.target.value})} required/></label><label>Tipo de vínculo<input value={form.employment_type} onChange={(e) => setForm({...form,employment_type:e.target.value})}/></label><label>Observações<input value={form.notes} onChange={(e) => setForm({...form,notes:e.target.value})}/></label></>}<button className="dashboard-primary-action full-action" type="submit">Criar acesso</button></form></div>}
     {editingStudent && <div className="modal-backdrop"><form className="student-modal" onSubmit={saveStudent}><div className="panel-heading"><div><span className="placeholder-kicker">DADOS CADASTRAIS</span><h3>Editar aluno</h3></div><button className="modal-close" onClick={() => setEditingStudent(null)} type="button">×</button></div>{[['full_name','Nome completo'],['email','E-mail'],['phone','Telefone'],['cpf','CPF']].map(([field,label]) => <label key={field}>{label}<input type={field === 'email' ? 'email' : 'text'} value={editingStudent.profile?.[field] || ''} onChange={(event) => setEditingStudent((current) => ({ ...current, profile: { ...current.profile, [field]: event.target.value } }))} required={['full_name','email'].includes(field)} /></label>)}<label>Status<select value={editingStudent.status} onChange={(e) => setEditingStudent({...editingStudent,status:e.target.value})}><option value="ATIVO">Ativo</option><option value="INATIVO">Inativo</option><option value="SUSPENSO">Suspenso</option><option value="CANCELADO">Cancelado</option></select></label><button className="dashboard-primary-action full-action" type="submit">Salvar dados e contato</button></form></div>}
     {editingEmployee && <div className="modal-backdrop"><form className="student-modal employee-modal" onSubmit={saveEmployee}><div className="panel-heading"><h3>Editar funcionário</h3><button className="modal-close" onClick={() => setEditingEmployee(null)} type="button">×</button></div>{[['full_name','Nome completo'],['email','E-mail'],['phone','Telefone'],['cpf','CPF'],['birth_date','Data de nascimento'],['address_zip_code','CEP'],['address_street','Rua'],['address_number','Número'],['address_complement','Complemento'],['address_district','Bairro'],['address_city','Cidade'],['address_state','Estado']].map(([field,label]) => <label key={field}>{label}<input type={field === 'birth_date' ? 'date' : field === 'email' ? 'email' : 'text'} value={editingEmployee.profile[field] || ''} onChange={(e) => setEditingEmployee({...editingEmployee, profile: {...editingEmployee.profile, [field]: e.target.value}})} /></label>)}<label>Cargo<input value={editingEmployee.position || ''} onChange={(e) => setEditingEmployee({...editingEmployee,position:e.target.value})} required /></label><label>Data de admissão<input type="date" value={editingEmployee.hire_date || ''} onChange={(e) => setEditingEmployee({...editingEmployee,hire_date:e.target.value})} /></label><label>Tipo de vínculo<input value={editingEmployee.employment_type || ''} onChange={(e) => setEditingEmployee({...editingEmployee,employment_type:e.target.value})} /></label><label>Observações<input value={editingEmployee.notes || ''} onChange={(e) => setEditingEmployee({...editingEmployee,notes:e.target.value})} /></label><button className="dashboard-primary-action full-action" type="submit">Salvar dados</button><label>Nova senha<input type="password" minLength="8" value={newPassword} onChange={(e) => setNewPassword(e.target.value)} /></label><button className="outline-action full-action" type="button" onClick={resetEmployeePassword}>Redefinir senha</button><button className="outline-action full-action" type="button" onClick={deleteEmployee}>Excluir conta</button></form></div>}
