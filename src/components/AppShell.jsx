@@ -13,6 +13,7 @@ const emptyForm = { full_name: '', email: '', phone: '', password: '', role: 'AL
 
 const onlyDigits = (value) => String(value || '').replace(/\D/g, '')
 const formatCpf = (value) => onlyDigits(value).slice(0, 11).replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2')
+const formatPhone = (value) => onlyDigits(value).slice(0, 11).replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d{1,4})$/, '$1-$2')
 const formatCep = (value) => onlyDigits(value).slice(0, 8).replace(/(\d{5})(\d)/, '$1-$2')
 const formatCurrency = (value) => Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 const formatPercent = (value) => `${Math.round(Number(value || 0))}%`
@@ -302,6 +303,23 @@ function AppShell({ profile, onLogout }) {
   }, [receptionPanel.waitlist])
 
   useEffect(() => {
+    const applyMask = (event) => {
+      const input = event.target
+      if (!(input instanceof HTMLInputElement)) return
+      const label = input.closest('label')?.textContent || ''
+      const field = label.startsWith('CPF') ? 'cpf' : label.startsWith('Telefone') ? 'phone' : label.startsWith('CEP') ? 'address_zip_code' : null
+      if (!field) return
+      const maskedValue = field === 'cpf' ? formatCpf(input.value) : field === 'phone' ? formatPhone(input.value) : formatCep(input.value)
+      input.value = maskedValue
+      const modal = input.closest('.student-modal')
+      if (modal?.classList.contains('employee-modal')) {
+        setEditingEmployee((current) => current ? { ...current, profile: { ...current.profile, [field]: maskedValue } } : current)
+      } else if (modal?.querySelector('.placeholder-kicker')?.textContent === 'DADOS CADASTRAIS') {
+        setEditingStudent((current) => current ? { ...current, profile: { ...current.profile, [field]: maskedValue } } : current)
+      } else {
+        setForm((current) => current ? { ...current, [field]: maskedValue } : current)
+      }
+    }
     const searchCep = async (event) => {
       const input = event.target
       if (!(input instanceof HTMLInputElement) || !(input.closest('label')?.textContent || '').startsWith('CEP')) return
@@ -316,8 +334,9 @@ function AppShell({ profile, onLogout }) {
         else setForm((current) => current ? { ...current, ...fields } : current)
       } catch (_) { setNotice('Não foi possível consultar o CEP agora.') }
     }
+    document.addEventListener('input', applyMask, true)
     document.addEventListener('blur', searchCep, true)
-    return () => document.removeEventListener('blur', searchCep, true)
+    return () => { document.removeEventListener('input', applyMask, true); document.removeEventListener('blur', searchCep, true) }
   }, [])
 
   const createAccount = async (event) => {
