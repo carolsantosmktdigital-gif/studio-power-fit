@@ -16,6 +16,8 @@
 .dashboard-shell .demo-seed-toolbar strong { font-size: 13px; line-height: 1.25; font-weight: 750; letter-spacing: -.01em; }
 .dashboard-shell .demo-seed-toolbar span { font-size: 11.5px; line-height: 1.45; }
 .dashboard-shell .status-pill { font-size: 10px; line-height: 1; letter-spacing: .01em; }
+.dashboard-shell .student-plan-admin-tag { display: inline-flex; align-items: center; min-height: 25px; padding: 0 9px; border: 1px solid rgba(38,99,196,.13); border-radius: 999px; color: #245b9f; background: rgba(46,108,207,.08); font-size: 9.5px; line-height: 1; font-weight: 750; white-space: nowrap; }
+.dashboard-shell.theme-dark .student-plan-admin-tag { color: #a9c9ff; border-color: rgba(126,170,238,.18); background: rgba(65,116,195,.13); }
 .dashboard-shell .directory-toolbar { display: flex; align-items: center; justify-content: space-between; gap: 16px; margin-top: 22px; }
 .dashboard-shell .directory-toolbar label { position: relative; display: flex; align-items: center; width: min(520px,100%); min-width: 0; }
 .dashboard-shell .directory-toolbar label>svg { position: absolute; left: 14px; color: var(--text-muted); pointer-events: none; }
@@ -124,6 +126,15 @@
   .dashboard-shell .students-table td:nth-child(3)::before { content: 'Detalhes'; }
   .dashboard-shell .students-table td:nth-child(4)::before { content: 'Status'; }
   .dashboard-shell .students-table td:nth-child(5)::before { content: 'Situação'; }
+  .dashboard-shell .students-page:not(.live-data-page):not(.audit-page):has(th:nth-child(5)) .students-table td:nth-child(1)::before { content: 'Aluno'; }
+  .dashboard-shell .students-page:not(.live-data-page):not(.audit-page):has(th:nth-child(5)) .students-table td:nth-child(2)::before { content: 'Status'; }
+  .dashboard-shell .students-page:not(.live-data-page):not(.audit-page):has(th:nth-child(5)) .students-table td:nth-child(3)::before { content: 'Plano'; }
+  .dashboard-shell .students-page:not(.live-data-page):not(.audit-page):has(th:nth-child(5)) .students-table td:nth-child(4)::before { content: 'Contato'; }
+  .dashboard-shell .students-page:not(.live-data-page):not(.audit-page):has(th:nth-child(5)) .students-table td:nth-child(5)::before { content: 'Ações'; }
+  .dashboard-shell .students-page:not(.live-data-page):not(.audit-page):has(th:nth-child(4):last-child) .students-table td:nth-child(1)::before { content: 'Funcionário'; }
+  .dashboard-shell .students-page:not(.live-data-page):not(.audit-page):has(th:nth-child(4):last-child) .students-table td:nth-child(2)::before { content: 'Cargo'; }
+  .dashboard-shell .students-page:not(.live-data-page):not(.audit-page):has(th:nth-child(4):last-child) .students-table td:nth-child(3)::before { content: 'Contato'; }
+  .dashboard-shell .students-page:not(.live-data-page):not(.audit-page):has(th:nth-child(4):last-child) .students-table td:nth-child(4)::before { content: 'Ações'; }
   .dashboard-shell .live-data-page:not(.finance-page) .students-table td:nth-child(1)::before { content: 'Aluno'; }
   .dashboard-shell .live-data-page:not(.finance-page) .students-table td:nth-child(2)::before { content: 'Data'; }
   .dashboard-shell .live-data-page:not(.finance-page) .students-table td:nth-child(3)::before { content: 'Horário'; }
