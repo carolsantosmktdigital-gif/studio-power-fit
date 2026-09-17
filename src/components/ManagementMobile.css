@@ -1,0 +1,101 @@
+.management-mobile-nav { display: none; }
+
+@media (max-width: 600px) {
+  .dashboard-shell { min-height: 100dvh; }
+  .dashboard-shell .app-main { height: 100dvh; }
+  .dashboard-shell .app-header { position: relative; z-index: 20; padding: 0 14px; background: color-mix(in srgb, var(--header-bg) 94%, transparent); }
+  .dashboard-shell .app-header > div:first-child { min-width: 0; }
+  .dashboard-shell .header-kicker { overflow: hidden; font-size: 7px; text-overflow: ellipsis; white-space: nowrap; }
+  .dashboard-shell .app-header h1 { overflow: hidden; max-width: 190px; font-size: 18px; text-overflow: ellipsis; white-space: nowrap; }
+  .dashboard-shell .header-actions { gap: 5px; }
+  .dashboard-shell .header-theme-button,.dashboard-shell .user-avatar { width: 36px; height: 36px; border-radius: 11px; }
+  .dashboard-shell .app-content { padding: 17px 12px calc(96px + env(safe-area-inset-bottom)); scroll-behavior: smooth; }
+
+  .management-mobile-nav {
+    position: fixed;
+    z-index: 80;
+    right: 10px;
+    bottom: max(8px, env(safe-area-inset-bottom));
+    left: 10px;
+    display: flex;
+    align-items: stretch;
+    gap: 3px;
+    min-height: 68px;
+    padding: 6px;
+    overflow-x: auto;
+    border: 1px solid var(--border-strong);
+    border-radius: 21px;
+    background: color-mix(in srgb, var(--sidebar-bg) 94%, transparent);
+    box-shadow: 0 18px 50px rgba(3,10,22,.34);
+    backdrop-filter: blur(22px);
+    -webkit-backdrop-filter: blur(22px);
+    scrollbar-width: none;
+  }
+  .management-mobile-nav::-webkit-scrollbar { display: none; }
+  .management-mobile-nav button {
+    flex: 1 0 61px;
+    min-width: 61px;
+    display: grid;
+    place-items: center;
+    align-content: center;
+    gap: 4px;
+    padding: 7px 4px;
+    border: 0;
+    border-radius: 15px;
+    color: var(--text-muted);
+    background: transparent;
+    font: inherit;
+  }
+  .management-mobile-nav button span { font-size: 17px; line-height: 1; }
+  .management-mobile-nav button small { max-width: 58px; overflow: hidden; font-size: 7.5px; font-weight: 750; text-overflow: ellipsis; white-space: nowrap; }
+  .management-mobile-nav button.active { color: #fff; background: linear-gradient(145deg,var(--accent),var(--accent-dark)); box-shadow: 0 8px 20px rgba(255,32,56,.24); }
+
+  .dashboard-shell .demo-seed-toolbar { gap: 12px; margin-bottom: 12px; padding: 14px; border-radius: 15px; }
+  .dashboard-shell .demo-seed-toolbar strong { font-size: 12px; }
+  .dashboard-shell .demo-seed-toolbar span { font-size: 10px; line-height: 1.45; }
+  .dashboard-shell .demo-seed-toolbar button { min-height: 46px; }
+  .dashboard-shell .dashboard-notice { margin: 0 0 12px; padding: 12px; font-size: 11px; line-height: 1.45; }
+
+  .dashboard-shell .students-page,.dashboard-shell .live-data-page,.dashboard-shell .audit-page { min-height: auto; padding: 17px; border-radius: 18px; }
+  .dashboard-shell .panel-heading { align-items: stretch; flex-direction: column; }
+  .dashboard-shell .panel-heading h2 { font-size: 28px; }
+  .dashboard-shell .panel-heading button { width: 100%; min-height: 44px; }
+
+  .dashboard-shell .students-table-wrap { margin-top: 17px; overflow: visible; border: 0; border-radius: 0; }
+  .dashboard-shell .students-table { min-width: 0; }
+  .dashboard-shell .students-table thead { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); }
+  .dashboard-shell .students-table,.dashboard-shell .students-table tbody,.dashboard-shell .students-table tr,.dashboard-shell .students-table td { display: block; width: 100%; }
+  .dashboard-shell .students-table tbody { display: grid; gap: 10px; }
+  .dashboard-shell .students-table tr { padding: 12px; border: 1px solid var(--border); border-radius: 14px; background: color-mix(in srgb,var(--surface) 92%,var(--page-bg)); }
+  .dashboard-shell .students-table td { display: grid; grid-template-columns: 84px minmax(0,1fr); gap: 10px; padding: 8px 0; border: 0; font-size: 11px; overflow-wrap: anywhere; }
+  .dashboard-shell .students-table td::before { color: var(--text-muted); font-size: 8px; font-weight: 850; letter-spacing: .06em; text-transform: uppercase; }
+  .dashboard-shell .students-table td:nth-child(1)::before { content: 'Registro'; }
+  .dashboard-shell .students-table td:nth-child(2)::before { content: 'Situação'; }
+  .dashboard-shell .students-table td:nth-child(3)::before { content: 'Detalhes'; }
+  .dashboard-shell .students-table td:nth-child(4)::before { content: 'Status'; }
+  .dashboard-shell .students-table td:nth-child(5)::before { content: 'Situação'; }
+  .dashboard-shell .live-data-page:not(.finance-page) .students-table td:nth-child(1)::before { content: 'Aluno'; }
+  .dashboard-shell .live-data-page:not(.finance-page) .students-table td:nth-child(2)::before { content: 'Data'; }
+  .dashboard-shell .live-data-page:not(.finance-page) .students-table td:nth-child(3)::before { content: 'Horário'; }
+  .dashboard-shell .live-data-page:not(.finance-page) .students-table td:nth-child(4)::before { content: 'Status'; }
+  .dashboard-shell .finance-page .students-table td:nth-child(1)::before { content: 'Aluno'; }
+  .dashboard-shell .finance-page .students-table td:nth-child(2)::before { content: 'Origem'; }
+  .dashboard-shell .finance-page .students-table td:nth-child(3)::before { content: 'Vencimento'; }
+  .dashboard-shell .finance-page .students-table td:nth-child(4)::before { content: 'Valor'; }
+  .dashboard-shell .finance-page .students-table td:nth-child(5)::before { content: 'Status'; }
+  .dashboard-shell .audit-page .students-table td:nth-child(1)::before { content: 'Responsável'; }
+  .dashboard-shell .audit-page .students-table td:nth-child(2)::before { content: 'Perfil'; }
+  .dashboard-shell .audit-page .students-table td:nth-child(3)::before { content: 'Ação'; }
+  .dashboard-shell .audit-page .students-table td:nth-child(4)::before { content: 'Módulo'; }
+  .dashboard-shell .audit-page .students-table td:nth-child(5)::before { content: 'Quando'; }
+  .dashboard-shell .students-table td[colspan] { display: block; text-align: center; }
+  .dashboard-shell .students-table td[colspan]::before { display: none; }
+  .dashboard-shell .students-table .outline-action { width: 100%; }
+  .dashboard-shell .finance-summary { grid-template-columns: 1fr; gap: 9px; margin-top: 17px; }
+  .dashboard-shell .finance-summary article { padding: 16px; }
+}
+
+@media (max-width: 370px) {
+  .dashboard-shell .app-header h1 { max-width: 150px; }
+  .management-mobile-nav button { flex-basis: 58px; min-width: 58px; }
+}
