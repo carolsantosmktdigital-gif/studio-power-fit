@@ -1,9 +1,9 @@
 .management-dashboard { --management-shadow: 0 12px 34px rgba(15,29,52,.07); display: grid; gap: 16px; color: var(--text); }
 .theme-dark .management-dashboard { --management-shadow: 0 15px 38px rgba(0,0,0,.24); }
 .management-intro { display: flex; align-items: end; justify-content: space-between; gap: 24px; padding: 4px 2px 8px; }
-.management-intro h2 { max-width: 760px; margin: 5px 0 7px; color: var(--text); font-size: clamp(25px,3vw,40px); line-height: 1.08; letter-spacing: -.035em; }
-.management-intro p,.management-panel-heading p { margin: 0; color: var(--text-muted); font-size: 12px; text-transform: capitalize; }
-.management-eyebrow { color: var(--accent); font-size: 9px; font-weight: 900; letter-spacing: .13em; }
+.management-intro h2 { max-width: 760px; margin: 5px 0 7px; color: var(--text); font-size: clamp(28px,3vw,40px); line-height: 1.08; font-weight: 780; letter-spacing: -.04em; }
+.management-intro p,.management-panel-heading p { margin: 0; color: var(--text-muted); font-size: 12px; line-height: 1.45; font-weight: 450; text-transform: capitalize; }
+.management-eyebrow { color: var(--accent); font-size: 9.5px; line-height: 1; font-weight: 850; letter-spacing: .13em; }
 .management-actions { display: flex; gap: 9px; }
 .management-kpis { display: grid; grid-template-columns: repeat(4,minmax(0,1fr)); gap: 12px; }
 .management-kpi { display: flex; align-items: flex-start; gap: 14px; min-height: 130px; padding: 20px; border: 1px solid var(--border); border-radius: 16px; background: var(--surface); box-shadow: var(--management-shadow); }
@@ -11,15 +11,15 @@
 .management-kpi.is-occupancy .management-kpi-icon { color: #e73143; background: rgba(231,49,67,.12); }
 .management-kpi.is-revenue .management-kpi-icon { color: #1eaa68; background: rgba(30,170,104,.12); }
 .management-kpi.is-overdue .management-kpi-icon { color: #cb8b16; background: rgba(230,164,37,.16); }
-.management-kpi small { display: block; color: var(--text-soft); font-size: 10px; font-weight: 850; letter-spacing: .06em; }
-.management-kpi strong { display: block; margin: 11px 0 7px; font-size: clamp(25px,2.4vw,34px); line-height: 1; letter-spacing: -.04em; }
-.management-kpi p { margin: 0; color: var(--text-muted); font-size: 11px; line-height: 1.4; }
+.management-kpi small { display: block; color: var(--text-soft); font-size: 10px; line-height: 1.2; font-weight: 800; letter-spacing: .055em; }
+.management-kpi strong { display: block; margin: 11px 0 7px; font-size: clamp(25px,2.4vw,34px); line-height: 1; font-weight: 780; letter-spacing: -.045em; }
+.management-kpi p { margin: 0; color: var(--text-muted); font-size: 11.5px; line-height: 1.4; font-weight: 450; }
 .management-main-grid { display: grid; grid-template-columns: minmax(0,2.1fr) minmax(300px,.9fr); gap: 14px; }
 .management-secondary-grid { display: grid; grid-template-columns: minmax(0,2fr) minmax(280px,.8fr); gap: 14px; }
 .management-bottom-grid { display: grid; grid-template-columns: minmax(300px,.95fr) minmax(0,1.35fr); gap: 14px; }
 .management-panel { padding: 20px; border: 1px solid var(--border); border-radius: 17px; background: var(--surface); box-shadow: var(--management-shadow); }
 .management-panel-heading { display: flex; align-items: flex-start; justify-content: space-between; gap: 18px; }
-.management-panel-heading h3 { margin: 5px 0 0; color: var(--text); font-size: 17px; letter-spacing: -.02em; }
+.management-panel-heading h3 { margin: 5px 0 0; color: var(--text); font-size: 17px; line-height: 1.2; font-weight: 750; letter-spacing: -.025em; }
 .management-panel-heading > strong { font-size: 22px; }
 .management-panel-heading button { padding: 0; border: 0; color: var(--text-soft); background: transparent; font: inherit; font-size: 10px; font-weight: 800; cursor: pointer; }
 .operation-summary { color: var(--text-muted); font-size: 11px; white-space: nowrap; }.operation-summary b { color: var(--text); }.operation-summary span { margin: 0 3px; }
@@ -44,21 +44,21 @@
   .management-dashboard{width:100%;max-width:100%;min-width:0;gap:10px;overflow:hidden}
   .management-dashboard>*{width:100%;max-width:100%;min-width:0}
   .management-intro{gap:14px;padding:0 2px 4px}
-  .management-intro h2{max-width:100%;margin:4px 0 6px;font-size:26px;line-height:1.08;overflow-wrap:anywhere}
-  .management-intro p{font-size:10px;line-height:1.45}
+  .management-intro h2{max-width:100%;margin:5px 0 7px;font-size:27px;line-height:1.1;font-weight:780;letter-spacing:-.04em;overflow-wrap:anywhere}
+  .management-intro p{font-size:11px;line-height:1.45}
   .management-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;min-width:0}
-  .management-actions button{min-height:43px;padding:0 10px;font-size:10px}
+  .management-actions button{min-height:44px;padding:0 10px;font-size:11px}
   .management-kpis{width:100%;max-width:100%;min-width:0;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;overflow:hidden}
   .management-kpi{display:block;min-height:137px;padding:13px;border-radius:14px}
   .management-kpi-icon{width:34px;height:34px;margin-bottom:12px;border-radius:10px;font-size:14px}
-  .management-kpi small{font-size:7.5px;line-height:1.25}
-  .management-kpi strong{margin:8px 0 6px;font-size:clamp(20px,6vw,26px);overflow-wrap:anywhere}
-  .management-kpi p{font-size:8.5px;line-height:1.35}
+  .management-kpi small{font-size:8.5px;line-height:1.25;letter-spacing:.045em}
+  .management-kpi strong{margin:8px 0 6px;font-size:clamp(21px,6vw,26px);font-weight:780;overflow-wrap:anywhere}
+  .management-kpi p{font-size:9.5px;line-height:1.4}
   .management-main-grid,.management-secondary-grid,.management-bottom-grid{width:100%;max-width:100%;min-width:0;grid-template-columns:minmax(0,1fr);gap:10px;overflow:hidden}
   .management-panel{width:100%;max-width:100%;min-width:0;padding:15px;box-sizing:border-box;border-radius:15px;overflow:hidden}
   .management-panel-heading{gap:7px}
-  .management-panel-heading h3{font-size:15px}
-  .management-panel-heading p,.operation-summary{font-size:9px;line-height:1.4}
+  .management-panel-heading h3{font-size:16px;font-weight:750}
+  .management-panel-heading p,.operation-summary{font-size:10px;line-height:1.4}
   .management-panel-heading>strong{font-size:19px}
   .operation-legend{justify-content:flex-start;gap:10px;margin:12px 0 7px;font-size:8px}
   .operation-chart{width:100%;max-width:100%;min-width:0;grid-template-columns:repeat(16,36px);gap:6px;min-height:184px;margin:0;padding:4px 0 2px;overflow-x:auto;scroll-snap-type:x proximity}
