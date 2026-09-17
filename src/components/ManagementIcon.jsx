@@ -16,6 +16,7 @@ const icons = {
   gauge: <><path d="M20.4 15a9 9 0 1 0-16.8 0"/><path d="m12 12 4-4"/><path d="M6.7 17h10.6"/></>,
   trend: <><path d="m3 17 6-6 4 4 8-8"/><path d="M15 7h6v6"/></>,
   alert: <><path d="M10.3 3.7 2.4 18a2 2 0 0 0 1.8 3h15.6a2 2 0 0 0 1.8-3L13.7 3.7a2 2 0 0 0-3.4 0Z"/><path d="M12 9v4M12 17h.01"/></>,
+  search: <><circle cx="11" cy="11" r="7"/><path d="m20 20-4-4"/></>,
 }
 
 function ManagementIcon({ name, size = 20, className = '' }) {
