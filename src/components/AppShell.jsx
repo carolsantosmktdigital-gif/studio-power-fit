@@ -13,7 +13,6 @@ const emptyForm = { full_name: '', email: '', phone: '', password: '', role: 'AL
 
 const onlyDigits = (value) => String(value || '').replace(/\D/g, '')
 const formatCpf = (value) => onlyDigits(value).slice(0, 11).replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d)/, '$1.$2').replace(/(\d{3})(\d{1,2})$/, '$1-$2')
-const formatPhone = (value) => onlyDigits(value).slice(0, 11).replace(/(\d{2})(\d)/, '($1) $2').replace(/(\d{5})(\d{1,4})$/, '$1-$2')
 const formatCep = (value) => onlyDigits(value).slice(0, 8).replace(/(\d{5})(\d)/, '$1-$2')
 const formatCurrency = (value) => Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 const formatPercent = (value) => `${Math.round(Number(value || 0))}%`
@@ -303,14 +302,6 @@ function AppShell({ profile, onLogout }) {
   }, [receptionPanel.waitlist])
 
   useEffect(() => {
-    const applyMask = (event) => {
-      const input = event.target
-      if (!(input instanceof HTMLInputElement)) return
-      const label = input.closest('label')?.textContent || ''
-      if (label.startsWith('CPF')) input.value = formatCpf(input.value)
-      if (label.startsWith('Telefone')) input.value = formatPhone(input.value)
-      if (label.startsWith('CEP')) input.value = formatCep(input.value)
-    }
     const searchCep = async (event) => {
       const input = event.target
       if (!(input instanceof HTMLInputElement) || !(input.closest('label')?.textContent || '').startsWith('CEP')) return
@@ -325,9 +316,8 @@ function AppShell({ profile, onLogout }) {
         else setForm((current) => current ? { ...current, ...fields } : current)
       } catch (_) { setNotice('Não foi possível consultar o CEP agora.') }
     }
-    document.addEventListener('input', applyMask, true)
     document.addEventListener('blur', searchCep, true)
-    return () => { document.removeEventListener('input', applyMask, true); document.removeEventListener('blur', searchCep, true) }
+    return () => document.removeEventListener('blur', searchCep, true)
   }, [])
 
   const createAccount = async (event) => {
@@ -345,6 +335,17 @@ function AppShell({ profile, onLogout }) {
       setNotice(message)
       setModalError(message)
       return
+    }
+    if (data?.id) {
+      const expectedProfile = { ...editableProfileFields(form, onlyDigits(form.cpf) || null), email: String(form.email || '').trim().toLowerCase() }
+      const { data: savedProfile, error: verificationError } = await supabase.from('profiles').select('id, full_name, email, phone, cpf, birth_date, address_zip_code, address_street, address_number, address_complement, address_district, address_city, address_state').eq('id', data.id).single()
+      const mismatch = changedFieldNotConfirmed(savedProfile, expectedProfile)
+      if (verificationError || mismatch) {
+        const message = verificationError?.message || `O cadastro foi criado, mas o banco não confirmou o campo ${mismatch[0]}.`
+        setNotice(message)
+        setModalError(message)
+        return
+      }
     }
     setForm(null)
     setNotice('Cadastro criado com sucesso.')
@@ -392,6 +393,17 @@ function AppShell({ profile, onLogout }) {
     address_state: String(profile.address_state || '').trim().toUpperCase() || null,
   })
 
+  const changedFieldNotConfirmed = (saved, expected) => Object.entries(expected).find(([field, value]) => (saved?.[field] ?? null) !== (value ?? null))
+
+  const updateProfile = async (profileId, profile, cpf) => {
+    const expected = editableProfileFields(profile, cpf)
+    const { data: saved, error } = await supabase.from('profiles').update(expected).eq('id', profileId).select('id, full_name, phone, cpf, birth_date, address_zip_code, address_street, address_number, address_complement, address_district, address_city, address_state').single()
+    if (error) return { error: error.message }
+    const mismatch = changedFieldNotConfirmed(saved, expected)
+    if (mismatch) return { error: `O banco não confirmou a alteração do campo ${mismatch[0]}. Tente novamente.` }
+    return { saved }
+  }
+
   const saveStudent = async (event) => {
     event.preventDefault()
     setNotice('')
@@ -399,10 +411,10 @@ function AppShell({ profile, onLogout }) {
     if (!String(editingStudent.profile?.full_name || '').trim()) return setModalError('Informe o nome completo do aluno.')
     const cpf = validateCpf(editingStudent.profile?.cpf, editingStudent.profile_id)
     if (!cpf.valid) return setModalError(cpf.message)
-    const { error: profileError } = await supabase.from('profiles').update(editableProfileFields(editingStudent.profile, cpf.value)).eq('id', editingStudent.profile_id).select('id').single()
-    if (profileError) { setModalError(profileError.message); return setNotice(profileError.message) }
-    const { error } = await supabase.from('students').update({ status: editingStudent.status }).eq('id', editingStudent.id)
-    if (error) { setModalError(error.message); return setNotice(error.message) }
+    const profileResult = await updateProfile(editingStudent.profile_id, editingStudent.profile, cpf.value)
+    if (profileResult.error) { setModalError(profileResult.error); return setNotice(profileResult.error) }
+    const { data: savedStudent, error } = await supabase.from('students').update({ status: editingStudent.status }).eq('id', editingStudent.id).select('status').single()
+    if (error || savedStudent?.status !== editingStudent.status) { const message = error?.message || 'O banco não confirmou a alteração do status.'; setModalError(message); return setNotice(message) }
     setEditingStudent(null)
     setNotice('Dados e contato do aluno atualizados com sucesso.')
     await loadStudents()
@@ -415,10 +427,12 @@ function AppShell({ profile, onLogout }) {
     if (!String(editingEmployee.profile?.full_name || '').trim()) return setModalError('Informe o nome completo do funcionário.')
     const cpf = validateCpf(editingEmployee.profile?.cpf, editingEmployee.profile_id)
     if (!cpf.valid) return setModalError(cpf.message)
-    const { error: profileError } = await supabase.from('profiles').update(editableProfileFields(editingEmployee.profile, cpf.value)).eq('id', editingEmployee.profile_id).select('id').single()
-    if (profileError) { setModalError(profileError.message); return setNotice(profileError.message) }
-    const { error: employeeError } = await supabase.from('employees').update({ position: editingEmployee.position, hire_date: editingEmployee.hire_date || null, employment_type: editingEmployee.employment_type || null, notes: editingEmployee.notes || null, status: editingEmployee.status || 'ATIVO' }).eq('id', editingEmployee.id)
-    if (employeeError) { setModalError(employeeError.message); return setNotice(employeeError.message) }
+    const profileResult = await updateProfile(editingEmployee.profile_id, editingEmployee.profile, cpf.value)
+    if (profileResult.error) { setModalError(profileResult.error); return setNotice(profileResult.error) }
+    const expectedEmployee = { position: editingEmployee.position, hire_date: editingEmployee.hire_date || null, employment_type: editingEmployee.employment_type || null, notes: editingEmployee.notes || null, status: editingEmployee.status || 'ATIVO' }
+    const { data: savedEmployee, error: employeeError } = await supabase.from('employees').update(expectedEmployee).eq('id', editingEmployee.id).select('position, hire_date, employment_type, notes, status').single()
+    const employeeMismatch = changedFieldNotConfirmed(savedEmployee, expectedEmployee)
+    if (employeeError || employeeMismatch) { const message = employeeError?.message || `O banco não confirmou a alteração do campo ${employeeMismatch[0]}.`; setModalError(message); return setNotice(message) }
     setEditingEmployee(null)
     setNotice('Dados e contato do funcionário atualizados com sucesso.')
     await loadEmployees()
