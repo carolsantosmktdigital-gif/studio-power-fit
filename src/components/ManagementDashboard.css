@@ -41,26 +41,27 @@
 @media(max-width:1180px){.management-kpis{grid-template-columns:repeat(2,minmax(0,1fr))}.management-main-grid,.management-secondary-grid,.management-bottom-grid{grid-template-columns:1fr}.attention-list{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:700px){.management-dashboard{gap:12px}.management-intro{align-items:stretch;flex-direction:column}.management-intro h2{font-size:27px}.management-actions{width:100%}.management-actions button{flex:1}.management-kpis{grid-template-columns:1fr}.management-kpi{min-height:112px;padding:17px}.management-panel{padding:17px}.management-panel-heading{align-items:flex-start;flex-direction:column}.operation-summary{white-space:normal}.operation-legend{justify-content:flex-start}.operation-chart{grid-template-columns:repeat(16,38px)}.attention-list{grid-template-columns:1fr}.next-slot-list{grid-template-columns:1fr}.base-profile-list article{grid-template-columns:82px 25px minmax(70px,1fr) 34px}}
 @media(max-width:600px){
-  .management-dashboard{gap:10px}
+  .management-dashboard{width:100%;max-width:100%;min-width:0;gap:10px;overflow:hidden}
+  .management-dashboard>*{width:100%;max-width:100%;min-width:0}
   .management-intro{gap:14px;padding:0 2px 4px}
-  .management-intro h2{margin:4px 0 6px;font-size:25px;line-height:1.08}
+  .management-intro h2{max-width:100%;margin:4px 0 6px;font-size:26px;line-height:1.08;overflow-wrap:anywhere}
   .management-intro p{font-size:10px;line-height:1.45}
-  .management-actions{gap:7px}
+  .management-actions{display:grid;grid-template-columns:1fr 1fr;gap:7px;min-width:0}
   .management-actions button{min-height:43px;padding:0 10px;font-size:10px}
-  .management-kpis{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px}
+  .management-kpis{width:100%;max-width:100%;min-width:0;grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;overflow:hidden}
   .management-kpi{display:block;min-height:137px;padding:13px;border-radius:14px}
   .management-kpi-icon{width:34px;height:34px;margin-bottom:12px;border-radius:10px;font-size:14px}
   .management-kpi small{font-size:7.5px;line-height:1.25}
   .management-kpi strong{margin:8px 0 6px;font-size:clamp(20px,6vw,26px);overflow-wrap:anywhere}
   .management-kpi p{font-size:8.5px;line-height:1.35}
-  .management-main-grid,.management-secondary-grid,.management-bottom-grid{gap:10px}
-  .management-panel{padding:15px;border-radius:15px}
+  .management-main-grid,.management-secondary-grid,.management-bottom-grid{width:100%;max-width:100%;min-width:0;grid-template-columns:minmax(0,1fr);gap:10px;overflow:hidden}
+  .management-panel{width:100%;max-width:100%;min-width:0;padding:15px;box-sizing:border-box;border-radius:15px;overflow:hidden}
   .management-panel-heading{gap:7px}
   .management-panel-heading h3{font-size:15px}
   .management-panel-heading p,.operation-summary{font-size:9px;line-height:1.4}
   .management-panel-heading>strong{font-size:19px}
   .operation-legend{justify-content:flex-start;gap:10px;margin:12px 0 7px;font-size:8px}
-  .operation-chart{grid-template-columns:repeat(16,36px);gap:6px;min-height:184px;margin-right:-15px;padding-right:15px;scroll-snap-type:x proximity}
+  .operation-chart{width:100%;max-width:100%;min-width:0;grid-template-columns:repeat(16,36px);gap:6px;min-height:184px;margin:0;padding:4px 0 2px;overflow-x:auto;scroll-snap-type:x proximity}
   .operation-chart article{grid-template-rows:18px 128px auto;scroll-snap-align:start}
   .financial-health-list>div{padding:10px 0;font-size:10px}
   .attention-list{grid-template-columns:repeat(2,minmax(0,1fr));gap:8px;margin-top:13px}
@@ -75,7 +76,7 @@
   .base-profile-list{gap:11px;margin-top:15px}
   .base-profile-list article{grid-template-columns:70px 22px minmax(58px,1fr) 31px;gap:6px;font-size:8px}
   .base-profile-list article>strong{font-size:10px}
-  .next-slot-list{display:flex;gap:8px;margin:13px -15px 0;padding:0 15px 2px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
+  .next-slot-list{display:flex;width:100%;max-width:100%;min-width:0;gap:8px;margin:13px 0 0;padding:0 0 2px;overflow-x:auto;scroll-snap-type:x mandatory;scrollbar-width:none}
   .next-slot-list::-webkit-scrollbar{display:none}
   .next-slot-list article{flex:0 0 150px;padding:11px;scroll-snap-align:start}
 }
