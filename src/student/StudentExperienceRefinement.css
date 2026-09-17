@@ -1889,3 +1889,47 @@
     animation-iteration-count: 1 !important;
   }
 }
+
+/* Identificação da modalidade do aluno no resumo inicial. */
+.student-welcome-plan {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  margin-top: 14px;
+  padding: 7px 11px;
+  border: 1px solid rgba(255, 32, 56, .16);
+  border-radius: 999px;
+  color: var(--student-navy);
+  background: rgba(255, 32, 56, .055);
+}
+
+.student-welcome-plan small {
+  color: var(--student-soft);
+  font-size: 8px;
+  font-weight: 800;
+  line-height: 1;
+  letter-spacing: .1em;
+}
+
+.student-welcome-plan strong {
+  font-size: 11px;
+  font-weight: 750;
+  line-height: 1;
+}
+
+.student-theme-dark .student-welcome-plan {
+  color: #f7f9fd;
+  border-color: rgba(255, 73, 94, .24);
+  background: rgba(255, 48, 72, .1);
+}
+
+.student-theme-dark .student-welcome-plan small {
+  color: #aebcd0;
+}
+
+@media (max-width: 700px) {
+  .student-welcome-plan {
+    margin-top: 13px;
+    padding: 7px 10px;
+  }
+}
