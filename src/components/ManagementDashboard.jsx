@@ -1,5 +1,6 @@
 import { useMemo } from 'react'
 import './ManagementDashboard.css'
+import ManagementIcon from './ManagementIcon'
 
 const currency = (value) => Number(value || 0).toLocaleString('pt-BR', { style: 'currency', currency: 'BRL' })
 const percent = (value) => `${Math.round(Number(value || 0))}%`
@@ -33,14 +34,14 @@ function ManagementDashboard({ health, appointments, receptionPanel, onNavigate,
   return <section className="management-dashboard">
     <div className="management-intro">
       <div><span className="management-eyebrow">VISÃO GERAL</span><h2>Acompanhe a operação do Studio em tempo real.</h2><p>{new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long', year: 'numeric' })}</p></div>
-      <div className="management-actions"><button className="outline-action" onClick={() => onNavigate('Relatórios')} type="button">Gerar relatório</button><button className="dashboard-primary-action" onClick={onRefresh} type="button">Atualizar dados</button></div>
+      <div className="management-actions"><button className="outline-action" onClick={() => onNavigate('Relatórios')} type="button"><ManagementIcon name="report" size={16} />Gerar relatório</button><button className="dashboard-primary-action" onClick={onRefresh} type="button"><ManagementIcon name="refresh" size={16} />Atualizar dados</button></div>
     </div>
 
     <div className="management-kpis">
-      <article className="management-kpi is-students"><span className="management-kpi-icon">◉</span><div><small>ALUNOS ATIVOS</small><strong>{health.activeStudents}</strong><p>{health.inactiveStudents} inativos ou suspensos</p></div></article>
-      <article className="management-kpi is-occupancy"><span className="management-kpi-icon">▥</span><div><small>OCUPAÇÃO HOJE</small><strong>{percent(dailyOccupancy)}</strong><p>{todaysAppointments.length} de {operationalCapacity} vagas do dia</p></div></article>
-      <article className="management-kpi is-revenue"><span className="management-kpi-icon">↗</span><div><small>RECEITA DO MÊS</small><strong>{currency(health.revenue)}</strong><p>{percent(health.collectionRate)} do valor previsto</p></div></article>
-      <article className="management-kpi is-overdue"><span className="management-kpi-icon">!</span><div><small>INADIMPLÊNCIA</small><strong>{currency(health.overdueAmount)}</strong><p>{health.overdue} aluno(s) em atraso</p></div></article>
+      <article className="management-kpi is-students"><span className="management-kpi-icon"><ManagementIcon name="users" size={20} /></span><div><small>ALUNOS ATIVOS</small><strong>{health.activeStudents}</strong><p>{health.inactiveStudents} inativos ou suspensos</p></div></article>
+      <article className="management-kpi is-occupancy"><span className="management-kpi-icon"><ManagementIcon name="gauge" size={20} /></span><div><small>OCUPAÇÃO HOJE</small><strong>{percent(dailyOccupancy)}</strong><p>{todaysAppointments.length} de {operationalCapacity} vagas do dia</p></div></article>
+      <article className="management-kpi is-revenue"><span className="management-kpi-icon"><ManagementIcon name="trend" size={20} /></span><div><small>RECEITA DO MÊS</small><strong>{currency(health.revenue)}</strong><p>{percent(health.collectionRate)} do valor previsto</p></div></article>
+      <article className="management-kpi is-overdue"><span className="management-kpi-icon"><ManagementIcon name="alert" size={20} /></span><div><small>INADIMPLÊNCIA</small><strong>{currency(health.overdueAmount)}</strong><p>{health.overdue} aluno(s) em atraso</p></div></article>
     </div>
 
     <div className="management-main-grid">
