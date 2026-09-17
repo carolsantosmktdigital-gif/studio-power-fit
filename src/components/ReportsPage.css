@@ -1,6 +1,6 @@
 .reports-page { display: grid; gap: 16px; color: var(--text); }
 .reports-heading { display: flex; align-items: flex-end; justify-content: space-between; gap: 22px; }
-.reports-heading h2 { margin: 5px 0 7px; font-size: clamp(28px,3.5vw,42px); letter-spacing: -.04em; }.reports-heading p { margin: 0; color: var(--text-muted); font-size: 12px; }.reports-heading > div:last-child { display: flex; gap: 9px; }
+.reports-heading h2 { margin: 5px 0 7px; font-size: clamp(28px,3.5vw,42px); line-height:1.08; font-weight:780; letter-spacing: -.04em; }.reports-heading p { margin: 0; color: var(--text-muted); font-size: 12px; line-height:1.45; }.reports-heading > div:last-child { display: flex; gap: 9px; }
 .report-filters { display: grid; grid-template-columns: 1.1fr repeat(4,minmax(120px,.7fr)) 1.4fr; gap: 10px; padding: 18px; border: 1px solid var(--border); border-radius: 17px; background: var(--surface); }
 .report-filters label { color: var(--text-muted); font-size: 9px; font-weight: 850; letter-spacing: .06em; text-transform: uppercase; }.report-filters input,.report-filters select { width: 100%; min-height: 41px; margin-top: 7px; padding: 0 11px; border: 1px solid var(--border); border-radius: 10px; color: var(--text); background: color-mix(in srgb,var(--surface) 94%,var(--page-bg)); font: inherit; font-size: 11px; color-scheme: inherit; }
 .report-presets { display: flex; align-items: center; flex-wrap: wrap; gap: 7px; color: var(--text-muted); font-size: 10px; }.report-presets button { padding: 7px 10px; border: 1px solid var(--border); border-radius: 999px; color: var(--text-soft); background: var(--surface); font: inherit; font-size: 9px; font-weight: 750; cursor: pointer; }
@@ -11,8 +11,8 @@
 @media(max-width:600px){
   .reports-page{gap:11px}
   .reports-heading{gap:13px}
-  .reports-heading h2{font-size:27px}
-  .reports-heading p{font-size:10px;line-height:1.45}
+  .reports-heading h2{font-size:27px;font-weight:780}
+  .reports-heading p{font-size:11px;line-height:1.45}
   .reports-heading>div:last-child{gap:7px}
   .reports-heading button{min-height:43px;padding:0 10px;font-size:10px}
   .report-filters{grid-template-columns:1fr;gap:9px;padding:14px;border-radius:15px}
