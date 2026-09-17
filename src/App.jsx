@@ -6,7 +6,7 @@ import StudentApp from './student/StudentApp'
 import './App.css'
 
 function App() {
-  const [darkMode, setDarkMode] = useState(true)
+  const [darkMode, setDarkMode] = useState(false)
   const [showPassword, setShowPassword] = useState(false)
   const [rememberMe, setRememberMe] = useState(true)
 
