@@ -1,40 +1,40 @@
 .management-mobile-nav { display: none; }
 
 @media (max-width: 600px) {
-  .dashboard-shell { min-height: 100dvh; }
-  .dashboard-shell .app-main { height: 100dvh; }
-  .dashboard-shell .app-header { position: relative; z-index: 20; padding: 0 14px; background: color-mix(in srgb, var(--header-bg) 94%, transparent); }
+  html,body,#root { width: 100%; max-width: 100%; overflow-x: clip !important; }
+  .dashboard-shell { position: relative; width: 100% !important; max-width: 100% !important; min-width: 0 !important; min-height: 100dvh; overflow: hidden !important; }
+  .dashboard-shell .app-main { width: 100%; max-width: 100%; min-width: 0; height: 100dvh; overflow: hidden; }
+  .dashboard-shell .app-header { position: relative; z-index: 20; flex: 0 0 70px; width: 100%; max-width: 100%; min-height: 70px; padding: 0 14px; box-sizing: border-box; background: color-mix(in srgb, var(--header-bg) 94%, transparent); }
   .dashboard-shell .app-header > div:first-child { min-width: 0; }
   .dashboard-shell .header-kicker { overflow: hidden; font-size: 7px; text-overflow: ellipsis; white-space: nowrap; }
   .dashboard-shell .app-header h1 { overflow: hidden; max-width: 190px; font-size: 18px; text-overflow: ellipsis; white-space: nowrap; }
   .dashboard-shell .header-actions { gap: 5px; }
   .dashboard-shell .header-theme-button,.dashboard-shell .user-avatar { width: 36px; height: 36px; border-radius: 11px; }
-  .dashboard-shell .app-content { padding: 17px 12px calc(96px + env(safe-area-inset-bottom)); scroll-behavior: smooth; }
+  .dashboard-shell .app-content { width: 100%; max-width: 100%; min-width: 0; padding: 14px 12px calc(94px + env(safe-area-inset-bottom)); box-sizing: border-box; overflow-x: hidden !important; overflow-y: auto; scroll-behavior: smooth; }
+  .dashboard-shell .app-content > *,.dashboard-shell .management-dashboard,.dashboard-shell .management-dashboard > *,.dashboard-shell .management-main-grid,.dashboard-shell .management-secondary-grid,.dashboard-shell .management-bottom-grid,.dashboard-shell .management-panel,.dashboard-shell .management-kpis { width: 100%; max-width: 100%; min-width: 0; box-sizing: border-box; }
 
   .management-mobile-nav {
     position: fixed;
-    z-index: 80;
+    z-index: 100;
     right: 10px;
     bottom: max(8px, env(safe-area-inset-bottom));
     left: 10px;
     display: flex;
     align-items: stretch;
-    gap: 3px;
-    min-height: 68px;
-    padding: 6px;
-    overflow-x: auto;
+    gap: 4px;
+    min-height: 66px;
+    padding: 5px;
+    overflow: hidden;
     border: 1px solid var(--border-strong);
     border-radius: 21px;
     background: color-mix(in srgb, var(--sidebar-bg) 94%, transparent);
     box-shadow: 0 18px 50px rgba(3,10,22,.34);
     backdrop-filter: blur(22px);
     -webkit-backdrop-filter: blur(22px);
-    scrollbar-width: none;
   }
-  .management-mobile-nav::-webkit-scrollbar { display: none; }
   .management-mobile-nav button {
-    flex: 1 0 61px;
-    min-width: 61px;
+    flex: 1 1 20%;
+    min-width: 0;
     display: grid;
     place-items: center;
     align-content: center;
@@ -46,13 +46,28 @@
     background: transparent;
     font: inherit;
   }
-  .management-mobile-nav button span { font-size: 17px; line-height: 1; }
-  .management-mobile-nav button small { max-width: 58px; overflow: hidden; font-size: 7.5px; font-weight: 750; text-overflow: ellipsis; white-space: nowrap; }
+  .management-mobile-nav button span { font-size: 16px; line-height: 1; }
+  .management-mobile-nav button small { max-width: 58px; overflow: hidden; font-size: 8px; font-weight: 750; text-overflow: ellipsis; white-space: nowrap; }
   .management-mobile-nav button.active { color: #fff; background: linear-gradient(145deg,var(--accent),var(--accent-dark)); box-shadow: 0 8px 20px rgba(255,32,56,.24); }
 
-  .dashboard-shell .demo-seed-toolbar { gap: 12px; margin-bottom: 12px; padding: 14px; border-radius: 15px; }
+  .management-mobile-backdrop { position: fixed; z-index: 89; inset: 0; width: 100%; border: 0; background: rgba(2,7,16,.62); backdrop-filter: blur(5px); -webkit-backdrop-filter: blur(5px); }
+  .management-mobile-sheet { position: fixed; z-index: 95; right: 10px; bottom: calc(82px + env(safe-area-inset-bottom)); left: 10px; padding: 16px; border: 1px solid var(--border-strong); border-radius: 22px; color: var(--text); background: color-mix(in srgb,var(--sidebar-bg) 97%,transparent); box-shadow: 0 24px 70px rgba(0,0,0,.42); backdrop-filter: blur(24px); -webkit-backdrop-filter: blur(24px); }
+  .management-mobile-sheet-heading { display: flex; align-items: center; justify-content: space-between; margin-bottom: 13px; }
+  .management-mobile-sheet-heading>div { display: grid; gap: 3px; }
+  .management-mobile-sheet-heading span { color: var(--accent); font-size: 8px; font-weight: 900; letter-spacing: .14em; }
+  .management-mobile-sheet-heading strong { font-size: 18px; }
+  .management-mobile-sheet-heading>button { width: 36px; height: 36px; border: 1px solid var(--border); border-radius: 11px; color: var(--text); background: var(--surface); font: inherit; font-size: 22px; }
+  .management-mobile-sheet-grid { display: grid; grid-template-columns: repeat(2,minmax(0,1fr)); gap: 8px; }
+  .management-mobile-sheet-grid button { display: flex; align-items: center; gap: 10px; min-width: 0; min-height: 52px; padding: 10px 12px; border: 1px solid var(--border); border-radius: 14px; color: var(--text-soft); background: var(--surface); font: inherit; text-align: left; }
+  .management-mobile-sheet-grid button span { font-size: 17px; }
+  .management-mobile-sheet-grid button strong { overflow: hidden; font-size: 10px; text-overflow: ellipsis; }
+  .management-mobile-sheet-grid button.active { color: #fff; border-color: rgba(255,32,56,.35); background: rgba(255,32,56,.17); }
+  .management-mobile-logout { display: flex; align-items: center; justify-content: center; gap: 8px; width: 100%; min-height: 44px; margin-top: 10px; border: 0; border-radius: 13px; color: #ff7584; background: rgba(255,32,56,.08); font: inherit; font-size: 10px; font-weight: 800; }
+
+  .dashboard-shell .demo-seed-toolbar { width: 100%; max-width: 100%; min-width: 0; gap: 12px; margin-bottom: 12px; padding: 14px; box-sizing: border-box; border-radius: 15px; }
+  .dashboard-shell .demo-seed-toolbar>div { min-width: 0; }
   .dashboard-shell .demo-seed-toolbar strong { font-size: 12px; }
-  .dashboard-shell .demo-seed-toolbar span { font-size: 10px; line-height: 1.45; }
+  .dashboard-shell .demo-seed-toolbar span { font-size: 10px; line-height: 1.45; overflow-wrap: anywhere; }
   .dashboard-shell .demo-seed-toolbar button { min-height: 46px; }
   .dashboard-shell .dashboard-notice { margin: 0 0 12px; padding: 12px; font-size: 11px; line-height: 1.45; }
 
@@ -97,5 +112,5 @@
 
 @media (max-width: 370px) {
   .dashboard-shell .app-header h1 { max-width: 150px; }
-  .management-mobile-nav button { flex-basis: 58px; min-width: 58px; }
+  .management-mobile-nav button small { font-size: 7.5px; }
 }
