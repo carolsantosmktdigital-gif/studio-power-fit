@@ -1,6 +1,6 @@
 import { useEffect, useState } from 'react'
 import { supabase } from '../lib/supabase'
-import { seedDemoData } from '../lib/demoSeed'
+import { DEMO_BATCH_ID, seedDemoData } from '../lib/demoSeed'
 import studioLogo from '../assets/studio-power-fit-logo.png'
 import ManagementDashboard from './ManagementDashboard'
 import ReceptionDashboard from './ReceptionDashboard'
@@ -520,7 +520,7 @@ function AppShell({ profile, onLogout }) {
       const result = await seedDemoData(supabase)
       const inserted = Object.values(result.inserted).reduce((total, amount) => total + amount, 0)
       const warning = result.warnings.length ? ` ${result.warnings.length} grupo(s) opcional(is) não puderam ser incluídos.` : ''
-      setNotice(`Demonstração pronta: ${result.totalAccounts} contas verificadas, ${result.createdAccounts} nova(s) e ${inserted} registro(s) operacional(is) incluído(s).${warning}`)
+      setNotice(`Demonstração pronta: ${result.totalStudents} aluno(s) atualizados, ${result.createdAccounts} conta(s) nova(s) e ${inserted} registro(s) operacional(is) incluído(s).${warning}`)
       await Promise.all([loadStudents(), loadEmployees(), loadHealth(), loadAgenda(), loadPayments(), loadReceptionPanel()])
     } catch (error) {
       setNotice(`Não foi possível concluir a demonstração: ${error.message}`)
@@ -528,6 +528,33 @@ function AppShell({ profile, onLogout }) {
       setSeedingDemo(false)
     }
   }
+  useEffect(() => {
+    if (!isAdmin) return undefined
+    const storageKey = `power-fit-${DEMO_BATCH_ID}`
+    try {
+      if (localStorage.getItem(storageKey) === 'completed') return undefined
+    } catch { /* The manual action remains available when storage is unavailable. */ }
+    let active = true
+    const populateDemo = async () => {
+      setSeedingDemo(true)
+      setNotice('Preparando automaticamente os dados da demonstração…')
+      try {
+        const result = await seedDemoData(supabase)
+        if (!active) return
+        const inserted = Object.values(result.inserted).reduce((total, amount) => total + amount, 0)
+        const warning = result.warnings.length ? ` ${result.warnings.length} grupo(s) não puderam ser incluídos.` : ''
+        setNotice(`Demonstração pronta: ${result.totalStudents} aluno(s), ${inserted} registro(s) operacional(is) incluído(s).${warning}`)
+        try { localStorage.setItem(storageKey, 'completed') } catch { /* The seed is idempotent. */ }
+        await Promise.all([loadStudents(), loadEmployees(), loadHealth(), loadAgenda(), loadPayments(), loadReceptionPanel()])
+      } catch (error) {
+        if (active) setNotice(`Não foi possível concluir a demonstração: ${error.message}`)
+      } finally {
+        if (active) setSeedingDemo(false)
+      }
+    }
+    populateDemo()
+    return () => { active = false }
+  }, [isAdmin])
   const navItems = isAdmin ? ['Início', 'Alunos', 'Funcionários', 'Agenda', 'Pagamentos', 'Relatórios', 'Auditoria'] : ['Início', 'Agendamentos', 'Alunos', 'Financeiro', 'Relatórios']
   const navigationPage = (item) => item === 'Agendamentos' ? 'Agenda' : item === 'Financeiro' ? 'Pagamentos' : item
   const mobilePrimaryItems = navItems.slice(0, 4)

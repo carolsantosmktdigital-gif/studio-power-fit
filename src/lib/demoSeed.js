@@ -1,6 +1,6 @@
 const DEMO_PASSWORD = '12345678'
 const DEMO_DOMAIN = 'example.com'
-export const DEMO_BATCH_ID = 'studio-power-fit-demo-25m-v1'
+export const DEMO_BATCH_ID = 'studio-power-fit-demo-operacao-v2'
 const DEMO_BATCH_MARKER = `[DEMO_BATCH:${DEMO_BATCH_ID}]`
 
 const people = [
@@ -50,6 +50,13 @@ const monthDate = (monthOffset, day) => {
   const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0).getDate()
   date.setDate(Math.min(day, lastDay))
   return isoDate(date)
+}
+const upcomingBirthday = (days, age) => {
+  const birthday = new Date()
+  birthday.setHours(12, 0, 0, 0)
+  birthday.setDate(birthday.getDate() + days)
+  birthday.setFullYear(birthday.getFullYear() - age)
+  return isoDate(birthday)
 }
 
 const createAccount = async (supabase, person) => {
@@ -107,30 +114,59 @@ export async function seedDemoData(supabase) {
   }
 
   const studentPeople = people.filter((person) => person.role === 'ALUNO')
-  const { data: profiles, error: profileError } = await supabase.from('profiles').select('id, email').in('email', studentPeople.map((person) => person.email))
+  const configuredByEmail = new Map(studentPeople.map((person) => [person.email, person]))
+  const { data: profiles, error: profileError } = await supabase
+    .from('profiles')
+    .select('id, email, full_name, birth_date, phone, role')
+    .eq('role', 'ALUNO')
+    .ilike('full_name', '[DEMO]%')
+    .order('full_name')
   if (profileError) throw new Error(profileError.message)
+  if (!(profiles ?? []).length) throw new Error('Nenhum aluno identificado como DEMO foi encontrado.')
   const profileByEmail = new Map((profiles ?? []).map((profile) => [profile.email, profile.id]))
-  const { data: students, error: studentError } = await supabase.from('students').select('id, profile_id').in('profile_id', [...profileByEmail.values()])
+  const { data: students, error: studentError } = await supabase
+    .from('students')
+    .select('id, profile_id, status, payment_plan')
+    .in('profile_id', (profiles ?? []).map((profile) => profile.id))
   if (studentError) throw new Error(studentError.message)
   const studentByProfile = new Map((students ?? []).map((student) => [student.profile_id, student.id]))
   const studentByKey = new Map(studentPeople.map((person) => [person.key, studentByProfile.get(profileByEmail.get(person.email))]))
+  const demoStudents = (profiles ?? []).map((profile, index) => {
+    const configured = configuredByEmail.get(profile.email)
+    return {
+      ...configured,
+      key: configured?.key || `student-${index + 1}`,
+      full_name: profile.full_name,
+      profile_id: profile.id,
+      student_id: studentByProfile.get(profile.id),
+      payment_plan: ['MENSALISTA', 'WELLHUB', 'TOTALPASS'][index % 3],
+    }
+  }).filter((student) => student.student_id)
+  if (!demoStudents.length) throw new Error('Os perfis DEMO ainda não possuem cadastros de aluno vinculados.')
 
-  for (const person of studentPeople) {
-    const studentId = studentByKey.get(person.key)
-    if (!studentId) continue
-    const { error } = await supabase.from('students').update({ status: person.status, payment_plan: person.payment_plan }).eq('id', studentId)
+  for (const person of demoStudents) {
+    const { error } = await supabase.from('students').update({ status: 'ATIVO', payment_plan: person.payment_plan }).eq('id', person.student_id)
     if (error) warnings.push(`aluno ${person.full_name}: ${error.message}`)
+  }
+
+  const birthdayOffsets = [1, 3, 5, 8, 12, 16]
+  for (const [index, person] of demoStudents.slice(0, birthdayOffsets.length).entries()) {
+    const { error } = await supabase
+      .from('profiles')
+      .update({ birth_date: upcomingBirthday(birthdayOffsets[index], 24 + (index * 3)) })
+      .eq('id', person.profile_id)
+    if (error) warnings.push(`aniversário ${person.full_name}: ${error.message}`)
   }
 
   const paymentAmount = (person) => person.payment_plan === 'WELLHUB' ? 154.8 : person.payment_plan === 'TOTALPASS' ? 139.5 : 189.9
   const paymentType = (person) => person.payment_plan === 'MENSALISTA' ? 'MENSALIDADE' : person.payment_plan
   const paymentRows = []
   Array.from({ length: 24 }, (_, index) => index - 24).forEach((monthOffset) => {
-    studentPeople.forEach((person, index) => {
+    demoStudents.forEach((person, index) => {
       const dueDate = monthDate(monthOffset, 5 + (index % 4) * 5)
       const isLongOverdue = person.key === 'hugo' && monthOffset === -1
       paymentRows.push({
-        student_id: studentByKey.get(person.key),
+        student_id: person.student_id,
         amount: paymentAmount(person),
         due_date: dueDate,
         status: isLongOverdue ? 'PENDENTE' : 'IDENTIFICADO',
@@ -148,9 +184,10 @@ export async function seedDemoData(supabase) {
     ['diego', -1, 'PENDENTE', null], ['elisa', -8, 'PENDENTE', null], ['andre', 10, 'CANCELADO', null],
   ]
   currentScenarios.forEach(([key, dueOffset, status, paymentOffset]) => {
-    const person = studentPeople.find((item) => item.key === key)
+    const person = demoStudents.find((item) => item.key === key)
+    if (!person) return
     paymentRows.push({
-      student_id: studentByKey.get(key),
+      student_id: person.student_id,
       amount: paymentAmount(person),
       due_date: relativeDate(dueOffset),
       status,
@@ -185,19 +222,31 @@ export async function seedDemoData(supabase) {
     }))
   })
 
-  const appointmentRows = [
-    ['ana', 0, '07:00:00'], ['bruno', 0, '07:00:00'], ['camila', 0, '07:00:00'], ['diego', 0, '07:00:00'],
-    ['elisa', 0, '12:00:00'], ['felipe', 0, '18:00:00'], ['gabriela', 0, '18:00:00'], ['hugo', 0, '18:00:00'],
-    ['felipe', 1, '07:00:00'], ['gabriela', 1, '19:00:00'], ['ana', 2, '08:00:00'], ['camila', 2, '18:00:00'],
-    ['isabela', 1, '08:00:00'], ['joao', 1, '18:00:00'], ['karina', 1, '19:00:00'], ['lucas', 2, '07:00:00'],
-    ['marcela', 2, '08:00:00'], ['olivia', 2, '18:00:00'], ['paulo', 1, '20:00:00'], ['raquel', 2, '19:00:00'],
-  ].map(([key, days, start_time]) => ({ student_id: studentByKey.get(key), appointment_date: relativeDate(days), start_time, status: 'CONFIRMADO' })).filter((row) => row.student_id)
+  const staggeredTimes = ['07:00:00', '08:00:00', '09:00:00', '12:00:00', '17:00:00', '18:00:00', '19:00:00', '20:00:00']
+  const appointmentRows = demoStudents.map((person, index) => {
+    if (index < 8) return { student_id: person.student_id, appointment_date: relativeDate(0), start_time: '18:00:00', status: 'CONFIRMADO' }
+    const queueIndex = index - 8
+    return {
+      student_id: person.student_id,
+      appointment_date: relativeDate(1 + (queueIndex % 2)),
+      start_time: staggeredTimes[Math.floor(queueIndex / 2) % staggeredTimes.length],
+      status: 'CONFIRMADO',
+    }
+  })
+  const waitlistRows = demoStudents.slice(8, 14).map((person, index) => ({
+    student_id: person.student_id,
+    appointment_date: relativeDate(0),
+    start_time: '18:00:00',
+    position: index + 1,
+    status: 'AGUARDANDO',
+  }))
 
   const inserted = {}
   inserted.payments = await insertRows(supabase, 'payments', paymentRows, ['student_id', 'due_date'], warnings)
   inserted.assessments = await insertRows(supabase, 'physical_assessments', assessmentRows, ['student_id', 'assessment_date'], warnings)
   inserted.attendance = await insertRows(supabase, 'attendance', attendanceRows, ['student_id', 'attendance_date'], warnings)
-  inserted.appointments = await insertRows(supabase, 'appointments', appointmentRows, ['student_id', 'appointment_date', 'start_time'], warnings)
+  inserted.appointments = await insertRows(supabase, 'appointments', appointmentRows, ['student_id', 'appointment_date'], warnings)
+  inserted.waitlist = await insertRows(supabase, 'waitlist', waitlistRows, ['student_id', 'appointment_date', 'start_time'], warnings)
 
-  return { createdAccounts, totalAccounts: people.length, inserted, warnings }
+  return { createdAccounts, totalAccounts: people.length, totalStudents: demoStudents.length, inserted, warnings }
 }
