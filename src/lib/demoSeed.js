@@ -124,10 +124,20 @@ export async function seedDemoData(supabase) {
   if (profileError) throw new Error(profileError.message)
   if (!(profiles ?? []).length) throw new Error('Nenhum aluno identificado como DEMO foi encontrado.')
   const profileByEmail = new Map((profiles ?? []).map((profile) => [profile.email, profile.id]))
-  const { data: students, error: studentError } = await supabase
+  let supportsStudentPaymentPlan = true
+  let { data: students, error: studentError } = await supabase
     .from('students')
     .select('id, profile_id, status, payment_plan')
     .in('profile_id', (profiles ?? []).map((profile) => profile.id))
+  if (studentError && /payment_plan|schema cache|column/i.test(studentError.message || '')) {
+    supportsStudentPaymentPlan = false
+    const fallback = await supabase
+      .from('students')
+      .select('id, profile_id, status')
+      .in('profile_id', (profiles ?? []).map((profile) => profile.id))
+    students = fallback.data
+    studentError = fallback.error
+  }
   if (studentError) throw new Error(studentError.message)
   const studentByProfile = new Map((students ?? []).map((student) => [student.profile_id, student.id]))
   const studentByKey = new Map(studentPeople.map((person) => [person.key, studentByProfile.get(profileByEmail.get(person.email))]))
@@ -145,7 +155,10 @@ export async function seedDemoData(supabase) {
   if (!demoStudents.length) throw new Error('Os perfis DEMO ainda não possuem cadastros de aluno vinculados.')
 
   for (const person of demoStudents) {
-    const { error } = await supabase.from('students').update({ status: 'ATIVO', payment_plan: person.payment_plan }).eq('id', person.student_id)
+    const studentUpdate = supportsStudentPaymentPlan
+      ? { status: 'ATIVO', payment_plan: person.payment_plan }
+      : { status: 'ATIVO' }
+    const { error } = await supabase.from('students').update(studentUpdate).eq('id', person.student_id)
     if (error) warnings.push(`aluno ${person.full_name}: ${error.message}`)
   }
 
