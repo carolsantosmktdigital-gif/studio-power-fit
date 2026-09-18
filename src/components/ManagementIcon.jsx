@@ -1,4 +1,9 @@
 const icons = {
+  arrow: <><path d="M5 12h14m-6-6 6 6-6 6"/></>,
+  plus: <path d="M12 5v14M5 12h14"/>,
+  check: <><circle cx="12" cy="12" r="9"/><path d="m8 12 3 3 5-6"/></>,
+  clock: <><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></>,
+  gift: <><rect x="3" y="8" width="18" height="4" rx="1"/><path d="M5 12v9h14v-9M12 8v13"/><path d="M12 8H8a3 3 0 1 1 3-3l1 3Zm0 0h4a3 3 0 1 0-3-3l-1 3Z"/></>,
   home: <><path d="m3 10 9-7 9 7"/><path d="M5 9v11h14V9"/><path d="M9 20v-7h6v7"/></>,
   users: <><path d="M16 21v-2a4 4 0 0 0-4-4H6a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M22 21v-2a4 4 0 0 0-3-3.87M16 3.13a4 4 0 0 1 0 7.75"/></>,
   team: <><circle cx="12" cy="8" r="4"/><path d="M4 21a8 8 0 0 1 16 0"/><path d="M4.5 9.5a3 3 0 1 0 0 5M19.5 9.5a3 3 0 1 1 0 5"/></>,

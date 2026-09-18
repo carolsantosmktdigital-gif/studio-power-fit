@@ -3,6 +3,7 @@ import { supabase } from '../lib/supabase'
 import { seedDemoData } from '../lib/demoSeed'
 import studioLogo from '../assets/studio-power-fit-logo.png'
 import ManagementDashboard from './ManagementDashboard'
+import ReceptionDashboard from './ReceptionDashboard'
 import ReportsPage from './ReportsPage'
 import ManagementIcon from './ManagementIcon'
 import './DemoSeed.css'
@@ -45,7 +46,12 @@ const getPaymentPresentation = (payment) => {
 }
 
 function AppShell({ profile, onLogout }) {
-  const [darkMode, setDarkMode] = useState(false)
+  const [darkMode, setDarkMode] = useState(() => {
+    try { return localStorage.getItem('power-fit-theme') === 'dark' } catch { return false }
+  })
+  useEffect(() => {
+    try { localStorage.setItem('power-fit-theme', darkMode ? 'dark' : 'light') } catch { /* Storage may be unavailable. */ }
+  }, [darkMode])
   const [page, setPage] = useState('Início')
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [students, setStudents] = useState([])
@@ -83,6 +89,9 @@ function AppShell({ profile, onLogout }) {
     planCounts: { MENSALISTA: 0, WELLHUB: 0, TOTALPASS: 0 },
   })
   const [receptionPanel, setReceptionPanel] = useState({ appointments: [], present: 0, absent: 0, activeTeachers: 0, overdue: 0, waitlist: 0, birthdays: [] })
+  const [receptionLoading, setReceptionLoading] = useState(true)
+  const [receptionError, setReceptionError] = useState('')
+  const [receptionUpdatedAt, setReceptionUpdatedAt] = useState(null)
   const [notice, setNotice] = useState('')
   const [seedingDemo, setSeedingDemo] = useState(false)
   const [form, setForm] = useState(null)
@@ -91,8 +100,6 @@ function AppShell({ profile, onLogout }) {
   const [newPassword, setNewPassword] = useState('')
   const [directorySearch, setDirectorySearch] = useState({ Alunos: '', Funcionários: '' })
   const [modalError, setModalError] = useState('')
-  const hour = new Date().getHours()
-  const receptionGreeting = hour < 12 ? 'Bom dia' : hour < 18 ? 'Boa tarde' : 'Boa noite'
   const isAdmin = profile.role === 'ADMIN'
 
   const loadStudents = async () => {
@@ -263,26 +270,37 @@ function AppShell({ profile, onLogout }) {
   }
 
   const loadReceptionPanel = async () => {
-    const today = new Date().toISOString().slice(0, 10)
-    const [agenda, attendance, teachers, waiting, paymentsData, profilesData] = await Promise.all([
-      supabase.from('appointments').select('id, appointment_date, start_time, status').eq('appointment_date', today).eq('status', 'CONFIRMADO').order('start_time'),
-      supabase.from('attendance').select('status, created_at').gte('created_at', `${today}T00:00:00`),
-      supabase.from('teachers').select('*', { count: 'exact', head: true }).eq('status', 'ATIVO'),
-      supabase.from('waitlist').select('*', { count: 'exact', head: true }).eq('appointment_date', today).eq('status', 'AGUARDANDO'),
-      supabase.from('payments').select('status, due_date').lt('due_date', today),
-      supabase.from('profiles').select('full_name, birth_date, phone').not('birth_date', 'is', null),
-    ])
-    const monthDay = today.slice(5)
-    const birthdays = (profilesData.data ?? []).filter((person) => String(person.birth_date).slice(5) === monthDay).slice(0, 5)
-    setReceptionPanel({
-      appointments: agenda.data ?? [],
-      present: (attendance.data ?? []).filter((item) => item.status === 'PRESENTE').length,
-      absent: (attendance.data ?? []).filter((item) => item.status === 'AUSENTE').length,
-      activeTeachers: teachers.count ?? 0,
-      overdue: (paymentsData.data ?? []).filter((item) => !['IDENTIFICADO', 'CANCELADO'].includes(item.status)).length,
-      waitlist: waiting.count ?? 0,
-      birthdays,
-    })
+    setReceptionLoading(true)
+    try {
+      const now = new Date()
+      const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
+      const [agenda, attendance, teachers, waiting, paymentsData, profilesData] = await Promise.all([
+        supabase.from('appointments').select('id, appointment_date, start_time, status').eq('appointment_date', today).eq('status', 'CONFIRMADO').order('start_time'),
+        supabase.from('attendance').select('status, attendance_date').eq('attendance_date', today),
+        supabase.from('teachers').select('*', { count: 'exact', head: true }).eq('status', 'ATIVO'),
+        supabase.from('waitlist').select('*', { count: 'exact', head: true }).eq('appointment_date', today).eq('status', 'AGUARDANDO'),
+        supabase.from('payments').select('status, due_date').lt('due_date', today),
+        supabase.from('profiles').select('id, full_name, birth_date, phone').not('birth_date', 'is', null),
+      ])
+      if ([agenda, attendance, teachers, waiting, paymentsData, profilesData].some((result) => result.error)) throw new Error('panel')
+      const monthDay = today.slice(5)
+      const birthdays = (profilesData.data ?? []).filter((person) => String(person.birth_date).slice(5) === monthDay)
+      setReceptionPanel({
+        appointments: agenda.data ?? [],
+        present: (attendance.data ?? []).filter((item) => item.status === 'PRESENTE').length,
+        absent: (attendance.data ?? []).filter((item) => item.status === 'AUSENTE').length,
+        activeTeachers: teachers.count ?? 0,
+        overdue: (paymentsData.data ?? []).filter((item) => !['IDENTIFICADO', 'CANCELADO'].includes(item.status)).length,
+        waitlist: waiting.count ?? 0,
+        birthdays,
+      })
+      setReceptionUpdatedAt(new Date())
+      setReceptionError('')
+    } catch {
+      setReceptionError('Não foi possível atualizar os dados da recepção.')
+    } finally {
+      setReceptionLoading(false)
+    }
   }
 
   useEffect(() => { loadStudents(); loadEmployees(); loadAudit(); loadHealth(); loadAgenda(); loadPayments(); loadReceptionPanel() }, [])
@@ -300,25 +318,6 @@ function AppShell({ profile, onLogout }) {
     const timer = window.setInterval(() => { loadReceptionPanel(); loadAgenda(); loadPayments() }, 30000)
     return () => window.clearInterval(timer)
   }, [isAdmin])
-
-  useEffect(() => {
-    const heading = document.querySelector('.reception-welcome h2')
-    const firstName = String(profile.full_name || 'Recepção').trim().split(/\s+/)[0]
-    if (heading) heading.textContent = `${receptionGreeting}, ${firstName}.`
-  }, [page, receptionGreeting, profile.full_name])
-
-  useEffect(() => {
-    const card = document.querySelector('.reception-stats article:nth-child(5)')
-    if (!card) return
-    card.querySelector('.waitlist-action')?.remove()
-    if (!receptionPanel.waitlist) return
-    const button = document.createElement('button')
-    button.className = 'waitlist-action'
-    button.type = 'button'
-    button.textContent = 'Ver lista de espera →'
-    button.onclick = () => setPage('Lista de espera')
-    card.appendChild(button)
-  }, [receptionPanel.waitlist])
 
   useEffect(() => {
     const applyMask = (event) => {
@@ -528,7 +527,7 @@ function AppShell({ profile, onLogout }) {
       setSeedingDemo(false)
     }
   }
-  const navItems = isAdmin ? ['Início', 'Alunos', 'Funcionários', 'Agenda', 'Pagamentos', 'Relatórios', 'Auditoria'] : ['Início', 'Agendamentos', 'Alunos', 'Professores', 'Financeiro', 'Lista de espera', 'Comunicação', 'Relatórios', 'Configurações']
+  const navItems = isAdmin ? ['Início', 'Alunos', 'Funcionários', 'Agenda', 'Pagamentos', 'Relatórios', 'Auditoria'] : ['Início', 'Agendamentos', 'Alunos', 'Financeiro', 'Relatórios']
   const navigationPage = (item) => item === 'Agendamentos' ? 'Agenda' : item === 'Financeiro' ? 'Pagamentos' : item
   const mobilePrimaryItems = navItems.slice(0, 4)
   const mobileMoreItems = navItems.slice(4)
@@ -543,14 +542,13 @@ function AppShell({ profile, onLogout }) {
   const filteredRows = directoryQuery ? rows.filter((item) => [item.profile?.full_name, item.profile?.cpf, item.profile?.email, page === 'Alunos' ? studentPlan(item) : item.position].some((value) => normalizeDirectorySearch(value).includes(directoryQuery))) : rows
   const openStudentEditor = (student) => setEditingStudent({ ...student, plan_code: studentPlanCode(student), profile: maskedProfile(student.profile) })
   const openEmployeeEditor = (employee) => setEditingEmployee({ ...employee, profile: maskedProfile(employee.profile) })
-  const receptionSlots = Object.values(receptionPanel.appointments.reduce((groups, item) => { const key = String(item.start_time).slice(0, 5); groups[key] = [...(groups[key] || []), item]; return groups }, {}))
 
   return <div className={`app-shell dashboard-shell ${darkMode ? 'theme-dark' : 'theme-light'} ${isAdmin ? 'is-admin' : 'is-reception'}`}>
     <aside className="app-sidebar"><div className="sidebar-brand sidebar-brand-logo"><img src={studioLogo} alt="Studio Power Fit" /></div><div className="sidebar-section-title">{isAdmin ? 'GESTÃO' : 'ATENDIMENTO'}</div><nav className="sidebar-menu">{navItems.map((item) => <button key={item} className={`sidebar-item ${page === navigationPage(item) ? 'active' : ''}`} onClick={() => setPage(navigationPage(item))} type="button"><span className="sidebar-icon"><ManagementIcon name={navIcon(item)} size={18} /></span><span>{item}</span></button>)}</nav><div className="sidebar-bottom"><button className="sidebar-item" onClick={onLogout} type="button"><span className="sidebar-icon"><ManagementIcon name="logout" size={18} /></span><span>Sair da conta</span></button></div></aside>
-    <div className="app-main"><header className="app-header"><div><span className="header-kicker">STUDIO POWER FIT · DEMONSTRAÇÃO</span><h1>{title}</h1></div><div className="header-actions"><button className="header-theme-button" aria-label={darkMode ? 'Ativar modo claro' : 'Ativar modo escuro'} title={darkMode ? 'Ativar modo claro' : 'Ativar modo escuro'} onClick={() => setDarkMode(!darkMode)} type="button"><ManagementIcon name={darkMode ? 'sun' : 'moon'} size={19} /></button><div className="header-user"><div className="user-avatar">{(profile.full_name || 'A')[0]}</div><div className="user-info"><strong>{profile.full_name}</strong><span>{profile.role}</span></div></div></div></header><main className="app-content">
+    <div className="app-main"><header className="app-header"><div><span className="header-kicker">STUDIO POWER FIT · DEMONSTRAÇÃO</span><h1>{title}</h1></div><div className="header-actions"><button className="header-theme-button" aria-label={darkMode ? 'Ativar modo claro' : 'Ativar modo escuro'} title={darkMode ? 'Ativar modo claro' : 'Ativar modo escuro'} onClick={() => setDarkMode(!darkMode)} type="button"><ManagementIcon name={darkMode ? 'sun' : 'moon'} size={19} /></button><div className="header-user"><div className="user-avatar">{(profile.full_name || 'A')[0]}</div><div className="user-info"><strong>{profile.full_name}</strong><span>{isAdmin ? 'Gestão' : 'Recepção'}</span></div></div></div></header><main className="app-content">
       {isAdmin && page === 'Início' && <div className="demo-seed-toolbar"><div><strong>Apresentação com dados realistas</strong><span>Crie contas e históricos fictícios identificados como DEMO, sem alterar os registros reais.</span></div><button className="dashboard-primary-action" disabled={seedingDemo} onClick={createDemoData} type="button"><ManagementIcon name="database" size={17} />{seedingDemo ? 'Criando demonstração…' : 'Criar dados da demo'}</button></div>}
       {isAdmin && page === 'Início' && notice && <div className="dashboard-notice demo-seed-notice">{notice}</div>}
-      {!isAdmin && page === 'Início' && <section className="reception-dashboard"><div className="reception-welcome"><div><span className="placeholder-kicker">OPERAÇÃO DO DIA</span><h2>Bom trabalho,<br />Recepção.</h2><p>{new Date().toLocaleDateString('pt-BR', { weekday: 'long', day: '2-digit', month: 'long' })}</p></div><button className="outline-action" onClick={loadReceptionPanel} type="button">Atualizar painel</button></div><div className="reception-stats"><article><small>AGENDADOS HOJE</small><strong>{receptionPanel.appointments.length}</strong><button onClick={() => setPage('Agenda')} type="button">Ver agenda</button></article><article><small>PRESENÇAS</small><strong>{receptionPanel.present}</strong><span>{receptionPanel.absent} falta(s)</span></article><article><small>PROFESSORES ATIVOS</small><strong>{receptionPanel.activeTeachers}</strong><span>em operação</span></article><article><small>INADIMPLENTES</small><strong>{receptionPanel.overdue}</strong><button onClick={() => setPage('Pagamentos')} type="button">Ver pagamentos</button></article><article><small>LISTA DE ESPERA</small><strong>{receptionPanel.waitlist}</strong><span>aguardando vaga</span></article></div><div className="reception-grid"><section className="reception-card"><div className="panel-heading"><div><span className="placeholder-kicker">PRÓXIMOS HORÁRIOS</span><h3>Agenda de hoje</h3></div><button className="outline-action" onClick={() => setPage('Agenda')} type="button">Abrir</button></div>{receptionSlots.length ? receptionSlots.slice(0, 5).map((slot) => <div className="slot-row" key={slot[0].start_time}><strong>{String(slot[0].start_time).slice(0, 5)}</strong><span>{slot.length} aluno(s) confirmado(s)</span><b>{slot.length >= 8 ? 'LOTADO' : 'COM VAGAS'}</b></div>) : <p>Nenhum horário confirmado para hoje.</p>}</section><section className="reception-card"><span className="placeholder-kicker">ALERTAS</span><h3>Atenção agora</h3><div className="reception-alert"><b>💳 Pagamentos pendentes</b><span>{receptionPanel.overdue} aluno(s) precisam de acompanhamento.</span><button onClick={() => setPage('Pagamentos')} type="button">Ver</button></div><div className="reception-alert"><b>📋 Lista de espera</b><span>{receptionPanel.waitlist} aluno(s) aguardando vaga.</span><button onClick={() => setPage('Agenda')} type="button">Ver</button></div></section><section className="reception-card birthdays"><span className="placeholder-kicker">ANIVERSARIANTES</span><h3>Hoje</h3>{receptionPanel.birthdays.length ? receptionPanel.birthdays.map((person) => <div className="birthday-row" key={person.full_name}><span>🎂</span><div><b>{person.full_name}</b><small>{person.notification_phone || person.phone || 'Sem telefone'}</small></div></div>) : <p>Nenhum aniversariante hoje.</p>}</section></div></section>}
+      {!isAdmin && page === 'Início' && <ReceptionDashboard profile={profile} panel={receptionPanel} loading={receptionLoading} error={receptionError} updatedAt={receptionUpdatedAt} onRefresh={loadReceptionPanel} onNavigate={setPage} onNewStudent={() => openForm('ALUNO')} />}
       {page === 'Agenda' && <section className="students-page live-data-page"><div className="panel-heading"><div><span className="placeholder-kicker">PRÓXIMOS ATENDIMENTOS</span><h2>Agenda</h2></div><button className="outline-action" onClick={loadAgenda} type="button">Atualizar</button></div><div className="students-table-wrap"><table className="students-table"><thead><tr><th>Aluno</th><th>Data</th><th>Horário</th><th>Status</th></tr></thead><tbody>{appointments.length ? appointments.map((item) => <tr key={item.id}><td>{item.student?.full_name || 'Aluno'}</td><td>{new Date(`${item.appointment_date}T12:00:00`).toLocaleDateString('pt-BR')}</td><td>{String(item.start_time).slice(0, 5)}</td><td><span className="status-pill is-active">{item.status}</span></td></tr>) : <tr><td colSpan="4">Não há atendimentos futuros cadastrados.</td></tr>}</tbody></table></div></section>}
       {page === 'Pagamentos' && <section className="students-page live-data-page finance-page"><div className="panel-heading"><div><span className="placeholder-kicker">CONTROLE FINANCEIRO</span><h2>Pagamentos</h2></div><button className="outline-action" onClick={() => { loadPayments(); loadHealth() }} type="button">Atualizar</button></div><div className="finance-summary"><article><small>RECEBIDO NO MÊS</small><strong>{formatCurrency(health.revenue)}</strong><span>{formatPercent(health.collectionRate)} do previsto</span></article><article className="finance-due"><small>A VENCER EM 7 DIAS</small><strong>{formatCurrency(health.dueSoonAmount)}</strong><span>{health.dueSoon} cobrança(s)</span></article><article className="finance-overdue"><small>TOTAL VENCIDO</small><strong>{formatCurrency(health.overdueAmount)}</strong><span>{health.overdue} cobrança(s)</span></article></div><div className="students-table-wrap"><table className="students-table"><thead><tr><th>Aluno</th><th>Origem</th><th>Vencimento</th><th>Valor</th><th>Status</th></tr></thead><tbody>{payments.length ? payments.map((item) => { const paymentState = getPaymentPresentation(item); return <tr key={item.id}><td>{item.student?.full_name || 'Aluno'}</td><td>{item.payment_type === 'MENSALIDADE' ? 'Mensalista' : item.payment_type}</td><td>{new Date(`${item.due_date}T12:00:00`).toLocaleDateString('pt-BR')}</td><td>{formatCurrency(item.amount)}</td><td><span className={`status-pill ${paymentState.tone}`}>{paymentState.label}</span></td></tr> }) : <tr><td colSpan="5">Nenhum pagamento registrado.</td></tr>}</tbody></table></div></section>}
       {isAdmin && page === 'Início' && <ManagementDashboard health={health} appointments={appointments} receptionPanel={receptionPanel} onNavigate={setPage} onRefresh={() => Promise.all([loadHealth(), loadAgenda(), loadPayments(), loadReceptionPanel()])} />}
