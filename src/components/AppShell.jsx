@@ -274,30 +274,31 @@ function AppShell({ profile, onLogout }) {
     try {
       const now = new Date()
       const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
-      const [agenda, attendance, teachers, waiting, paymentsData, profilesData] = await Promise.all([
+      const [agenda, attendance, bookingSlots, paymentsData, profilesData] = await Promise.all([
         supabase.from('appointments').select('id, appointment_date, start_time, status').eq('appointment_date', today).eq('status', 'CONFIRMADO').order('start_time'),
         supabase.from('attendance').select('status, attendance_date').eq('attendance_date', today),
-        supabase.from('teachers').select('*', { count: 'exact', head: true }).eq('status', 'ATIVO'),
-        supabase.from('waitlist').select('*', { count: 'exact', head: true }).eq('appointment_date', today).eq('status', 'AGUARDANDO'),
+        supabase.rpc('get_student_booking_slots', { p_start_date: today }),
         supabase.from('payments').select('status, due_date').lt('due_date', today),
         supabase.from('profiles').select('id, full_name, birth_date, phone').not('birth_date', 'is', null),
       ])
-      if ([agenda, attendance, teachers, waiting, paymentsData, profilesData].some((result) => result.error)) throw new Error('panel')
       const monthDay = today.slice(5)
       const birthdays = (profilesData.data ?? []).filter((person) => String(person.birth_date).slice(5) === monthDay)
-      setReceptionPanel({
-        appointments: agenda.data ?? [],
-        present: (attendance.data ?? []).filter((item) => item.status === 'PRESENTE').length,
-        absent: (attendance.data ?? []).filter((item) => item.status === 'AUSENTE').length,
-        activeTeachers: teachers.count ?? 0,
-        overdue: (paymentsData.data ?? []).filter((item) => !['IDENTIFICADO', 'CANCELADO'].includes(item.status)).length,
-        waitlist: waiting.count ?? 0,
-        birthdays,
-      })
+      const slots = bookingSlots.data ?? []
+      const activeTeachers = Math.ceil(Math.max(0, ...slots.map((slot) => Number(slot.capacity || 0))) / 4)
+      const waitlist = slots.reduce((total, slot) => total + Number(slot.waitlist_count || 0), 0)
+      setReceptionPanel((current) => ({
+        appointments: agenda.error ? current.appointments : agenda.data ?? [],
+        present: attendance.error ? current.present : (attendance.data ?? []).filter((item) => item.status === 'PRESENTE').length,
+        absent: attendance.error ? current.absent : (attendance.data ?? []).filter((item) => item.status === 'AUSENTE').length,
+        activeTeachers: bookingSlots.error ? current.activeTeachers : activeTeachers,
+        overdue: paymentsData.error ? current.overdue : (paymentsData.data ?? []).filter((item) => !['IDENTIFICADO', 'CANCELADO'].includes(item.status)).length,
+        waitlist: bookingSlots.error ? current.waitlist : waitlist,
+        birthdays: profilesData.error ? current.birthdays : birthdays,
+      }))
       setReceptionUpdatedAt(new Date())
-      setReceptionError('')
+      setReceptionError(agenda.error ? 'Não foi possível atualizar a agenda neste momento.' : '')
     } catch {
-      setReceptionError('Não foi possível atualizar os dados da recepção.')
+      setReceptionError('O painel não pôde ser atualizado. Tente novamente.')
     } finally {
       setReceptionLoading(false)
     }
