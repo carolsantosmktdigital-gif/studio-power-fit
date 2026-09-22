@@ -317,19 +317,32 @@
 
 
 /* Employee work schedule */
-.work-schedule-editor{border:1px solid var(--border-color,rgba(148,163,184,.24));border-radius:16px;padding:16px;margin:8px 0 4px;display:grid;gap:10px}
-.work-schedule-editor legend{font-weight:700;padding:0 8px}
-.work-schedule-help{margin:0 0 4px;font-size:.82rem;line-height:1.45;opacity:.72}
-.work-schedule-day{border:1px solid var(--border-color,rgba(148,163,184,.18));border-radius:12px;padding:12px;transition:.2s ease}
-.work-schedule-day.is-off{opacity:.68}
-.work-schedule-toggle{display:flex!important;align-items:center;gap:10px;margin:0!important}
-.work-schedule-toggle input{width:18px!important;height:18px}
-.work-schedule-toggle span{font-weight:650;flex:1}
-.work-schedule-toggle small{font-size:.75rem;opacity:.7}
-.work-schedule-periods{display:grid;gap:8px;margin-top:12px}
-.work-schedule-period{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end}
-.work-schedule-period label{margin:0!important}
-.schedule-add,.schedule-remove{border:0;background:transparent;cursor:pointer;font:inherit}
-.schedule-add{margin-top:10px;font-weight:650;text-align:left;color:inherit;opacity:.8}
-.schedule-remove{padding:10px 6px;opacity:.7}
-@media(max-width:640px){.work-schedule-period{grid-template-columns:1fr 1fr}.schedule-remove{grid-column:1/-1;text-align:left;padding:2px 0}}
+.work-schedule-editor{border:1px solid var(--border);border-radius:18px;padding:18px;margin:10px 0 6px;display:grid;gap:14px;min-width:0}
+.work-schedule-editor legend{font-weight:800;padding:0 9px;color:var(--text)}
+.work-schedule-help{margin:0;font-size:.84rem;line-height:1.5;color:var(--text-muted)}
+.work-schedule-shift-note{display:grid;gap:3px;padding:11px 13px;border:1px solid rgba(78,154,255,.24);border-radius:12px;background:rgba(78,154,255,.07);font-size:.78rem;line-height:1.4}
+.work-schedule-shift-note strong{color:var(--text)}
+.work-schedule-shift-note span{color:var(--text-muted)}
+.work-schedule-table{overflow:hidden;border:1px solid var(--border);border-radius:14px}
+.work-schedule-head,.work-schedule-row{display:grid;grid-template-columns:minmax(145px,1.2fr) minmax(72px,.55fr) minmax(120px,1fr) minmax(120px,1fr);gap:12px;align-items:center}
+.work-schedule-head{padding:10px 13px;border-bottom:1px solid var(--border);color:var(--text-muted);font-size:.72rem;font-weight:800}
+.work-schedule-row{padding:10px 13px;border-bottom:1px solid var(--border)}
+.work-schedule-row:last-child{border-bottom:0}
+.work-schedule-row>strong{font-size:.82rem;color:var(--text)}
+.work-schedule-row>strong small{font-weight:600;color:var(--text-muted)}
+.work-schedule-row.is-off{background:color-mix(in srgb,var(--text-muted) 3%,transparent)}
+.work-schedule-check{display:flex!important;align-items:center!important;justify-content:flex-start;margin:0!important}
+.work-schedule-check input{width:18px!important;height:18px!important;margin:0;accent-color:#58a9ff}
+.work-schedule-time{margin:0!important}
+.work-schedule-time>span{display:none}
+.work-schedule-time input{width:100%;min-width:0}
+.work-schedule-time input:disabled{opacity:.42;cursor:not-allowed}
+@media(max-width:640px){
+ .work-schedule-editor{padding:14px}
+ .work-schedule-head{display:none}
+ .work-schedule-row{grid-template-columns:1fr auto;gap:10px 12px;padding:13px}
+ .work-schedule-row>strong{font-size:.86rem}
+ .work-schedule-check{justify-content:flex-end}
+ .work-schedule-time{display:grid!important;gap:5px}
+ .work-schedule-time>span{display:block;font-size:.7rem;font-weight:750;color:var(--text-muted)}
+}
