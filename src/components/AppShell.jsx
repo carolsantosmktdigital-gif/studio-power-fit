@@ -686,8 +686,11 @@ function AppShell({ profile, onLogout }) {
   }
 
   const changeAppointmentTeacher = async (appointmentId, teacherId) => {
-    const { error } = await supabase.from('appointments').update({ teacher_id: teacherId || null }).eq('id', appointmentId)
-    if (error) { setNotice(error.message); return false }
+    const expectedTeacherId = teacherId || null
+    const { data: savedRows, error } = await supabase.from('appointments').update({ teacher_id: expectedTeacherId }).eq('id', appointmentId).select('id, teacher_id')
+    if (error) { setNotice(`Não foi possível alterar o professor: ${error.message}`); return false }
+    if (!savedRows?.length || savedRows[0].teacher_id !== expectedTeacherId) { setNotice('O banco não confirmou a alteração do professor.'); return false }
+    setReceptionPanel(current => ({...current, appointments: current.appointments.map(item => item.id === appointmentId ? {...item, teacher_id: expectedTeacherId} : item)}))
     setNotice('Professor atualizado com sucesso.')
     await Promise.all([loadReceptionPanel(), loadAgenda()])
     return true
