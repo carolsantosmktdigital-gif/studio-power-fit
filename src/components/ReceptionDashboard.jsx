@@ -5,7 +5,7 @@ import './ReceptionDashboard.css'
 const plural = (count, one, many) => `${count} ${count === 1 ? one : many}`
 const timeOf = (value) => String(value).slice(0, 5)
 
-export default function ReceptionDashboard({ profile, panel, loading, error, updatedAt, onRefresh, onNavigate, onNewStudent }) {
+export default function ReceptionDashboard({ profile, panel, loading, error, updatedAt, onRefresh, onNavigate, onNewStudent, onScheduleStudent, onRegisterPayment }) {
   const [period, setPeriod] = useState('upcoming')
   const now = new Date()
   const clock = now.toTimeString().slice(0, 5)
@@ -34,7 +34,7 @@ export default function ReceptionDashboard({ profile, panel, loading, error, upd
     </div>
     {error && <p className="rx-error" role="alert"><span aria-hidden="true">*</span>{error}</p>}
     <div className="rx-hero">
-      <div className="rx-hero-copy"><span className="rx-eyebrow">CADA ATENDIMENTO CONTA</span><h3>Seu dia, bem organizado.</h3><p>Agenda, alunos e prioridades em um só lugar.</p><div className="rx-hero-actions"><button className="rx-button rx-primary" onClick={() => onNavigate('Agenda')} type="button"><ManagementIcon name="calendar" size={18} />Abrir agenda<ManagementIcon name="arrow" size={17} /></button><button className="rx-button rx-hero-secondary" onClick={onNewStudent} type="button"><ManagementIcon name="plus" size={18} />Cadastrar aluno</button></div></div>
+      <div className="rx-hero-copy"><span className="rx-eyebrow">CADA ATENDIMENTO CONTA</span><h3>Seu dia, bem organizado.</h3><p>Agenda, alunos e prioridades em um só lugar.</p><div className="rx-hero-actions"><button className="rx-button rx-primary" onClick={() => onNavigate('Agenda')} type="button"><ManagementIcon name="calendar" size={18} />Abrir agenda<ManagementIcon name="arrow" size={17} /></button><button className="rx-button rx-hero-secondary" onClick={onNewStudent} type="button"><ManagementIcon name="plus" size={18} />Cadastrar aluno</button><button className="rx-button rx-hero-secondary" onClick={onScheduleStudent} type="button"><ManagementIcon name="calendar" size={18} />Agendar aluno</button><button className="rx-button rx-hero-secondary" onClick={onRegisterPayment} type="button"><ManagementIcon name="wallet" size={18} />Cadastrar pagamento</button></div></div>
       <div className="rx-next"><span><ManagementIcon name="clock" size={16} />PRÓXIMO HORÁRIO</span><strong>{ready ? next?.[0] || 'Dia em ordem' : '—'}</strong><p>{!ready ? 'Consultando agenda…' : next ? plural(next[1], 'reserva confirmada', 'reservas confirmadas') : 'Sem novas reservas para hoje.'}</p><div><ManagementIcon name="team" size={16} />{ready ? plural(panel.activeTeachers, 'professor ativo', 'professores ativos') : 'Consultando equipe…'}</div></div>
     </div>
     <div className="rx-stats">{stats.map((stat) => <button key={stat.label} className={`rx-stat rx-${stat.tone}`} onClick={() => onNavigate(stat.page)} type="button"><div className="rx-stat-top"><span className="rx-icon"><ManagementIcon name={stat.icon} size={20} /></span><ManagementIcon name="arrow" size={17} /></div><span className="rx-stat-label">{stat.label}</span><strong>{value(stat.number)}</strong><span className="rx-stat-note">{ready ? stat.note : 'Aguardando dados'}</span></button>)}</div>
