@@ -26,3 +26,20 @@
 .reception-notifications.is-open .rn-action{min-width:190px;justify-content:center;padding:14px 18px;border-radius:12px}
 @media(max-width:900px){.reception-notifications.is-open .rn-item{grid-template-columns:1fr;gap:18px}.reception-notifications.is-open .rn-action{width:100%}}
 @media(max-width:600px){.reception-notifications.is-open .rn-list{padding:0 16px 18px}.reception-notifications.is-open .rn-item-copy{padding-left:0}.reception-notifications.is-open .rn-item-copy>strong{font-size:18px}}
+
+/* Ajuste final aprovado: leitura horizontal e conteúdo alinhado à esquerda */
+.reception-notifications.is-open .rn-list{padding:0 34px 22px}
+.reception-notifications.is-open .rn-item{grid-template-columns:minmax(0,1fr) 220px;gap:40px;align-items:center;padding:22px 0 20px}
+.reception-notifications.is-open .rn-item-copy{max-width:920px;padding-left:6px;text-align:left!important;margin:0!important}
+.reception-notifications.is-open .rn-kicker,
+.reception-notifications.is-open .rn-item-copy>strong,
+.reception-notifications.is-open .rn-item p,
+.reception-notifications.is-open .rn-item small,
+.reception-notifications.is-open .rn-item time{text-align:left!important;margin-left:0!important;margin-right:0!important}
+.reception-notifications.is-open .rn-kicker{margin-bottom:10px}
+.reception-notifications.is-open .rn-item-copy>strong{margin-bottom:9px}
+.reception-notifications.is-open .rn-item p{margin-top:0;margin-bottom:5px}
+.reception-notifications.is-open .rn-item small{margin-top:2px}
+.reception-notifications.is-open .rn-item time{margin-top:12px}
+.reception-notifications.is-open .rn-action{width:220px;min-width:220px;justify-content:center;align-self:center}
+@media(max-width:900px){.reception-notifications.is-open .rn-item{grid-template-columns:1fr;gap:16px}.reception-notifications.is-open .rn-action{width:100%;min-width:0}}
