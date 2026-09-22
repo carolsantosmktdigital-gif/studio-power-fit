@@ -58,22 +58,27 @@ const getPaymentPresentation = (payment) => {
 
 function WorkScheduleEditor({ schedule, onChange, required = false }) {
   const days = schedule?.length ? schedule : freshWorkSchedule()
+  const firstPeriod = (day) => day.periods?.[0] || { start_time: '', end_time: '' }
   const updateDay = (weekday, patch) => onChange(days.map((day) => day.weekday === weekday ? { ...day, ...patch } : day))
-  const updatePeriod = (weekday, index, field, value) => onChange(days.map((day) => day.weekday === weekday ? { ...day, periods: day.periods.map((period, periodIndex) => periodIndex === index ? { ...period, [field]: value } : period) } : day))
-  const addPeriod = (weekday) => onChange(days.map((day) => day.weekday === weekday ? { ...day, periods: [...day.periods, { start_time: '14:00', end_time: '18:00' }] } : day))
-  const removePeriod = (weekday, index) => onChange(days.map((day) => day.weekday === weekday ? { ...day, periods: day.periods.filter((_, periodIndex) => periodIndex !== index) } : day))
+  const updateTime = (weekday, field, value) => onChange(days.map((day) => day.weekday === weekday ? { ...day, periods: [{ ...firstPeriod(day), [field]: value }] } : day))
+  const isWeekend = (weekday) => weekday === 0 || weekday === 6
+
   return <fieldset className="work-schedule-editor">
     <legend>Horário de expediente{required ? ' *' : ''}</legend>
-    <p className="work-schedule-help">Defina os dias e períodos em que o funcionário estará no Studio. Para professores, estes horários também limitam a disponibilidade para agendamentos.</p>
-    {days.map((day) => <div className={`work-schedule-day ${day.active ? 'is-active' : 'is-off'}`} key={day.weekday}>
-      <label className="work-schedule-toggle"><input type="checkbox" checked={day.active} onChange={(event) => updateDay(day.weekday, { active: event.target.checked })} /><span>{day.label}</span><small>{day.active ? 'Trabalha' : 'Folga'}</small></label>
-      {day.active && <div className="work-schedule-periods">{day.periods.map((period, index) => <div className="work-schedule-period" key={index}>
-        <label>Entrada<input type="time" value={period.start_time} onChange={(event) => updatePeriod(day.weekday, index, 'start_time', event.target.value)} required /></label>
-        <label>Saída<input type="time" value={period.end_time} onChange={(event) => updatePeriod(day.weekday, index, 'end_time', event.target.value)} required /></label>
-        {day.periods.length > 1 && <button type="button" className="schedule-remove" onClick={() => removePeriod(day.weekday, index)}>Remover</button>}
-      </div>)}
-      <button type="button" className="schedule-add" onClick={() => addPeriod(day.weekday)}>+ Adicionar período</button></div>}
-    </div>)}
+    <p className="work-schedule-help">Defina os dias em que o funcionário trabalha e informe o horário de entrada e saída.</p>
+    <div className="work-schedule-shift-note"><strong>Sábado e domingo funcionam por escala.</strong><span>Marque o dia somente quando fizer parte do expediente do funcionário.</span></div>
+    <div className="work-schedule-table">
+      <div className="work-schedule-head"><span>Dia da semana</span><span>Trabalha</span><span>Entrada</span><span>Saída</span></div>
+      {days.map((day) => {
+        const period = firstPeriod(day)
+        return <div className={`work-schedule-row ${day.active ? 'is-active' : 'is-off'}`} key={day.weekday}>
+          <strong>{day.label}{isWeekend(day.weekday) && <small> (escala)</small>}</strong>
+          <label className="work-schedule-check"><input aria-label={`${day.label}: trabalha`} type="checkbox" checked={day.active} onChange={(event) => updateDay(day.weekday, { active: event.target.checked })} /></label>
+          <label className="work-schedule-time"><span>Entrada</span><input type="time" value={period.start_time} disabled={!day.active} onChange={(event) => updateTime(day.weekday, 'start_time', event.target.value)} required={day.active} /></label>
+          <label className="work-schedule-time"><span>Saída</span><input type="time" value={period.end_time} disabled={!day.active} onChange={(event) => updateTime(day.weekday, 'end_time', event.target.value)} required={day.active} /></label>
+        </div>
+      })}
+    </div>
   </fieldset>
 }
 
