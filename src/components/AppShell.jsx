@@ -534,12 +534,12 @@ function AppShell({ profile, onLogout }) {
     if (!cpf.valid) return setModalError(cpf.message)
     const profileResult = await updateProfile(editingEmployee.profile_id, editingEmployee.profile, cpf.value)
     if (profileResult.error) { setModalError(profileResult.error); return setNotice(profileResult.error) }
-    const scheduleRows = (editingEmployee.work_schedule || []).flatMap((day) => day.active ? (day.periods || []).slice(0,1).map((period) => ({ employee_id: editingEmployee.id, weekday: day.weekday, start_time: period.start_time, end_time: period.end_time })) : []).filter((row) => row.start_time && row.end_time && row.start_time < row.end_time)
+    const scheduleRows = (editingEmployee.work_schedule || []).flatMap((day) => day.active ? (day.periods || []).slice(0,1).map((period) => ({ employee_id: editingEmployee.id, weekday: day.weekday, start_time: period.start_time, end_time: period.end_time, active: true })) : []).filter((row) => row.start_time && row.end_time && row.start_time < row.end_time)
     if (editingEmployee.profile?.role === 'PROFESSOR' && !scheduleRows.length) return setModalError('Informe pelo menos um dia e horário de expediente para o professor.')
-    const { error: deleteScheduleError } = await supabase.from('employee_schedules').delete().eq('employee_id', editingEmployee.id)
+    const { error: deleteScheduleError } = await supabase.from('employee_work_hours').delete().eq('employee_id', editingEmployee.id)
     if (deleteScheduleError) { setModalError(deleteScheduleError.message); return setNotice(deleteScheduleError.message) }
     if (scheduleRows.length) {
-      const { error: scheduleError } = await supabase.from('employee_schedules').insert(scheduleRows)
+      const { error: scheduleError } = await supabase.from('employee_work_hours').insert(scheduleRows)
       if (scheduleError) { setModalError(scheduleError.message); return setNotice(scheduleError.message) }
     }
     const expectedEmployee = { position: editingEmployee.position, hire_date: editingEmployee.hire_date || null, employment_type: editingEmployee.employment_type || null, notes: editingEmployee.notes || null, status: editingEmployee.status || 'ATIVO' }
@@ -624,12 +624,12 @@ function AppShell({ profile, onLogout }) {
   const openStudentEditor = (student) => setEditingStudent({ ...student, plan_code: studentPlanCode(student), profile: maskedProfile(student.profile) })
   const openEmployeeEditor = async (employee) => {
     setModalError('')
-    const { data: schedules, error } = await supabase.from('employee_schedules').select('weekday, start_time, end_time').eq('employee_id', employee.id).order('weekday')
+    const { data: schedules, error } = await supabase.from('employee_work_hours').select('weekday, start_time, end_time, active').eq('employee_id', employee.id).order('weekday')
     if (error) setNotice(`Não foi possível carregar o expediente: ${error.message}`)
     const byWeekday = new Map((schedules ?? []).map((item) => [Number(item.weekday), item]))
     const work_schedule = freshWorkSchedule().map((day) => {
       const saved = byWeekday.get(day.weekday)
-      return saved ? { ...day, active: true, periods: [{ start_time: String(saved.start_time || '').slice(0,5), end_time: String(saved.end_time || '').slice(0,5) }] } : { ...day, active: false }
+      return saved ? { ...day, active: saved.active !== false, periods: [{ start_time: String(saved.start_time || '').slice(0,5), end_time: String(saved.end_time || '').slice(0,5) }] } : { ...day, active: false }
     })
     setEditingEmployee({ ...employee, documents: [], work_schedule, profile: maskedProfile(employee.profile) })
   }
