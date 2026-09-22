@@ -329,7 +329,7 @@ function AppShell({ profile, onLogout }) {
       const now = new Date()
       const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
       const [agenda, attendance, bookingSlots, paymentsData, profilesData] = await Promise.all([
-        supabase.from('appointments').select('id, appointment_date, start_time, status').eq('appointment_date', today).eq('status', 'CONFIRMADO').order('start_time'),
+        supabase.from('appointments').select('id, student_id, teacher_id, appointment_date, start_time, status, students(profile_id, profiles:profile_id(full_name)), employees:teacher_id(profile_id, profiles:profile_id(full_name))').eq('appointment_date', today).eq('status', 'CONFIRMADO').order('start_time'),
         supabase.from('attendance').select('status, attendance_date').eq('attendance_date', today),
         supabase.rpc('get_student_booking_slots', { p_start_date: today }),
         supabase.from('payments').select('status, due_date').lt('due_date', today),
