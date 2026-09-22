@@ -6,6 +6,7 @@ export default function ReceptionWaitlist({ focus }) {
   const [rows, setRows] = useState([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState('')
+  const [copiedId, setCopiedId] = useState(null)
 
   const load = async () => {
     setLoading(true)
@@ -38,6 +39,18 @@ export default function ReceptionWaitlist({ focus }) {
 
   useEffect(() => { load() }, [])
 
+  const copyPhone = async (row) => {
+    const phone = String(row.person?.phone || '').replace(/\D/g, '')
+    if (!phone) return
+    try {
+      await navigator.clipboard.writeText(phone)
+      setCopiedId(row.id)
+      window.setTimeout(() => setCopiedId(current => current === row.id ? null : current), 4000)
+    } catch {
+      setError('Não foi possível copiar o telefone. Tente novamente.')
+    }
+  }
+
   const focused = focus?.appointment_date && focus?.start_time
     ? rows.filter(row => row.appointment_date === focus.appointment_date && String(row.start_time).slice(0,5) === String(focus.start_time).slice(0,5))
     : rows
@@ -53,7 +66,13 @@ export default function ReceptionWaitlist({ focus }) {
         <div className="rw-position"><strong>{row.position}º</strong><span>na fila</span></div>
         <div className="rw-person"><small>{index === 0 ? 'PRÓXIMO ALUNO' : 'ALUNO'}</small><strong>{row.person?.full_name || 'Aluno'}</strong><span>{row.person?.phone || 'Telefone não informado'}</span></div>
         <div className="rw-slot"><small>VAGA DE INTERESSE</small><strong>{new Date(`${row.appointment_date}T12:00:00`).toLocaleDateString('pt-BR')}</strong><span>{String(row.start_time).slice(0,5)}</span></div>
-        <span className="rw-status">{row.status === 'CONVOCADO' ? 'Convocado' : 'Aguardando'}</span>
+        <div className="rw-actions">
+          <span className="rw-status">{row.status === 'CONVOCADO' ? 'Convocado' : 'Aguardando'}</span>
+          {row.person?.phone ? <button className={`rw-copy-phone ${copiedId === row.id ? 'is-copied' : ''}`} type="button" onClick={() => copyPhone(row)}>
+            {copiedId === row.id ? 'Telefone copiado ✓' : 'Copiar telefone'}
+          </button> : <span className="rw-no-phone">Telefone não cadastrado</span>}
+          {copiedId === row.id && <small className="rw-copy-feedback">Número copiado. Cole no WhatsApp Business para entrar em contato com o aluno.</small>}
+        </div>
       </article>)}
     </div> : <div className="rw-empty">Não há alunos aguardando nesta fila.</div>}
   </section>
