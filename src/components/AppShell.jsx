@@ -537,6 +537,10 @@ function AppShell({ profile, onLogout }) {
       const planResult = await updateStudentPlan(editingStudent.id, requestedPlan)
       if (planResult.error) { setModalError(planResult.error); return setNotice(planResult.error) }
     }
+    if (requestedPlan === 'MENSALISTA') {
+      const { error: chargeError } = await supabase.rpc('generate_monthly_charge_for_student', { p_student_id: editingStudent.id })
+      if (chargeError) { setModalError(chargeError.message); return setNotice(chargeError.message) }
+    }
     setEditingStudent(null)
     setNotice('Dados, contato e plano do aluno atualizados com sucesso.')
     await Promise.all([loadStudents(), loadPayments(), loadHealth()])
