@@ -97,8 +97,7 @@ Deno.serve(async (request) => {
       employee_id: employee.id,
       weekday: Number(day.weekday),
       start_time: String(period.start_time || ''),
-      end_time: String(period.end_time || ''),
-      active: true,
+      end_time: String(period.end_time || '')
     }))).filter((row: Record<string, unknown>) => row.start_time && row.end_time && row.start_time < row.end_time)
     if (role === 'PROFESSOR' && scheduleRows.length === 0) return Response.json({ error: 'Informe pelo menos um período de expediente para o professor.' }, { status: 400, headers: corsHeaders })
     if (scheduleRows.length) {
