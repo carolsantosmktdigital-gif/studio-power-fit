@@ -172,7 +172,8 @@ function AppShell({ profile, onLogout }) {
   }
 
   const loadEmployees = async () => {
-    const { data } = await supabase.from('employees').select('id, profile_id, position, status, hire_date, employment_type, notes, created_at').order('created_at', { ascending: false })
+    const { data, error: employeesError } = await supabase.from('employees').select('id, profile_id, position, status, hire_date, employment_type, notes, created_at').order('created_at', { ascending: false })
+    if (employeesError) return setNotice(`Não foi possível carregar os professores: ${employeesError.message}`)
     const ids = (data ?? []).map((item) => item.profile_id)
     const { data: profiles, error: profilesError } = ids.length ? await supabase.from('profiles').select('id, full_name, email, phone, cpf, birth_date, address_zip_code, address_street, address_number, address_complement, address_district, address_city, address_state, role').in('id', ids) : { data: [], error: null }
     if (profilesError) return setNotice(`Não foi possível carregar os dados dos funcionários: ${profilesError.message}`)
@@ -370,7 +371,7 @@ function AppShell({ profile, onLogout }) {
 
   useEffect(() => {
     if (isAdmin) return undefined
-    const timer = window.setInterval(() => { loadReceptionPanel(); loadAgenda(); loadPayments() }, 30000)
+    const timer = window.setInterval(() => { loadReceptionPanel(); loadAgenda(); loadPayments(); loadEmployees() }, 30000)
     return () => window.clearInterval(timer)
   }, [isAdmin])
 
