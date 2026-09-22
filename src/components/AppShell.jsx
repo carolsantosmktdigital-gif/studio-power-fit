@@ -482,8 +482,11 @@ function AppShell({ profile, onLogout }) {
 
   const updateProfile = async (profileId, profile, cpf) => {
     const expected = editableProfileFields(profile, cpf)
-    const { data: saved, error } = await supabase.from('profiles').update(expected).eq('id', profileId).select('id, full_name, phone, cpf, birth_date, address_zip_code, address_street, address_number, address_complement, address_district, address_city, address_state').single()
+    const { data: savedRows, error } = await supabase.from('profiles').update(expected).eq('id', profileId).select('id, full_name, phone, cpf, birth_date, address_zip_code, address_street, address_number, address_complement, address_district, address_city, address_state')
     if (error) return { error: error.message }
+    if (!savedRows?.length) return { error: 'O cadastro não foi encontrado ou você não tem permissão para alterá-lo.' }
+    if (savedRows.length > 1) return { error: 'Foram encontrados registros duplicados para este cadastro. A atualização foi interrompida por segurança.' }
+    const saved = savedRows[0]
     const mismatch = changedFieldNotConfirmed(saved, expected)
     if (mismatch) return { error: `O banco não confirmou a alteração do campo ${mismatch[0]}. Tente novamente.` }
     return { saved }
