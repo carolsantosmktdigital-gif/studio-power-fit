@@ -107,8 +107,8 @@ export default function ReceptionNotifications({ profile, onNavigate }) {
             <span className="rn-kicker">VAGA LIBERADA</span>
             <strong>Vaga disponível para lista de espera</strong>
             {waiting?.full_name ? <>
-              <p><b>{waiting.full_name}</b> é o primeiro da fila para <b>{formatDate(waiting.appointment_date)}, às {String(waiting.start_time).slice(0, 5)}</b>.</p>
-              <small>Entre em contato com o aluno para confirmar o interesse na vaga.</small>
+              <p><b>{waiting.full_name}</b> é a primeira da fila para <b>{formatDate(waiting.appointment_date)}, às {String(waiting.start_time).slice(0, 5)}</b>.</p>
+              <small>Entre em contato com a aluna para confirmar o interesse na vaga.</small>
             </> : <p>{item.message}</p>}
             <time>{new Date(item.created_at).toLocaleString('pt-BR', { timeZone: 'America/Sao_Paulo' })}</time>
           </div>
