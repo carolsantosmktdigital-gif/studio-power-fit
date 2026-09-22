@@ -314,3 +314,22 @@
   .executive-panel-heading h3 { font-size: 19px; }
   .executive-panel-heading > strong { font-size: 24px; }
 }
+
+
+/* Employee work schedule */
+.work-schedule-editor{border:1px solid var(--border-color,rgba(148,163,184,.24));border-radius:16px;padding:16px;margin:8px 0 4px;display:grid;gap:10px}
+.work-schedule-editor legend{font-weight:700;padding:0 8px}
+.work-schedule-help{margin:0 0 4px;font-size:.82rem;line-height:1.45;opacity:.72}
+.work-schedule-day{border:1px solid var(--border-color,rgba(148,163,184,.18));border-radius:12px;padding:12px;transition:.2s ease}
+.work-schedule-day.is-off{opacity:.68}
+.work-schedule-toggle{display:flex!important;align-items:center;gap:10px;margin:0!important}
+.work-schedule-toggle input{width:18px!important;height:18px}
+.work-schedule-toggle span{font-weight:650;flex:1}
+.work-schedule-toggle small{font-size:.75rem;opacity:.7}
+.work-schedule-periods{display:grid;gap:8px;margin-top:12px}
+.work-schedule-period{display:grid;grid-template-columns:1fr 1fr auto;gap:8px;align-items:end}
+.work-schedule-period label{margin:0!important}
+.schedule-add,.schedule-remove{border:0;background:transparent;cursor:pointer;font:inherit}
+.schedule-add{margin-top:10px;font-weight:650;text-align:left;color:inherit;opacity:.8}
+.schedule-remove{padding:10px 6px;opacity:.7}
+@media(max-width:640px){.work-schedule-period{grid-template-columns:1fr 1fr}.schedule-remove{grid-column:1/-1;text-align:left;padding:2px 0}}
