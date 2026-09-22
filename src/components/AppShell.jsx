@@ -524,8 +524,12 @@ function AppShell({ profile, onLogout }) {
     if (profileResult.error) { setModalError(profileResult.error); return setNotice(profileResult.error) }
     const { data: savedStudent, error } = await supabase.from('students').update({ status: editingStudent.status }).eq('id', editingStudent.id).select('status').single()
     if (error || savedStudent?.status !== editingStudent.status) { const message = error?.message || 'O banco não confirmou a alteração do status.'; setModalError(message); return setNotice(message) }
-    const planResult = await updateStudentPlan(editingStudent.id, editingStudent.plan_code)
-    if (planResult.error) { setModalError(planResult.error); return setNotice(planResult.error) }
+    const originalPlan = normalizePlan(editingStudent.original_plan_code ?? editingStudent.plan_code)
+    const requestedPlan = normalizePlan(editingStudent.plan_code)
+    if (requestedPlan !== originalPlan) {
+      const planResult = await updateStudentPlan(editingStudent.id, requestedPlan)
+      if (planResult.error) { setModalError(planResult.error); return setNotice(planResult.error) }
+    }
     setEditingStudent(null)
     setNotice('Dados, contato e plano do aluno atualizados com sucesso.')
     await Promise.all([loadStudents(), loadPayments(), loadHealth()])
@@ -627,7 +631,10 @@ function AppShell({ profile, onLogout }) {
   const studentPlanCode = (student) => normalizePlan(student?.payment_plan || payments.find((payment) => payment.student_id === student?.id)?.payment_type)
   const directoryQuery = normalizeDirectorySearch(directorySearch[page] || '')
   const filteredRows = directoryQuery ? rows.filter((item) => [item.profile?.full_name, item.profile?.cpf, item.profile?.email, page === 'Alunos' ? studentPlan(item) : item.position].some((value) => normalizeDirectorySearch(value).includes(directoryQuery))) : rows
-  const openStudentEditor = (student) => setEditingStudent({ ...student, plan_code: studentPlanCode(student), profile: maskedProfile(student.profile) })
+  const openStudentEditor = (student) => {
+    const planCode = studentPlanCode(student)
+    setEditingStudent({ ...student, plan_code: planCode, original_plan_code: planCode, profile: maskedProfile(student.profile) })
+  }
   const openEmployeeEditor = async (employee) => {
     setModalError('')
     const { data: schedules, error } = await supabase.from('employee_work_hours').select('weekday, start_time, end_time, active').eq('employee_id', employee.id).order('weekday')
