@@ -232,6 +232,13 @@ function StudentAppointments({ student, latestPayment, onChanged }) {
           </div>
         </div>
 
+        {appointments.some((item) => item.status === 'CONFIRMADO') && (
+          <div className="student-day-limit" role="note">
+            <strong>Não vai conseguir comparecer?</strong>
+            <span>Cancele seu agendamento com pelo menos 1h30 de antecedência. Assim, outro aluno poderá aproveitar esse horário.</span>
+          </div>
+        )}
+
         {appointments.filter((item) => item.status === 'CONFIRMADO').length === 0 ? (
           <div className="student-empty-state">
             <span>▣</span>
@@ -273,6 +280,11 @@ function StudentAppointments({ student, latestPayment, onChanged }) {
               <span className="student-kicker">LISTA DE ESPERA</span>
               <h3>Você está aguardando vaga</h3>
             </div>
+          </div>
+
+          <div className="student-day-limit" role="note">
+            <strong>Fique de olho no celular!</strong>
+            <span>Se surgir uma vaga no horário de sua preferência e chegar a sua vez na lista de espera, a recepção enviará uma mensagem para você. Fique atento ao celular para confirmar sua presença.</span>
           </div>
 
           <div className="student-waitlist-grid">
