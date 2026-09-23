@@ -3082,3 +3082,24 @@ body.student-scroll-page {
 @media (max-width: 640px) {
   .student-booking-page .student-slot-section .student-slot-card.full:not(.past) { padding-top: 11px; }
 }
+
+/* Subtle payment reminders, shown only when due today or booking is blocked. */
+.student-booking-page .student-booking-status.payment-reminder {
+  background: #fff9e9;
+  border: 1px solid #ead7a2;
+  border-left: 3px solid #c59631;
+  color: #765818;
+  max-width: 360px;
+}
+.student-booking-page .student-booking-status.payment-reminder strong { color: #765818; }
+.student-booking-page .student-booking-status.payment-reminder span { color: #806a36; line-height: 1.6; }
+.student-theme-dark .student-booking-page .student-booking-status.payment-reminder {
+  background: rgba(196,150,49,.08);
+  border-color: rgba(212,171,77,.24);
+  border-left-color: #b69344;
+}
+.student-theme-dark .student-booking-page .student-booking-status.payment-reminder strong { color: #e6c984; }
+.student-theme-dark .student-booking-page .student-booking-status.payment-reminder span { color: #c6b58f; }
+@media (max-width: 640px) {
+  .student-booking-page .student-booking-status.payment-reminder { max-width: none; width: 100%; }
+}

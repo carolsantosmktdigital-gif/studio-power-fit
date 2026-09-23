@@ -1,19 +1,20 @@
 import { useEffect, useMemo, useState } from 'react'
 import { supabase } from '../lib/supabase'
 
-const isoDate = (date) => {
-  const y = date.getFullYear()
-  const m = String(date.getMonth() + 1).padStart(2, '0')
-  const d = String(date.getDate()).padStart(2, '0')
-  return `${y}-${m}-${d}`
+const studioDate = (timestamp) => new Intl.DateTimeFormat('en-CA', {
+  timeZone: 'America/Sao_Paulo', year: 'numeric', month: '2-digit', day: '2-digit',
+}).format(new Date(timestamp))
+
+const dateFromOffset = (today, offset) => {
+  const date = new Date(`${today}T12:00:00Z`)
+  date.setUTCDate(date.getUTCDate() + offset)
+  return date.toISOString().slice(0, 10)
 }
 
-const dateFromOffset = (offset) => {
-  const date = new Date()
-  date.setHours(12, 0, 0, 0)
-  date.setDate(date.getDate() + offset)
-  return date
-}
+const slotIsVisible = (slot, timestamp) => !slot.is_past &&
+  new Date(`${slot.appointment_date}T${slot.start_time}-03:00`).getTime() - timestamp > 10 * 60 * 1000
+
+const paymentIsPending = (payment) => !['IDENTIFICADO', 'CANCELADO'].includes(payment.status)
 
 const dateLabel = (offset) => {
   if (offset === 0) return 'Hoje'
@@ -46,17 +47,20 @@ function BookingNote({ type, title, children }) {
 }
 
 function StudentAppointments({ student, latestPayment, onChanged }) {
+  const [now, setNow] = useState(() => Date.now())
+  const today = studioDate(now)
   const dates = useMemo(() => [0, 1, 2].map((offset) => ({
     offset,
     label: dateLabel(offset),
-    value: isoDate(dateFromOffset(offset)),
-  })), [])
+    value: dateFromOffset(today, offset),
+  })), [today])
 
   const [selectedDate, setSelectedDate] = useState(dates[0].value)
   const [slots, setSlots] = useState([])
   const [appointments, setAppointments] = useState([])
   const [waitlist, setWaitlist] = useState([])
   const [overdue, setOverdue] = useState(false)
+  const [paymentDueDate, setPaymentDueDate] = useState(null)
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState('')
   const [notice, setNotice] = useState('')
@@ -72,7 +76,7 @@ function StudentAppointments({ student, latestPayment, onChanged }) {
     const startDate = dates[0].value
     const endDate = dates[2].value
 
-    const [slotsResult, appointmentsResult, waitlistResult, overdueResult] = await Promise.all([
+    const [slotsResult, appointmentsResult, waitlistResult, overdueResult, dueTodayResult] = await Promise.all([
       supabase.rpc('get_student_booking_slots', { p_start_date: startDate }),
       supabase
         .from('appointments')
@@ -93,6 +97,8 @@ function StudentAppointments({ student, latestPayment, onChanged }) {
         .order('appointment_date')
         .order('start_time'),
       supabase.rpc('student_is_overdue', { p_student_id: student.id }),
+      supabase.from('payments').select('due_date, status')
+        .eq('student_id', student.id).eq('due_date', today),
     ])
 
     if (slotsResult.error) {
@@ -102,30 +108,47 @@ function StudentAppointments({ student, latestPayment, onChanged }) {
       setSlots(slotsResult.data ?? [])
     }
 
-    if (appointmentsResult.error || waitlistResult.error) {
+    if (appointmentsResult.error || waitlistResult.error || overdueResult.error || dueTodayResult.error) {
       setNotice((current) => current || 'Algumas informações de agendamento estão temporariamente indisponíveis.')
     }
 
     setAppointments(appointmentsResult.data ?? [])
     setWaitlist(waitlistResult.data ?? [])
     setOverdue(Boolean(overdueResult.data))
+    setPaymentDueDate(dueTodayResult.data?.some(paymentIsPending) ? today : null)
     setLoading(false)
   }
 
   useEffect(() => {
     load()
-  }, [student?.id])
+  }, [student?.id, today, latestPayment?.id, latestPayment?.status])
 
-  const selectedSlots = slots.filter((slot) => slot.appointment_date === selectedDate)
+  useEffect(() => {
+    const tick = () => setNow(Date.now())
+    const timer = window.setInterval(tick, 1000)
+    window.addEventListener('focus', tick)
+    document.addEventListener('visibilitychange', tick)
+    return () => {
+      window.clearInterval(timer)
+      window.removeEventListener('focus', tick)
+      document.removeEventListener('visibilitychange', tick)
+    }
+  }, [])
+
+  useEffect(() => {
+    setSelectedDate((current) => dates.some((date) => date.value === current) ? current : today)
+  }, [today, dates])
+
+  const selectedSlots = slots.filter((slot) => slot.appointment_date === selectedDate && slotIsVisible(slot, now))
   const dayAppointment = appointments.find(
     (item) => item.appointment_date === selectedDate && item.status === 'CONFIRMADO'
   )
 
   const isBlocked = overdue
-  const pendingPayment = latestPayment && latestPayment.status !== 'IDENTIFICADO'
+  const paymentDueToday = paymentDueDate === today
 
   const handleBook = async (slot) => {
-    if (!student?.id || isBlocked || dayAppointment) return
+    if (!student?.id || isBlocked || dayAppointment || !slotIsVisible(slot, Date.now())) return
 
     setActionLoading(`book-${slot.appointment_date}-${slot.start_time}`)
     setNotice('')
@@ -149,7 +172,7 @@ function StudentAppointments({ student, latestPayment, onChanged }) {
   }
 
   const handleJoinWaitlist = async (slot) => {
-    if (!student?.id || isBlocked || dayAppointment) return
+    if (!student?.id || isBlocked || dayAppointment || !slotIsVisible(slot, Date.now())) return
 
     setActionLoading(`wait-${slot.appointment_date}-${slot.start_time}`)
     setNotice('')
@@ -223,16 +246,14 @@ function StudentAppointments({ student, latestPayment, onChanged }) {
           <p>Escolha sua data e horário. O Studio Power Fit cuida da distribuição da equipe para você.</p>
         </div>
 
-        <div className={`student-booking-status ${isBlocked ? 'blocked' : 'ok'}`}>
-          <strong>{isBlocked ? 'Agendamento bloqueado' : 'Agendamento liberado'}</strong>
-          <span>
-            {isBlocked
-              ? 'Há pagamento com mais de 3 dias de atraso.'
-              : pendingPayment
-                ? 'Pagamento aguardando confirmação, sem bloqueio por enquanto.'
-                : 'Você está apto a realizar novos agendamentos.'}
-          </span>
-        </div>
+        {(isBlocked || paymentDueToday) && (
+          <div className="student-booking-status payment-reminder" role="status">
+            <strong>{isBlocked ? 'Agendamento bloqueado por pagamento vencido' : 'Seu pagamento vence hoje'}</strong>
+            <span>{isBlocked
+              ? 'Regularize o pagamento com a recepção para voltar a agendar.'
+              : 'Lembre-se de regularizar seu pagamento. Seus agendamentos continuam liberados.'}</span>
+          </div>
+        )}
       </section>
 
       {notice && <div className="student-data-alert" role="status"><span>{notice}</span></div>}
@@ -333,7 +354,7 @@ function StudentAppointments({ student, latestPayment, onChanged }) {
             <span className="student-kicker">AGENDAR MUSCULAÇÃO</span>
             <h3>Horários disponíveis</h3>
           </div>
-          <p className="slot-section-description">Escolha o dia e encontre o melhor horário para o seu treino.</p>
+          <p className="slot-section-description">Escolha o dia e encontre o melhor horário para o seu treino. Os horários saem da lista 10 minutos antes do início.</p>
         </div>
 
         <div className="student-date-tabs" role="group" aria-label="Dia do treino">
@@ -372,8 +393,8 @@ function StudentAppointments({ student, latestPayment, onChanged }) {
           <div className="student-empty-state">
             <span>◌</span>
             <div>
-              <strong>Não há horários disponíveis para exibir.</strong>
-              <small>Confira a configuração de disponibilidade dos professores.</small>
+              <strong>Não há mais horários para agendar neste dia.</strong>
+              <small>Escolha outro dia para consultar os próximos horários.</small>
             </div>
           </div>
         ) : (
