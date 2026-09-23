@@ -1,0 +1,182 @@
+@import '../styles/typography.css';
+
+/* Shared student typography, loaded after legacy visual refinements.
+   Explicit specificity is needed while legacy rules use !important. */
+.student-app.student-app {
+  --student-font-family: var(--spf-font-family);
+  --student-type-page: var(--spf-type-page);
+  --student-type-title: var(--spf-type-title);
+  --student-type-value: var(--spf-type-value);
+  --student-type-body: var(--spf-type-body);
+  --student-type-button: var(--spf-type-body);
+  --student-type-small: var(--spf-type-meta);
+  --student-type-tag: var(--spf-type-meta);
+  font-family: var(--spf-font-family) !important;
+  font-size: var(--spf-type-body);
+  line-height: var(--spf-line-body);
+}
+.student-app.student-app :where(*) { font-family: var(--spf-font-family) !important; }
+.student-app.student-app :is(p, span, small, strong, em, label, input, select, textarea, button) {
+  font-size: var(--spf-type-body) !important;
+  line-height: var(--spf-line-body) !important;
+  letter-spacing: normal !important;
+}
+.student-app.student-app :is(p, small, em, label) { font-weight: 400 !important; }
+.student-app.student-app :is(strong, b, button) { font-weight: 700 !important; }
+.student-app.student-app :is(h1, h1 strong) {
+  font-size: var(--student-type-page) !important;
+  font-weight: 700 !important;
+  line-height: var(--spf-line-title) !important;
+  letter-spacing: -.025em !important;
+}
+.student-app.student-app :is(h2, h3) {
+  font-size: var(--spf-type-title) !important;
+  font-weight: 700 !important;
+  line-height: 1.3 !important;
+  letter-spacing: -.015em !important;
+}
+.student-app.student-app :is(
+  .student-kicker, .student-welcome-plan small, .student-user-copy small,
+  .student-help small, .student-welcome-meta span, .student-welcome-meta em,
+  .student-workout-type span, .student-frequency-body > div:last-child > span,
+  .student-evolution-metrics span, .student-due-date, .student-detail-metrics article > span,
+  .student-profile-fields > div > span, .student-history-row > div > span,
+  .student-detail-heading > span, .student-bottom-nav button small,
+  .student-status-badge, .student-payment-pill, .student-history-status,
+  .student-card-context, .student-plan-label
+) {
+  font-size: var(--spf-type-meta) !important;
+  line-height: 1.4 !important;
+}
+.student-app.student-app .student-kicker {
+  letter-spacing: .06em !important;
+  font-weight: 700 !important;
+}
+.student-app.student-app :is(
+  .student-workout-time strong, .student-frequency-body > div:last-child > strong,
+  .student-evolution-metrics strong, .student-challenge-count strong,
+  .student-progress-ring strong, .student-payment-amount,
+  .student-detail-metrics article > strong
+) {
+  font-size: var(--spf-type-value) !important;
+  line-height: 1.25 !important;
+  font-variant-numeric: tabular-nums;
+  letter-spacing: -.02em !important;
+}
+.student-app.student-app .student-evolution-metrics strong.student-metric-empty {
+  font-size: var(--spf-type-body) !important;
+}
+.student-app.student-app :is(.student-card-icon, .student-icon-button, .student-back-button,
+ .student-sidebar-nav button > span, .student-bottom-nav button > span,
+ .student-workout-time > span, .student-evolution-message > span,
+ .student-evolution-empty > span, .student-detail-status-icon) {
+  font-size: 24px !important;
+}
+.student-app.student-app button { min-height: var(--spf-touch-target); }
+.student-app.student-app :is(.student-primary-button, .student-secondary-button, .student-signout-button) {
+  height: auto !important;
+  min-height: var(--spf-touch-target) !important;
+  padding: 12px 18px !important;
+  white-space: normal !important;
+}
+.student-app.student-app :is(.student-content, .student-main, .student-card, .student-detail-card,
+ .student-profile-summary > div, .student-title-with-icon > div) { min-width: 0; }
+.student-app.student-app .student-home-grid {
+  grid-template-columns: repeat(2,minmax(0,1fr)) !important;
+  gap: 20px !important;
+}
+.student-app.student-app .student-home-grid > .student-card {
+  grid-column: auto !important;
+  grid-row: auto !important;
+  height: auto !important;
+  min-height: 0 !important;
+  padding: 24px !important;
+}
+.student-app.student-app .student-home-grid > .student-finance-card {
+  grid-column: 1 / -1 !important;
+  display: grid !important;
+  grid-template-columns: minmax(0,1fr) minmax(0,1.2fr) !important;
+  gap: 24px !important;
+}
+.student-app.student-app .student-finance-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  gap: 16px;
+}
+.student-app.student-app :is(.student-card-heading, .student-detail-heading) {
+  flex-wrap: wrap;
+  align-items: flex-start;
+  gap: 16px;
+  height: auto;
+}
+.student-app.student-app .student-title-with-icon { align-items: flex-start; min-width: 0; gap: 12px; }
+.student-app.student-app .student-card-icon { flex-shrink: 0; width: 40px !important; min-width: 40px !important; height: 40px !important; }
+.student-app.student-app .student-welcome { gap: 24px; }
+.student-app.student-app .student-welcome h1 { max-width: 100%; overflow-wrap: anywhere; }
+.student-app.student-app .student-welcome p { max-width: 65ch !important; }
+.student-app.student-app .student-welcome-meta { max-width: 100%; }
+.student-app.student-app .student-frequency-body { flex-wrap: wrap; gap: 24px !important; margin-block: 24px; }
+.student-app.student-app .student-progress-ring { flex-shrink: 0; width: 112px !important; height: 112px !important; }
+.student-app.student-app .student-evolution-metrics {
+  display: grid;
+  grid-template-columns: repeat(3,minmax(0,1fr));
+  gap: 16px;
+  margin-block: 24px;
+}
+.student-app.student-app .student-evolution-metrics > div { min-width: 0; }
+.student-app.student-app .student-evolution-metrics strong { display: block; overflow-wrap: anywhere; margin-top: 8px; }
+.student-app.student-app :is(.student-info-strip, .student-evolution-message, .student-evolution-empty) {
+  min-height: 0 !important;
+  height: auto !important;
+  gap: 12px;
+  padding: 16px !important;
+}
+.student-app.student-app .student-challenge-count { flex-wrap: wrap; gap: 12px; margin-block: 24px; }
+.student-app.student-app .student-detail-metrics { grid-template-columns: repeat(auto-fit,minmax(210px,1fr)); gap: 16px; }
+.student-app.student-app .student-detail-metrics article { min-height: 128px; height: auto; padding: 20px; }
+.student-app.student-app .student-detail-metrics strong { display: block; overflow-wrap: anywhere; margin-top: 10px; }
+.student-app.student-app .student-detail-hero { height: auto; gap: 24px; padding: 28px; }
+.student-app.student-app .student-detail-hero p { max-width: 65ch; margin-top: 12px; }
+.student-app.student-app .student-history-row {
+  grid-template-columns: minmax(0,1fr) auto auto;
+  gap: 20px;
+  padding: 20px;
+  align-items: center;
+}
+.student-app.student-app .student-history-row > div { min-width: 0; }
+.student-app.student-app .student-history-status { white-space: normal; text-align: center; padding: 7px 12px; }
+.student-app.student-app .student-profile-fields { gap: 16px; }
+.student-app.student-app .student-profile-fields > div { padding: 20px; min-width: 0; }
+.student-app.student-app .student-profile-fields strong { overflow-wrap: anywhere; display: block; margin-top: 8px; }
+.student-app.student-app .student-profile-summary { gap: 20px; }
+.student-app.student-app .student-profile-summary p { overflow-wrap: anywhere; }
+.student-app.student-app .student-profile-big-avatar { font-size: 28px !important; flex-shrink: 0; }
+.student-app.student-app .student-sidebar-nav button { height: auto; padding-block: 14px; }
+.student-app.student-app .student-help { height: auto; flex-wrap: wrap; }
+@media (max-width: 1100px) {
+  .student-app.student-app .student-home-grid { grid-template-columns: 1fr !important; }
+  .student-app.student-app .student-home-grid > .student-finance-card { grid-template-columns: 1fr !important; }
+}
+@media (max-width: 700px) {
+  .student-app.student-app { --student-type-page: var(--spf-type-page-mobile); }
+  .student-app.student-app .student-content { padding-bottom: 124px !important; }
+  .student-app.student-app .student-home-grid { gap: 16px !important; }
+  .student-app.student-app .student-home-grid > .student-card { padding: 20px !important; }
+  .student-app.student-app .student-welcome { display: flex; flex-direction: column; align-items: flex-start; }
+  .student-app.student-app .student-welcome-meta { align-items: flex-start; }
+  .student-app.student-app .student-evolution-metrics { grid-template-columns: 1fr; }
+  .student-app.student-app .student-evolution-metrics > div { display: flex; align-items: baseline; justify-content: space-between; gap: 16px; }
+  .student-app.student-app .student-evolution-metrics strong { margin: 0; }
+  .student-app.student-app .student-detail-metrics { grid-template-columns: 1fr; }
+  .student-app.student-app .student-detail-hero { padding: 20px; flex-wrap: wrap; }
+  .student-app.student-app .student-history-row { grid-template-columns: minmax(0,1fr) auto; gap: 12px; padding: 16px; }
+  .student-app.student-app .student-history-row > .student-history-status { grid-column: 1 / -1; justify-self: start; }
+  .student-app.student-app .student-profile-fields { grid-template-columns: 1fr; }
+  .student-app.student-app .student-profile-summary { flex-wrap: wrap; }
+  .student-app.student-app .student-bottom-nav { height: auto !important; min-height: 84px !important; padding: 8px 6px !important; }
+  .student-app.student-app .student-bottom-nav button { height: auto !important; min-height: 64px !important; padding: 6px 2px !important; overflow: visible !important; }
+  .student-app.student-app .student-bottom-nav button small { white-space: normal !important; overflow: visible !important; word-break: normal !important; }
+}

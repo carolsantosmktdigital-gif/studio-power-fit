@@ -6,6 +6,7 @@ import './StudentApp.css'
 import './StudentDesktopRefinements.css'
 import './StudentHomePolish.css'
 import './StudentExperienceRefinement.css'
+import './StudentTypography.css'
 
 const pages = {
   HOME: 'Início',

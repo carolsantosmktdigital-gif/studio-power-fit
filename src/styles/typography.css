@@ -1,0 +1,16 @@
+/* Studio Power Fit — approved system typography.
+   Use these semantic tokens in every new or revised screen. */
+:root {
+  --spf-font-family: Arial, Helvetica, sans-serif;
+  --spf-type-page: 36px;
+  --spf-type-page-mobile: 28px;
+  --spf-type-title: 24px;
+  --spf-type-value: 28px;
+  --spf-type-body: 16px;
+  --spf-type-meta: 14px;
+  --spf-line-body: 1.5;
+  --spf-line-title: 1.25;
+  --spf-weight-normal: 400;
+  --spf-weight-strong: 700;
+  --spf-touch-target: 48px;
+}
