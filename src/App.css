@@ -3875,3 +3875,10 @@ body {
 
 /* Center attendance action label */
 .agenda-presence{display:inline-flex;align-items:center;justify-content:center;text-align:center}
+
+.agenda-waitlist-card{margin-top:14px;border:1px solid var(--border);border-radius:16px;background:var(--surface,#fff);overflow:hidden}
+.agenda-waitlist-head{display:flex;align-items:center;justify-content:space-between;gap:14px;padding:16px 20px;border-bottom:1px solid var(--border)}
+.agenda-waitlist-head h3{margin:4px 0 0;font-size:15px}.agenda-waitlist-head .placeholder-kicker{color:#b87900}
+.agenda-waitlist-list{display:grid}.agenda-waitlist-row{display:grid;grid-template-columns:58px 34px minmax(0,1fr) auto;align-items:center;gap:11px;padding:13px 18px;border-bottom:1px solid var(--border)}.agenda-waitlist-row:last-child{border-bottom:0}.agenda-waitlist-row time{font-size:14px;font-weight:800}.agenda-waitlist-avatar{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:#fff3d7;color:#a86b00;font-weight:800}.agenda-waitlist-row>div{display:grid;gap:2px}.agenda-waitlist-row strong{font-size:11px}.agenda-waitlist-row small{font-size:9px;color:var(--text-soft)}.agenda-waitlist-badge{padding:6px 9px;border-radius:999px;background:#fff3d7;color:#9a6200;font-size:9px;font-weight:700}
+.dashboard-shell.theme-dark .agenda-waitlist-card{background:var(--surface)}.dashboard-shell.theme-dark .agenda-waitlist-avatar,.dashboard-shell.theme-dark .agenda-waitlist-badge{background:#332b19;color:#f2cf87}
+@media(max-width:600px){.agenda-waitlist-head{align-items:flex-start;flex-direction:column}.agenda-waitlist-head .outline-action{width:100%}.agenda-waitlist-row{grid-template-columns:48px 32px minmax(0,1fr)}.agenda-waitlist-badge{grid-column:3;justify-self:start}}
