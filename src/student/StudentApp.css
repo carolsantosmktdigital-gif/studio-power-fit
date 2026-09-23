@@ -2911,3 +2911,74 @@ body.student-scroll-page {
   min-height: 100vh;
   overflow: visible;
 }
+
+
+/* Student booking cards and guidance */
+.student-booking-page .booking-note {
+  display: flex;
+  align-items: flex-start;
+  gap: 14px;
+  padding: 16px 18px;
+  margin: 0 0 20px;
+  border: 0;
+  border-left: 3px solid #7389a8;
+  border-radius: 0 12px 12px 0;
+  background: rgba(32, 73, 120, .045);
+}
+.student-booking-page .booking-note-icon {
+  display: grid;
+  place-items: center;
+  flex: 0 0 36px;
+  height: 36px;
+  border-radius: 11px;
+  color: #42638b;
+  background: rgba(32, 73, 120, .07);
+}
+.student-booking-page .booking-note-icon svg { width: 22px; height: 22px; }
+.student-booking-page .booking-note strong { display: block; font-size: 14px; line-height: 1.5; color: var(--student-text); }
+.student-booking-page .booking-note p { margin: 4px 0 0; max-width: 85ch; font-size: 13px; line-height: 1.65; color: var(--student-soft); }
+.student-booking-page .booking-note b { font-weight: 650; color: var(--student-text); }
+.student-booking-page .booking-note--phone { border-left-color: #c48b33; background: rgba(194, 137, 47, .055); }
+.student-booking-page .booking-note--phone .booking-note-icon { color: #90601b; background: rgba(194, 137, 47, .1); }
+.student-booking-page .student-booking-list { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 14px; }
+.student-booking-page .student-booking-item { grid-template-columns: auto minmax(0, 1fr) auto; gap: 18px; padding: 20px; border-radius: 18px; box-shadow: 0 3px 12px rgba(8,22,47,.025); }
+.student-booking-page .student-booking-date-badge { min-width: 92px; padding: 16px 12px; gap: 5px; text-align: center; border-radius: 13px; }
+.student-booking-page .student-booking-date-badge strong { font-size: 25px; line-height: 1.1; letter-spacing: -.8px; font-variant-numeric: tabular-nums; }
+.student-booking-page .student-booking-date-badge span { font-size: 12px; color: #d7e3f3; }
+.student-booking-page .student-booking-item-copy { align-items: flex-start; gap: 9px; }
+.student-booking-page .student-booking-item-copy strong { font-size: 16px; }
+.student-booking-page .student-booking-item-copy .booking-confirmed { display: inline-flex; align-items: center; gap: 6px; border-radius: 20px; background: #e9f5ef; color: #246d50; font-size: 11px; font-weight: 650; padding: 5px 9px; line-height: 1.3; }
+.student-booking-page .booking-confirmed i { width: 5px; height: 5px; border-radius: 50%; background: currentColor; }
+.student-booking-page .student-cancel-button { min-height: 44px; font-size: 12px; padding: 0 13px; font-weight: 650; border-radius: 10px; }
+.student-booking-page .student-waitlist-grid { grid-template-columns: 1fr; }
+.student-booking-page .student-waitlist-card { grid-template-columns: minmax(100px, 1fr) minmax(90px, 1fr) minmax(90px, 1fr) auto; padding: 20px 24px; gap: 24px; border-color: var(--student-border); background: #fff; border-radius: 16px; }
+.student-booking-page .student-waitlist-card > div { gap: 7px; }
+.student-booking-page .student-waitlist-card > div + div { padding-left: 24px; border-left: 1px solid var(--student-border); }
+.student-booking-page .student-waitlist-card span { font-size: 12px; font-weight: 500; }
+.student-booking-page .student-waitlist-card strong { font-size: 16px; }
+.student-booking-page .student-waitlist-card > div:first-child strong { font-size: 24px; letter-spacing: -.6px; font-variant-numeric: tabular-nums; }
+.student-booking-page .student-waitlist-card button { min-height: 44px; font-size: 12px; font-weight: 650; border-radius: 10px; }
+.student-booking-page button:focus-visible { outline: 3px solid #648cbe; outline-offset: 3px; }
+.student-theme-dark .student-booking-page .booking-note { background: rgba(138, 168, 205, .045); }
+.student-theme-dark .student-booking-page .booking-note-icon { background: rgba(138, 168, 205, .1); color: #a9c3e6; }
+.student-theme-dark .student-booking-page .booking-note--phone { background: rgba(210, 164, 86, .045); }
+.student-theme-dark .student-booking-page .booking-note--phone .booking-note-icon { color: #e8bd78; background: rgba(210, 164, 86, .1); }
+.student-theme-dark .student-booking-page .student-booking-item,
+.student-theme-dark .student-booking-page .student-waitlist-card { background: rgba(15, 32, 51, .65); }
+.student-theme-dark .student-booking-page .student-booking-item-copy .booking-confirmed { background: rgba(80, 185, 133, .12); color: #8bddb3; }
+.student-theme-dark .student-booking-page .student-cancel-button { color: #ff8997; border-color: rgba(255,137,151,.22); background: rgba(255,90,113,.045); }
+@media (max-width: 1180px) {
+  .student-booking-page .student-booking-list { grid-template-columns: 1fr; }
+}
+@media (max-width: 640px) {
+  .student-booking-page .booking-note { gap: 10px; padding: 14px 12px; }
+  .student-booking-page .booking-note strong { font-size: 13px; }
+  .student-booking-page .booking-note p { font-size: 12px; }
+  .student-booking-page .booking-note-icon { flex-basis: 30px; height: 30px; }
+  .student-booking-page .student-booking-item { grid-template-columns: auto minmax(0, 1fr); gap: 14px; padding: 16px; }
+  .student-booking-page .student-cancel-button { grid-column: 1 / -1; width: 100%; }
+  .student-booking-page .student-waitlist-card { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 18px; padding: 18px; }
+  .student-booking-page .student-waitlist-card > div + div { padding-left: 0; border-left: 0; }
+  .student-booking-page .student-waitlist-card > div:first-child { grid-column: 1 / -1; padding-bottom: 14px; border-bottom: 1px solid var(--student-border); }
+  .student-booking-page .student-waitlist-card button { grid-column: 1 / -1; width: 100%; }
+}

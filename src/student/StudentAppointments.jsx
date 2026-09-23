@@ -32,6 +32,19 @@ const prettyDate = (value) => {
 
 const prettyTime = (value) => String(value || '').slice(0, 5)
 
+function BookingNote({ type, title, children }) {
+  return (
+    <aside className={`booking-note booking-note--${type}`}>
+      <span className="booking-note-icon" aria-hidden="true">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round">
+          {type === 'phone' ? <><rect x="7" y="2" width="10" height="20" rx="2.5" /><path d="M10 5h4M11 18h2" /></> : <><circle cx="12" cy="12" r="9" /><path d="M12 7v5l3 2" /></>}
+        </svg>
+      </span>
+      <div><strong>{title}</strong><p>{children}</p></div>
+    </aside>
+  )
+}
+
 function StudentAppointments({ student, latestPayment, onChanged }) {
   const dates = useMemo(() => [0, 1, 2].map((offset) => ({
     offset,
@@ -233,10 +246,9 @@ function StudentAppointments({ student, latestPayment, onChanged }) {
         </div>
 
         {appointments.some((item) => item.status === 'CONFIRMADO') && (
-          <div className="student-day-limit" role="note">
-            <strong>Não vai conseguir comparecer?</strong>
-            <span>Cancele seu agendamento com pelo menos 1h30 de antecedência. Assim, outro aluno poderá aproveitar esse horário.</span>
-          </div>
+          <BookingNote type="clock" title="Seu cuidado abre espaço para outro aluno">
+            Não vai conseguir comparecer? Cancele com pelo menos <b>1h30 de antecedência</b> para que outra pessoa possa aproveitar esse horário.
+          </BookingNote>
         )}
 
         {appointments.filter((item) => item.status === 'CONFIRMADO').length === 0 ? (
@@ -257,7 +269,7 @@ function StudentAppointments({ student, latestPayment, onChanged }) {
                 </div>
                 <div className="student-booking-item-copy">
                   <strong>Musculação</strong>
-                  <span>Treino confirmado</span>
+                  <span className="booking-confirmed"><i aria-hidden="true" />Confirmado</span>
                 </div>
                 <button
                   type="button"
@@ -282,10 +294,9 @@ function StudentAppointments({ student, latestPayment, onChanged }) {
             </div>
           </div>
 
-          <div className="student-day-limit" role="note">
-            <strong>Fique de olho no celular!</strong>
-            <span>Se surgir uma vaga no horário de sua preferência e chegar a sua vez na lista de espera, a recepção enviará uma mensagem para você. Fique atento ao celular para confirmar sua presença.</span>
-          </div>
+          <BookingNote type="phone" title="Fique de olho no celular">
+            Quando surgir uma vaga no seu horário e chegar sua vez, a recepção enviará uma mensagem. <b>Fique atento para confirmar sua presença.</b>
+          </BookingNote>
 
           <div className="student-waitlist-grid">
             {waitlist.map((item) => {
@@ -304,7 +315,7 @@ function StudentAppointments({ student, latestPayment, onChanged }) {
                   </div>
                   <div>
                     <span>Aguardando</span>
-                    <strong>{matchingSlot?.waitlist_count ?? item.position} pessoas</strong>
+                    <strong>{matchingSlot?.waitlist_count ?? item.position} {(matchingSlot?.waitlist_count ?? item.position) === 1 ? 'pessoa' : 'pessoas'}</strong>
                   </div>
                   <button type="button" onClick={() => setLeaveCandidate(item)}>
                     Escolher outro horário
