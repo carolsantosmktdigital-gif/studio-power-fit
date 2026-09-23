@@ -333,21 +333,27 @@ function StudentAppointments({ student, latestPayment, onChanged }) {
             <span className="student-kicker">AGENDAR MUSCULAÇÃO</span>
             <h3>Horários disponíveis</h3>
           </div>
-          <small>Vagas atualizadas automaticamente conforme a equipe disponível</small>
+          <p className="slot-section-description">Escolha o dia e encontre o melhor horário para o seu treino.</p>
         </div>
 
-        <div className="student-date-tabs">
+        <div className="student-date-tabs" role="group" aria-label="Dia do treino">
           {dates.map((date) => (
             <button
               type="button"
               key={date.value}
               className={selectedDate === date.value ? 'active' : ''}
+              aria-pressed={selectedDate === date.value}
               onClick={() => setSelectedDate(date.value)}
             >
               <strong>{date.label}</strong>
               <span>{prettyDate(date.value)}</span>
             </button>
           ))}
+        </div>
+
+        <div className="slot-day-summary" aria-live="polite">
+          <span>Horários de <strong>{prettyDate(selectedDate)}</strong></span>
+          {!loading && <small>{selectedSlots.filter((slot) => !slot.is_past && Number(slot.available) > 0).length} horários com vagas</small>}
         </div>
 
         {dayAppointment && (
@@ -383,21 +389,23 @@ function StudentAppointments({ student, latestPayment, onChanged }) {
               const actionKey = `${full ? 'wait' : 'book'}-${slot.appointment_date}-${slot.start_time}`
 
               return (
-                <article key={`${slot.appointment_date}-${slot.start_time}`} className={`student-slot-card ${full ? 'full' : ''} ${disabled ? 'disabled' : ''}`}>
+                <article key={`${slot.appointment_date}-${slot.start_time}`} className={`student-slot-card ${full ? 'full' : ''} ${disabled ? 'disabled' : ''} ${past ? 'past' : ''}`}>
                   <div>
                     <strong>{prettyTime(slot.start_time)}</strong>
                     <span>
                       {past
                         ? 'Horário encerrado'
                         : full
-                          ? 'LOTADO'
+                          ? 'Lista de espera'
                           : `${available} ${available === 1 ? 'vaga' : 'vagas'}`}
                     </span>
                   </div>
 
-                  <small>{Number(slot.capacity || 0)} vagas totais</small>
+                  <small>{past ? 'Este horário já terminou' : full ? 'Receba um aviso quando surgir uma vaga' : 'Musculação • Treino acompanhado'}</small>
 
-                  {alreadyWaiting ? (
+                  {past ? (
+                    <button type="button" disabled>Encerrado</button>
+                  ) : alreadyWaiting ? (
                     <button type="button" disabled>Na lista de espera</button>
                   ) : full ? (
                     <button
