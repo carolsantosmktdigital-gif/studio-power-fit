@@ -396,7 +396,7 @@ function StudentAppointments({ student, latestPayment, onChanged }) {
                       {past
                         ? 'Horário encerrado'
                         : full
-                          ? 'Lista de espera'
+                          ? 'LOTADO'
                           : `${available} ${available === 1 ? 'vaga' : 'vagas'}`}
                     </span>
                   </div>

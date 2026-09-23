@@ -3035,3 +3035,50 @@ body.student-scroll-page {
 @media (max-width: 360px) {
   .student-booking-page .student-slot-section .student-slots-grid { grid-template-columns: 1fr; }
 }
+
+/* Emphasize full upcoming slots without highlighting past sessions. */
+.student-booking-page .student-slot-section .student-slot-card.full:not(.past) {
+  border: 1px solid #e7a1ab;
+  border-top: 4px solid #d72e48;
+  padding-top: 15px;
+  background: linear-gradient(145deg, #fff0f2, #fff8f9);
+  box-shadow: 0 3px 12px rgba(170, 31, 54, .06);
+}
+.student-booking-page .student-slot-section .student-slot-card.full:not(.past) > div span {
+  background: #bc2440;
+  color: #fff;
+  padding: 6px 10px;
+  font-size: 11px;
+  font-weight: 800;
+  letter-spacing: .06em;
+}
+.student-booking-page .student-slot-section .student-slot-card.full:not(.past) > small {
+  color: #82404b;
+}
+.student-booking-page .student-slot-section .student-slot-card.full:not(.past) button {
+  background: #fff;
+  color: #a91f39;
+  border-color: #d77f8e;
+  font-weight: 750;
+}
+.student-theme-dark .student-booking-page .student-slot-section .student-slot-card.full:not(.past) {
+  background: linear-gradient(145deg, #30202e, #201c2b);
+  border-color: #874153;
+  border-top-color: #ff637d;
+  box-shadow: 0 3px 12px rgba(0,0,0,.1);
+}
+.student-theme-dark .student-booking-page .student-slot-section .student-slot-card.full:not(.past) > div span {
+  background: #f4738a;
+  color: #29121b;
+}
+.student-theme-dark .student-booking-page .student-slot-section .student-slot-card.full:not(.past) > small {
+  color: #e4b9c2;
+}
+.student-theme-dark .student-booking-page .student-slot-section .student-slot-card.full:not(.past) button {
+  background: rgba(255,111,139,.1);
+  border-color: #9e4c61;
+  color: #ffc0cc;
+}
+@media (max-width: 640px) {
+  .student-booking-page .student-slot-section .student-slot-card.full:not(.past) { padding-top: 11px; }
+}
