@@ -1933,3 +1933,110 @@
     padding: 7px 10px;
   }
 }
+
+
+/* Approved booking typography: 14 / 16 / 24 / 28 / 36 px. */
+.student-app .student-appointments-screen {
+  --student-font-family: Arial, Helvetica, sans-serif;
+  --student-type-page: 36px;
+  --student-type-title: 24px;
+  --student-type-value: 28px;
+  --student-type-body: 16px;
+  --student-type-button: 16px;
+  --student-type-small: 14px;
+  --student-type-tag: 14px;
+  font-family: var(--student-font-family);
+  font-size: 16px;
+  line-height: 1.5;
+}
+.student-app .student-appointments-screen :where(*) {
+  font-family: Arial, Helvetica, sans-serif !important;
+}
+.student-app .student-appointments-screen :is(p, span, small, strong, button) {
+  font-size: 16px !important;
+  line-height: 1.5 !important;
+  letter-spacing: normal !important;
+}
+.student-app .student-appointments-screen :is(strong, b, button) { font-weight: 700 !important; }
+.student-app .student-appointments-screen :is(p, small) { font-weight: 400 !important; }
+.student-app .student-appointments-screen h1 {
+  font-size: 36px !important;
+  line-height: 1.2 !important;
+  font-weight: 700 !important;
+  letter-spacing: -.025em !important;
+}
+.student-app .student-appointments-screen :is(h2, h3) {
+  font-size: 24px !important;
+  line-height: 1.3 !important;
+  font-weight: 700 !important;
+  letter-spacing: -.015em !important;
+}
+.student-app .student-appointments-screen .student-booking-page :is(
+  .student-kicker, .student-booking-date-badge span, .booking-confirmed,
+  .student-waitlist-card > div > span, .student-slot-card > div > span,
+  .student-date-tabs button span, .slot-day-summary small
+),
+.student-app .student-appointments-screen .student-section-page-heading .student-kicker {
+  font-size: 14px !important;
+  line-height: 1.4 !important;
+}
+.student-app .student-appointments-screen .student-booking-page :is(
+  .student-booking-date-badge strong,
+  .student-waitlist-card > div:first-child strong,
+  .student-slot-card > div strong
+) {
+  font-size: 28px !important;
+  line-height: 1.2 !important;
+  letter-spacing: -.02em !important;
+  font-variant-numeric: tabular-nums;
+}
+.student-app .student-appointments-screen .student-kicker {
+  display: inline-block;
+  margin-bottom: 8px;
+  letter-spacing: .06em !important;
+}
+.student-app .student-appointments-screen .student-booking-section-title { margin-bottom: 24px; }
+.student-app .student-appointments-screen .booking-note { padding: 18px; gap: 14px; }
+.student-app .student-appointments-screen .booking-note p { margin-top: 6px; max-width: 75ch; }
+.student-app .student-appointments-screen .student-booking-item { gap: 20px; padding: 20px; }
+.student-app .student-appointments-screen .student-booking-date-badge { min-width: 108px; padding: 16px 12px; }
+.student-app .student-appointments-screen .student-booking-status { max-width: 400px; }
+.student-app .student-appointments-screen button { min-height: 48px; white-space: normal; }
+.student-app .student-appointments-screen .student-date-tabs button { min-height: 88px; padding: 14px 16px; }
+.student-app .student-appointments-screen .student-slot-section .student-slots-grid {
+  grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+  gap: 16px;
+}
+.student-app .student-appointments-screen .student-slot-card { min-height: 204px; padding: 20px; gap: 16px; }
+.student-app .student-appointments-screen .student-slot-card > div { flex-wrap: wrap; gap: 10px; }
+.student-app .student-appointments-screen .student-slot-card button { padding: 10px 14px; }
+.student-app .student-appointments-screen .student-waitlist-card {
+  grid-template-columns: minmax(110px,1fr) minmax(100px,1fr) minmax(100px,1fr) auto;
+}
+.student-app .student-appointments-screen .student-waitlist-card button { padding: 10px 18px; }
+.student-app .student-appointments-screen .student-empty-state small { display: block; margin-top: 6px; }
+.student-app .student-appointments-screen .student-confirm-modal { width: min(480px, calc(100vw - 32px)); }
+.student-app .student-appointments-screen .student-confirm-modal p { line-height: 1.5 !important; }
+.student-app .student-appointments-screen .student-confirm-modal button { padding: 12px 18px; }
+@media (max-width: 1400px) {
+  .student-app .student-appointments-screen .student-booking-list { grid-template-columns: 1fr; }
+}
+@media (max-width: 900px) {
+  .student-app .student-appointments-screen .student-waitlist-card { grid-template-columns: repeat(3, minmax(0,1fr)); }
+  .student-app .student-appointments-screen .student-waitlist-card button { grid-column: 1 / -1; }
+}
+@media (max-width: 700px) {
+  .student-app .student-appointments-screen { --student-type-page: 28px; }
+  .student-app .student-appointments-screen h1 { font-size: 28px !important; }
+  .student-app .student-appointments-screen .student-slot-section .student-slots-grid { grid-template-columns: 1fr; }
+  .student-app .student-appointments-screen .student-slot-card { min-height: 190px; }
+  .student-app .student-appointments-screen .student-slot-card > div { flex-direction: row; align-items: center; }
+  .student-app .student-appointments-screen .student-date-tabs button { padding: 12px 8px; min-height: 104px; }
+  .student-app .student-appointments-screen .student-booking-item { grid-template-columns: auto minmax(0,1fr); padding: 16px; gap: 14px; }
+  .student-app .student-appointments-screen .student-cancel-button { grid-column: 1 / -1; width: 100%; }
+  .student-app .student-appointments-screen .student-waitlist-card { grid-template-columns: repeat(2,minmax(0,1fr)); gap: 18px; padding: 18px; }
+  .student-app .student-appointments-screen .student-waitlist-card > div:first-child { grid-column: 1 / -1; }
+  .student-app .student-appointments-screen .student-waitlist-card > div + div { border-left: 0; padding-left: 0; }
+  .student-app .student-appointments-screen .booking-note { padding: 16px 12px; }
+  .student-app .student-appointments-screen .student-confirm-modal > div { flex-wrap: wrap; }
+}
