@@ -147,6 +147,13 @@
 @media(max-width:800px){.rx-flow-slot{grid-template-columns:1fr}.rx-flow-time{border-right:0;border-bottom:1px solid var(--rx-line);padding:12px 14px}.rx-flow-time time{font-size:19px}.rx-flow-student{grid-template-columns:32px minmax(0,1fr) auto;gap:8px;padding:11px}.rx-flow-teacher{grid-column:2/-1}.rx-attendance{grid-column:2}.rx-payment-action{grid-column:3}.rx-flow-teacher select{min-height:36px}.rx-attendance,.rx-payment-action{min-height:36px}}
 @media(max-width:480px){.rx-flow-student{grid-template-columns:30px minmax(0,1fr)}.rx-flow-teacher,.rx-attendance,.rx-payment-action{grid-column:1/-1}.rx-attendance,.rx-payment-action{justify-content:center;width:100%}.rx-flow-avatar{grid-row:1}.rx-flow-name{grid-column:2}.rx-flow-note{align-items:flex-start}}
 
-/* Attendance action contrast */
-.rx-attendance{color:#fff!important}
-.theme-dark .rx-attendance{color:#000!important}
+
+/* Attendance action contrast: scoped to the actual reception theme container */
+.dashboard-shell.is-reception:not(.theme-dark) .rx-attendance,
+.dashboard-shell.is-reception:not(.theme-dark) .rx-attendance:hover,
+.dashboard-shell.is-reception:not(.theme-dark) .rx-attendance:focus,
+.dashboard-shell.is-reception:not(.theme-dark) .rx-attendance:active{color:#fff!important;-webkit-text-fill-color:#fff!important}
+.dashboard-shell.is-reception.theme-dark .rx-attendance,
+.dashboard-shell.is-reception.theme-dark .rx-attendance:hover,
+.dashboard-shell.is-reception.theme-dark .rx-attendance:focus,
+.dashboard-shell.is-reception.theme-dark .rx-attendance:active{color:#000!important;-webkit-text-fill-color:#000!important}
