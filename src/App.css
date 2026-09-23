@@ -3853,3 +3853,7 @@ body {
 .dashboard-shell.theme-dark .agenda-absence{background:#3a2028;border-color:#62313b;color:#ffb4be}
 @media(max-width:1180px){.agenda-actions{grid-template-columns:1fr 1fr}.agenda-more{grid-column:1/-1;width:100%}}
 @media(max-width:900px){.agenda-actions{grid-template-columns:1fr;min-width:130px}.agenda-more{grid-column:auto;width:100%}}
+
+.agenda-undo-attendance{height:40px;min-width:0;padding:0 10px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--text);font-size:10px;font-weight:700;white-space:normal}
+.agenda-undo-attendance:hover{background:var(--app-bg,#f5f7fb)}
+.dashboard-shell.theme-dark .agenda-undo-attendance:hover{background:#263244}
