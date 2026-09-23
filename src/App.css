@@ -3857,3 +3857,18 @@ body {
 .agenda-undo-attendance{height:40px;min-width:0;padding:0 10px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--text);font-size:10px;font-weight:700;white-space:normal}
 .agenda-undo-attendance:hover{background:var(--app-bg,#f5f7fb)}
 .dashboard-shell.theme-dark .agenda-undo-attendance:hover{background:#263244}
+
+/* Daily agenda compact status + organized action group */
+.agenda-row{grid-template-columns:72px minmax(165px,1.25fr) minmax(145px,1fr) minmax(105px,.62fr) minmax(220px,1.15fr);gap:12px}
+.agenda-status{min-height:0;padding:0;border-radius:0;background:transparent!important;font-size:9px;font-weight:700;line-height:1.25;text-align:left;justify-content:flex-start;white-space:normal}
+.agenda-status:before{content:"";width:7px;height:7px;flex:0 0 7px;border-radius:50%;margin-right:6px;background:#8290a6}
+.agenda-status.confirmado{color:#c88912}.agenda-status.confirmado:before{background:#f2b01e}
+.agenda-status.realizado,.agenda-status.presente{color:#169a66}.agenda-status.realizado:before,.agenda-status.presente:before{background:#11a66a}
+.agenda-status.faltou{color:#d95a67}.agenda-status.faltou:before{background:#e53949}
+.agenda-status.cancelado{color:#8290a6}
+.agenda-actions{display:flex;align-items:center;justify-content:flex-end;gap:7px;width:100%}
+.agenda-presence,.agenda-absence,.agenda-undo-attendance{width:auto;min-width:92px;height:36px;padding:0 11px;white-space:nowrap;font-size:10px}
+.agenda-more{flex:0 0 38px;width:38px;height:36px}
+@media(max-width:1180px){.agenda-row{grid-template-columns:70px minmax(150px,1.15fr) minmax(135px,.9fr) minmax(95px,.55fr) minmax(195px,1fr)}.agenda-presence,.agenda-absence{min-width:84px;padding:0 8px}}
+@media(max-width:900px){.agenda-row{grid-template-columns:64px minmax(0,1fr)}.agenda-teacher,.agenda-status{grid-column:2}.agenda-actions{grid-column:1/-1;grid-row:auto;justify-content:flex-end;min-width:0}.agenda-presence,.agenda-absence,.agenda-undo-attendance{flex:1;max-width:180px}}
+@media(max-width:520px){.agenda-actions{display:grid;grid-template-columns:1fr 1fr 38px}.agenda-presence,.agenda-absence,.agenda-undo-attendance{width:100%;max-width:none;min-width:0;white-space:normal}}
