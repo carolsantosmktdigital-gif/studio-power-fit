@@ -3808,3 +3808,28 @@ body {
 @media(max-width:1180px){.agenda-filterbar{grid-template-columns:auto repeat(3,minmax(145px,1fr))}.agenda-period{margin-right:0}.agenda-summary{grid-template-columns:repeat(3,minmax(0,1fr))}}
 @media(max-width:900px){.agenda-filterbar{grid-template-columns:1fr 1fr}.agenda-period{grid-column:1/-1}.agenda-summary{grid-template-columns:repeat(2,minmax(0,1fr))}}
 @media(max-width:600px){.agenda-redesign{gap:16px}.agenda-title-row h2{font-size:27px}.agenda-title-row p{font-size:13px}.agenda-filterbar{grid-template-columns:1fr;padding:13px}.agenda-filterbar label,.agenda-filterbar label:first-of-type{grid-column:1}.agenda-period{width:100%}.agenda-period button{flex:1}.agenda-summary{display:flex;gap:10px}.agenda-summary article{min-width:165px;min-height:84px;padding:13px 14px}}
+
+/* Agenda do dia: denser, aligned operational row */
+.agenda-main-card{overflow:hidden}
+.agenda-card-head{min-height:102px;padding:20px 28px}
+.agenda-card-head>div{display:grid;gap:7px}
+.agenda-card-head .placeholder-kicker{font-size:10px;letter-spacing:.18em}
+.agenda-card-head h3{margin:0;font-size:20px;line-height:1.25;letter-spacing:-.02em}
+.agenda-card-head .outline-action{min-width:116px;height:42px;border-radius:10px}
+.agenda-row{grid-template-columns:96px minmax(220px,1.35fr) minmax(190px,1.15fr) minmax(150px,.85fr) 132px;gap:18px;min-height:112px;padding:18px 22px}
+.agenda-row:before{top:18px;bottom:18px;width:4px}
+.agenda-row time{font-size:22px;line-height:1;font-weight:800;text-align:center}
+.agenda-person{gap:12px;min-width:0}
+.agenda-person>span{flex:0 0 40px;width:40px;height:40px}
+.agenda-person div{min-width:0}
+.agenda-person strong{font-size:14px;line-height:1.25}
+.agenda-person small{font-size:10px;line-height:1.35}
+.agenda-teacher{min-width:0;gap:5px}
+.agenda-teacher small{font-size:9px;text-transform:uppercase;letter-spacing:.04em}
+.agenda-teacher strong{font-size:13px;line-height:1.3;overflow-wrap:anywhere}
+.agenda-status{justify-self:start;display:inline-flex;align-items:center;justify-content:center;min-height:34px;padding:7px 12px;text-align:center;line-height:1.2}
+.agenda-actions{justify-self:end;width:100%}
+.agenda-presence{width:100%;height:40px;padding:0 12px;line-height:1.15;white-space:nowrap}
+@media(max-width:1180px){.agenda-row{grid-template-columns:78px minmax(180px,1.2fr) minmax(160px,1fr) 140px 120px;gap:12px;padding:16px}.agenda-card-head{padding:18px 20px}}
+@media(max-width:900px){.agenda-row{grid-template-columns:72px minmax(0,1fr) auto;min-height:auto}.agenda-teacher,.agenda-status{grid-column:2}.agenda-actions{grid-column:3;grid-row:1/4;align-self:center;min-width:122px}}
+@media(max-width:600px){.agenda-card-head{min-height:auto;padding:16px}.agenda-card-head h3{font-size:17px}.agenda-row{grid-template-columns:54px minmax(0,1fr);padding:15px 12px}.agenda-row time{font-size:18px}.agenda-teacher,.agenda-status{grid-column:2}.agenda-actions{grid-column:1/-1;grid-row:auto;min-width:0}.agenda-presence{height:42px}}
