@@ -100,6 +100,12 @@ function AppShell({ profile, onLogout }) {
     try { localStorage.setItem('power-fit-theme', darkMode ? 'dark' : 'light') } catch { /* Storage may be unavailable. */ }
   }, [darkMode])
   const [page, setPage] = useState('Início')
+  const [sidebarCollapsed, setSidebarCollapsed] = useState(() => {
+    try { return localStorage.getItem('power-fit-sidebar-collapsed') === 'true' } catch { return false }
+  })
+  useEffect(() => {
+    try { localStorage.setItem('power-fit-sidebar-collapsed', String(sidebarCollapsed)) } catch { /* Storage may be unavailable. */ }
+  }, [sidebarCollapsed])
   const [waitlistFocus, setWaitlistFocus] = useState(null)
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false)
   const [students, setStudents] = useState([])
@@ -772,8 +778,8 @@ function AppShell({ profile, onLogout }) {
     setEditingEmployee({ ...employee, documents: [], work_schedule, profile: maskedProfile(employee.profile) })
   }
 
-  return <div className={`app-shell dashboard-shell ${darkMode ? 'theme-dark' : 'theme-light'} ${isAdmin ? 'is-admin' : 'is-reception'}`}>
-    <aside className="app-sidebar"><div className="sidebar-brand sidebar-brand-logo"><img src={studioLogo} alt="Studio Power Fit" /></div><div className="sidebar-section-title">{isAdmin ? 'GESTÃO' : 'ATENDIMENTO'}</div><nav className="sidebar-menu">{navItems.map((item) => <button key={item} className={`sidebar-item ${page === navigationPage(item) ? 'active' : ''}`} onClick={() => setPage(navigationPage(item))} type="button"><span className="sidebar-icon"><ManagementIcon name={navIcon(item)} size={18} /></span><span>{item}</span></button>)}</nav><div className="sidebar-bottom"><button className="sidebar-item" onClick={onLogout} type="button"><span className="sidebar-icon"><ManagementIcon name="logout" size={18} /></span><span>Sair da conta</span></button></div></aside>
+  return <div className={`app-shell dashboard-shell ${darkMode ? 'theme-dark' : 'theme-light'} ${isAdmin ? 'is-admin' : 'is-reception'} ${sidebarCollapsed ? 'sidebar-collapsed' : ''}`}>
+    <aside className="app-sidebar"><button className="sidebar-collapse-toggle" type="button" onClick={() => setSidebarCollapsed((value) => !value)} aria-label={sidebarCollapsed ? 'Expandir menu lateral' : 'Recolher menu lateral'} title={sidebarCollapsed ? 'Expandir menu' : 'Recolher menu'}><span>{sidebarCollapsed ? '›' : '‹'}</span></button><div className="sidebar-brand sidebar-brand-logo"><img src={studioLogo} alt="Studio Power Fit" /></div><div className="sidebar-section-title">{isAdmin ? 'GESTÃO' : 'ATENDIMENTO'}</div><nav className="sidebar-menu">{navItems.map((item) => <button key={item} className={`sidebar-item ${page === navigationPage(item) ? 'active' : ''}`} title={sidebarCollapsed ? item : undefined} onClick={() => setPage(navigationPage(item))} type="button"><span className="sidebar-icon"><ManagementIcon name={navIcon(item)} size={18} /></span><span>{item}</span></button>)}</nav><div className="sidebar-bottom"><button className="sidebar-item" onClick={onLogout} type="button"><span className="sidebar-icon"><ManagementIcon name="logout" size={18} /></span><span>Sair da conta</span></button></div></aside>
     <div className="app-main"><header className="app-header"><div><span className="header-kicker">STUDIO POWER FIT · DEMONSTRAÇÃO</span><h1>{title}</h1></div><div className="header-actions"><button className="header-theme-button" aria-label={darkMode ? 'Ativar modo claro' : 'Ativar modo escuro'} title={darkMode ? 'Ativar modo claro' : 'Ativar modo escuro'} onClick={() => setDarkMode(!darkMode)} type="button"><ManagementIcon name={darkMode ? 'sun' : 'moon'} size={19} /></button><div className="header-user"><div className="user-avatar">{(profile.full_name || 'A')[0]}</div><div className="user-info"><strong>{profile.full_name}</strong><span>{isAdmin ? 'Gestão' : 'Recepção'}</span></div></div></div></header><main className="app-content">
       {profile.role === 'RECEPCAO' && page === 'Início' && <ReceptionNotifications profile={profile} onNavigate={(target, focus) => { setWaitlistFocus(focus); setPage(target) }} />}
       {isAdmin && page === 'Início' && <div className="demo-seed-toolbar"><div><strong>Apresentação com dados realistas</strong><span>Crie contas e históricos fictícios identificados como DEMO, sem alterar os registros reais.</span></div><button className="dashboard-primary-action" disabled={seedingDemo} onClick={createDemoData} type="button"><ManagementIcon name="database" size={17} />{seedingDemo ? 'Criando demonstração…' : 'Criar dados da demo'}</button></div>}
