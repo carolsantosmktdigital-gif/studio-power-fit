@@ -346,8 +346,8 @@ function AppShell({ profile, onLogout }) {
       const now = new Date()
       const today = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`
       const [agenda, attendance, bookingSlots, paymentsData, profilesData] = await Promise.all([
-        supabase.from('appointments').select('id, student_id, teacher_id, appointment_date, start_time, status, students(profile_id, profiles:profile_id(full_name)), employees:teacher_id(profile_id, profiles:profile_id(full_name))').eq('appointment_date', today).eq('status', 'CONFIRMADO').order('start_time'),
-        supabase.from('attendance').select('status, attendance_date').eq('attendance_date', today),
+        supabase.from('appointments').select('id, student_id, teacher_id, appointment_date, start_time, status, students(profile_id, profiles:profile_id(full_name))').eq('appointment_date', today).neq('status', 'CANCELADO').order('start_time'),
+        supabase.from('attendance').select('status, registered_at').gte('registered_at', today + 'T00:00:00-03:00').lt('registered_at', (() => { const d = new Date(today + 'T12:00:00'); d.setDate(d.getDate() + 1); return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}T00:00:00-03:00` })()),
         supabase.rpc('get_student_booking_slots', { p_start_date: today }),
         supabase.from('payments').select('status, due_date').lt('due_date', today),
         supabase.from('profiles').select('id, full_name, birth_date, phone').not('birth_date', 'is', null),
@@ -360,7 +360,7 @@ function AppShell({ profile, onLogout }) {
       setReceptionPanel((current) => ({
         appointments: agenda.error ? current.appointments : agenda.data ?? [],
         present: attendance.error ? current.present : (attendance.data ?? []).filter((item) => item.status === 'PRESENTE').length,
-        absent: attendance.error ? current.absent : (attendance.data ?? []).filter((item) => item.status === 'AUSENTE').length,
+        absent: attendance.error ? current.absent : (attendance.data ?? []).filter((item) => ['FALTOU','AUSENTE'].includes(item.status)).length,
         activeTeachers: bookingSlots.error ? current.activeTeachers : activeTeachers,
         overdue: paymentsData.error ? current.overdue : (paymentsData.data ?? []).filter((item) => !['IDENTIFICADO', 'CANCELADO'].includes(item.status)).length,
         waitlist: bookingSlots.error ? current.waitlist : waitlist,
