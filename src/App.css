@@ -3998,3 +3998,30 @@ body {
 .agenda-waitlist-side .agenda-copy-phone:active{transform:translateY(0) scale(.96)}
 .theme-light .agenda-waitlist-side .agenda-copy-phone{color:#a82d4e!important;background:#fff!important;border-color:#e6c7d0!important;box-shadow:0 2px 8px rgba(104,32,53,.06)}
 .theme-light .agenda-waitlist-side .agenda-copy-phone:hover{color:#8d1f3e!important;background:#fff5f8!important;border-color:#d99aac!important}
+
+/* Validated premium Agenda KPI cards */
+.agenda-redesign .agenda-summary{gap:16px!important;margin:20px 0!important}
+.agenda-redesign .agenda-summary article{position:relative;min-height:116px!important;padding:20px 20px 20px 84px!important;border-radius:18px!important;display:flex!important;flex-direction:column!important;align-items:flex-start!important;justify-content:center!important;overflow:hidden;background:linear-gradient(135deg,#f7faff,#eef5ff)!important;border:1px solid #c7dcff!important;box-shadow:0 10px 28px rgba(38,72,120,.06)!important}
+.agenda-redesign .agenda-summary article::after{content:"";position:absolute;width:104px;height:104px;border-radius:50%;right:-48px;bottom:-55px;background:rgba(73,137,255,.07)}
+.agenda-redesign .agenda-summary article>span{position:absolute;left:22px;top:50%;transform:translateY(-50%);width:48px;height:48px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-size:22px;font-weight:800;background:#dceaff!important;color:#1764d8!important}
+.agenda-redesign .agenda-summary article>strong{font-size:31px!important;line-height:1!important;letter-spacing:-.04em;color:#10213b!important;margin:0 0 7px!important}
+.agenda-redesign .agenda-summary article>small{font-size:13px!important;line-height:1.25!important;color:#40506a!important}
+.agenda-redesign .agenda-summary article.green{background:linear-gradient(135deg,#f4fff9,#eafaf2)!important;border-color:#bcebd2!important}
+.agenda-redesign .agenda-summary article.green::after{background:rgba(30,190,115,.07)}
+.agenda-redesign .agenda-summary article.green>span{background:#d8f5e6!important;color:#0aa45d!important}
+.agenda-redesign .agenda-summary article.amber{background:linear-gradient(135deg,#fffaf0,#fff5dc)!important;border-color:#f3d28b!important}
+.agenda-redesign .agenda-summary article.amber::after{background:rgba(226,164,24,.08)}
+.agenda-redesign .agenda-summary article.amber>span{background:#ffedbd!important;color:#c98700!important}
+.agenda-redesign .agenda-summary article.red{background:linear-gradient(135deg,#fff7f7,#fff0f2)!important;border-color:#ffc3c8!important}
+.agenda-redesign .agenda-summary article.red::after{background:rgba(235,65,83,.07)}
+.agenda-redesign .agenda-summary article.red>span{background:#ffdce1!important;color:#dd233d!important}
+.agenda-redesign .agenda-summary article:nth-child(5){background:linear-gradient(135deg,#faf8ff,#f3efff)!important;border-color:#d8c7ff!important}
+.agenda-redesign .agenda-summary article:nth-child(5)::after{background:rgba(117,72,225,.07)}
+.agenda-redesign .agenda-summary article:nth-child(5)>span{background:#e8dfff!important;color:#6f35d7!important}
+.dashboard-shell.theme-dark .agenda-redesign .agenda-summary article{background:linear-gradient(135deg,#10243b,#0d1d31)!important;border-color:#24476a!important;box-shadow:0 12px 30px rgba(0,0,0,.18)!important}
+.dashboard-shell.theme-dark .agenda-redesign .agenda-summary article>strong{color:#f4f8ff!important}.dashboard-shell.theme-dark .agenda-redesign .agenda-summary article>small{color:#aebed2!important}
+.dashboard-shell.theme-dark .agenda-redesign .agenda-summary article.green{background:linear-gradient(135deg,#0e3027,#0b271f)!important;border-color:#1d6049!important}
+.dashboard-shell.theme-dark .agenda-redesign .agenda-summary article.amber{background:linear-gradient(135deg,#342914,#2a2111)!important;border-color:#66501f!important}
+.dashboard-shell.theme-dark .agenda-redesign .agenda-summary article.red{background:linear-gradient(135deg,#351c25,#2a171f)!important;border-color:#693044!important}
+.dashboard-shell.theme-dark .agenda-redesign .agenda-summary article:nth-child(5){background:linear-gradient(135deg,#261e3b,#201932)!important;border-color:#493873!important}
+@media(max-width:700px){.agenda-redesign .agenda-summary article{min-height:104px!important;padding:16px 12px 16px 66px!important}.agenda-redesign .agenda-summary article>span{left:14px;width:42px;height:42px}.agenda-redesign .agenda-summary article>strong{font-size:27px!important}}
