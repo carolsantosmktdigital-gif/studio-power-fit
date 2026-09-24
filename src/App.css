@@ -3882,3 +3882,24 @@ body {
 .agenda-waitlist-list{display:grid}.agenda-waitlist-row{display:grid;grid-template-columns:58px 34px minmax(0,1fr) auto;align-items:center;gap:11px;padding:13px 18px;border-bottom:1px solid var(--border)}.agenda-waitlist-row:last-child{border-bottom:0}.agenda-waitlist-row time{font-size:14px;font-weight:800}.agenda-waitlist-avatar{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:#fff3d7;color:#a86b00;font-weight:800}.agenda-waitlist-row>div{display:grid;gap:2px}.agenda-waitlist-row strong{font-size:11px}.agenda-waitlist-row small{font-size:9px;color:var(--text-soft)}.agenda-waitlist-badge{padding:6px 9px;border-radius:999px;background:#fff3d7;color:#9a6200;font-size:9px;font-weight:700}
 .dashboard-shell.theme-dark .agenda-waitlist-card{background:var(--surface)}.dashboard-shell.theme-dark .agenda-waitlist-avatar,.dashboard-shell.theme-dark .agenda-waitlist-badge{background:#332b19;color:#f2cf87}
 @media(max-width:600px){.agenda-waitlist-head{align-items:flex-start;flex-direction:column}.agenda-waitlist-head .outline-action{width:100%}.agenda-waitlist-row{grid-template-columns:48px 32px minmax(0,1fr)}.agenda-waitlist-badge{grid-column:3;justify-self:start}}
+
+/* Reception booking modal polish */
+.quick-booking-modal{width:min(1280px,94vw)!important;max-height:90vh!important;border:1px solid rgba(130,150,180,.18)!important;border-radius:22px!important;box-shadow:0 28px 80px rgba(4,13,28,.24)!important}
+.quick-booking-head{grid-template-columns:minmax(0,1fr) 290px!important;padding:24px 30px 18px!important;border-bottom:1px solid rgba(132,151,178,.12)}
+.quick-booking-head h3{font-size:27px!important;letter-spacing:-.035em!important}.quick-booking-head p{font-size:14px!important}
+.quick-booking-callout{min-width:0!important;margin-right:32px!important;padding:12px 15px!important;border-radius:12px!important}
+.quick-booking-search{padding:18px 30px 0!important}.quick-booking-search>label{gap:7px!important;font-size:11px!important;text-transform:uppercase;letter-spacing:.05em!important}
+.quick-booking-search input{height:46px!important;border-radius:10px!important}
+.quick-booking-section-title{padding:24px 30px 12px!important}.quick-booking-section-title h4{font-size:16px!important;margin:0}.quick-slot-legend{gap:14px!important}
+.quick-day-columns{gap:14px!important;padding:0 30px 24px!important;align-items:start}
+.quick-day-card{min-height:0!important;border-radius:15px!important;box-shadow:0 4px 16px rgba(23,42,69,.035)}
+.quick-day-head{min-height:74px;padding:14px 16px!important;gap:10px!important}.quick-day-head strong{font-size:14px!important}.quick-day-head span{font-size:10px!important}
+.quick-day-slots{grid-template-columns:repeat(3,minmax(0,1fr))!important;gap:7px!important;padding:12px!important}
+.quick-day-slots button{min-height:66px!important;padding:8px 5px!important;border:1px solid transparent!important;border-radius:9px!important;flex-direction:column!important;gap:2px!important}
+.quick-day-slots button strong{font-size:13px!important}.quick-day-slots button .quick-slot-dot{font-size:8px!important;line-height:1!important}.quick-slot-count{font-size:8px!important;line-height:1.25!important;text-align:center}
+.quick-day-slots button.full{border-color:rgba(217,54,73,.12)!important}.quick-day-slots button:not(.full){border-color:rgba(8,115,76,.1)!important}
+.quick-day-slots button em{font-size:8px!important;padding:2px 7px!important;border-radius:999px!important}
+.quick-no-slots{min-height:150px!important;display:grid!important;place-items:center!important;padding:20px!important}
+.quick-booking-footer{padding:13px 30px 16px!important}.quick-booking-footer .dashboard-primary-action{min-width:260px!important}
+.theme-dark .quick-booking-modal{border-color:#26364d!important;box-shadow:0 28px 80px rgba(0,0,0,.38)!important}.theme-dark .quick-booking-head{border-bottom-color:#223149}.theme-dark .quick-day-card{box-shadow:none}.theme-dark .quick-day-slots button:not(.full){border-color:rgba(78,202,151,.12)!important}
+@media(max-width:900px){.quick-booking-modal{max-height:94vh!important}.quick-booking-head{grid-template-columns:1fr!important}.quick-day-columns{padding-left:18px!important;padding-right:18px!important}.quick-day-card{min-width:300px!important}.quick-day-slots{grid-template-columns:repeat(2,minmax(0,1fr))!important}}
