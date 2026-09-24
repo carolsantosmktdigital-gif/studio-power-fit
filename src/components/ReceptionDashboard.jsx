@@ -28,8 +28,8 @@ export default function ReceptionDashboard({ profile, panel, loading, error, upd
   const stats = [
     { icon: 'calendar', label: 'Agendados hoje', number: panel.appointments.length, note: 'Reservas confirmadas', page: 'Agenda', tone: 'blue' },
     { icon: 'check', label: 'Presenças hoje', number: panel.present, note: plural(panel.absent, 'ausência registrada', 'ausências registradas'), page: 'Agenda', tone: 'green' },
-    { icon: 'wallet', label: 'Cobranças vencidas', number: panel.overdue, note: 'Acompanhar pagamentos', page: 'Pagamentos', tone: panel.overdue ? 'red' : 'neutral' },
-    { icon: 'clock', label: 'Em espera hoje', number: panel.waitlist, note: 'Consultar horários na agenda', page: 'Agenda', tone: 'amber' },
+    { icon: 'wallet', label: 'Cobranças vencidas', number: panel.overdue, note: 'Acompanhar pagamentos', page: 'Pagamentos', tone: 'amber' },
+    { icon: 'team', label: 'Em espera hoje', number: panel.waitlist, note: 'Consultar horários na agenda', page: 'Agenda', tone: 'purple' },
   ]
   return <section className="rx-dashboard" aria-label="Painel da recepção" aria-busy={loading}>
     <div className="rx-intro">
