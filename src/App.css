@@ -3907,3 +3907,21 @@ body {
 /* Collapsible desktop sidebar */
 @media (min-width:901px){.dashboard-shell .app-sidebar{transition:width .24s ease,min-width .24s ease,padding .24s ease}.sidebar-collapse-toggle{position:absolute;top:92px;right:-14px;width:28px;height:28px;border-radius:50%;border:1px solid var(--border);background:var(--panel);color:var(--text);display:flex;align-items:center;justify-content:center;cursor:pointer;z-index:20;box-shadow:0 6px 18px rgba(0,0,0,.16);font-size:20px;line-height:1;transition:transform .18s ease}.sidebar-collapse-toggle:hover{transform:scale(1.06)}.sidebar-collapsed .app-sidebar{width:78px!important;min-width:78px!important;padding-left:10px!important;padding-right:10px!important}.sidebar-collapsed .sidebar-brand{justify-content:center;padding-left:0;padding-right:0}.sidebar-collapsed .sidebar-brand-logo img{max-width:48px;object-fit:contain}.sidebar-collapsed .sidebar-section-title,.sidebar-collapsed .sidebar-item>span:not(.sidebar-icon){display:none!important}.sidebar-collapsed .sidebar-item{justify-content:center!important;padding-left:0!important;padding-right:0!important}.sidebar-collapsed .sidebar-icon{width:auto!important;flex-basis:auto!important;margin:0!important}.sidebar-collapsed .sidebar-bottom{align-items:stretch}.sidebar-collapsed .app-content{max-width:none}}
 @media (max-width:900px){.sidebar-collapse-toggle{display:none!important}}
+
+/* Agenda status rails + featured waitlist */
+.agenda-row{position:relative;overflow:hidden}
+.agenda-row::before{content:"";position:absolute;left:0;top:0;bottom:0;width:6px;border-radius:8px 0 0 8px;background:#f4c430}
+.agenda-row.status-realizado::before{background:#25d989}
+.agenda-row.status-faltou::before,.agenda-row.status-ausente::before{background:#ff7a2f}
+.agenda-row.status-confirmado::before{background:#f4c430}
+.agenda-waitlist-featured{border:1px solid rgba(170,35,72,.7)!important;background:linear-gradient(145deg,rgba(86,20,42,.88),rgba(44,14,28,.92))!important;box-shadow:0 18px 42px rgba(54,8,24,.18)!important}
+.agenda-waitlist-featured .agenda-waitlist-head{border-bottom:1px solid rgba(255,112,145,.18)}
+.agenda-waitlist-featured .agenda-waitlist-row{border-color:rgba(255,255,255,.09)!important}
+.agenda-waitlist-person{min-width:0;display:flex;flex-direction:column;gap:2px}
+.agenda-waitlist-phone{font-size:12px;color:var(--text-soft)}
+.agenda-copy-phone{width:34px;height:34px;flex:0 0 34px;border-radius:9px;border:1px solid rgba(255,255,255,.24);background:rgba(255,255,255,.045);color:var(--text);display:inline-flex;align-items:center;justify-content:center;cursor:pointer;font-size:15px;transition:.18s ease}
+.agenda-copy-phone:hover{border-color:#ff4264;background:rgba(255,66,100,.12);transform:translateY(-1px)}
+.agenda-waitlist-featured .agenda-waitlist-badge{background:rgba(126,25,53,.55)!important;color:#ffd8e1!important;border:1px solid rgba(255,92,127,.24)}
+.theme-light .agenda-waitlist-featured{background:linear-gradient(145deg,#fff7f9,#fff0f4)!important;border-color:rgba(173,38,75,.35)!important}
+.theme-light .agenda-waitlist-phone{color:#6d5260}
+.theme-light .agenda-copy-phone{border-color:rgba(100,35,55,.2);color:#6f263d;background:#fff}
