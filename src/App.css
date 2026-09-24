@@ -3961,3 +3961,32 @@ body {
 .agenda-waitlist-side .agenda-waitlist-person small,.agenda-waitlist-side .agenda-waitlist-phone{font-size:10px}
 .agenda-waitlist-empty{padding:28px 16px;text-align:center;color:var(--text-soft);font-size:13px}
 @media(max-width:1180px){.agenda-content-validated{grid-template-columns:minmax(0,1fr)!important}.agenda-waitlist-side{position:static}}
+
+/* Validated waitlist internal composition */
+.agenda-waitlist-side .agenda-waitlist-head{padding:20px 18px!important}
+.agenda-waitlist-heading{display:flex;align-items:center;gap:11px;min-width:0}
+.agenda-waitlist-icon{width:36px;height:36px;display:inline-flex;align-items:center;justify-content:center;border-radius:10px;background:rgba(255,59,95,.16);color:#ff496a;font-size:20px;flex:0 0 36px}
+.agenda-waitlist-heading .placeholder-kicker{color:#ff496a!important;letter-spacing:.12em}
+.agenda-waitlist-heading h3{font-size:17px!important;margin-top:2px!important}
+.agenda-waitlist-groups{padding:10px 12px 14px}
+.agenda-waitlist-group{overflow:hidden;border-radius:13px;background:rgba(79,15,37,.44);border:1px solid rgba(255,103,137,.12);margin-bottom:10px}
+.agenda-waitlist-group:last-child{margin-bottom:0}
+.agenda-waitlist-group-head{display:flex;align-items:center;justify-content:space-between;padding:12px 14px;background:rgba(139,28,59,.38);border-bottom:1px solid rgba(255,113,143,.12)}
+.agenda-waitlist-group-head strong{font-size:18px;color:var(--text)}
+.agenda-waitlist-group-head span{font-size:10px;font-weight:800;padding:5px 9px;border-radius:999px;background:rgba(222,44,82,.3);color:#ffd7df}
+.agenda-waitlist-side .agenda-waitlist-list{padding:0!important}
+.agenda-waitlist-side .agenda-waitlist-row{grid-template-columns:26px 36px minmax(0,1fr) 36px!important;padding:12px 10px!important;border-bottom:1px solid rgba(255,255,255,.07)!important}
+.agenda-waitlist-side .agenda-waitlist-row:last-child{border-bottom:0!important}
+.agenda-waitlist-position{width:25px;height:25px;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,255,255,.1);font-size:11px;font-weight:800}
+.agenda-waitlist-side .agenda-waitlist-avatar{width:36px!important;height:36px!important;border-radius:50%;display:flex;align-items:center;justify-content:center;background:rgba(255,210,91,.14);color:#d39b00;font-weight:900}
+.agenda-waitlist-side .agenda-waitlist-person{gap:3px}
+.agenda-waitlist-side .agenda-waitlist-person strong{font-size:13px!important}
+.agenda-waitlist-side .agenda-waitlist-person small{color:#45dda3!important;font-weight:700}
+.agenda-waitlist-side .agenda-waitlist-phone{font-size:11px!important;color:var(--text-soft)}
+.agenda-waitlist-side .agenda-copy-phone{border-color:rgba(255,255,255,.22);background:rgba(8,19,34,.38)}
+.theme-light .agenda-waitlist-group{background:#fff8fa;border-color:#f0cbd5}
+.theme-light .agenda-waitlist-group-head{background:#fbe9ee}
+.theme-light .agenda-waitlist-group-head span{background:#f5ced9;color:#9d2848}
+.theme-light .agenda-waitlist-position{background:#f3dce3;color:#862a45}
+.theme-light .agenda-waitlist-side .agenda-waitlist-row{border-bottom-color:#f1dce2!important}
+.theme-light .agenda-waitlist-side .agenda-copy-phone{background:#fff;border-color:#dfc6ce}
