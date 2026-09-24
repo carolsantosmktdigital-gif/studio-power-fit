@@ -157,3 +157,32 @@
 .dashboard-shell.is-reception.theme-dark .rx-attendance:hover,
 .dashboard-shell.is-reception.theme-dark .rx-attendance:focus,
 .dashboard-shell.is-reception.theme-dark .rx-attendance:active{color:#000!important;-webkit-text-fill-color:#000!important}
+
+/* Validated premium reception KPI cards */
+.rx-dashboard .rx-stats{gap:16px}
+.rx-dashboard .rx-stat{position:relative;min-height:176px;padding:24px 24px 22px 118px!important;border-radius:18px!important;justify-content:center;overflow:hidden;transition:transform .18s ease,box-shadow .18s ease,border-color .18s ease}
+.rx-dashboard .rx-stat::after{content:"";position:absolute;width:130px;height:130px;border-radius:50%;right:-58px;bottom:-68px;pointer-events:none}
+.rx-dashboard .rx-stat:hover{transform:translateY(-2px)}
+.rx-dashboard .rx-stat-top{position:static;margin:0}
+.rx-dashboard .rx-stat-top>.rx-icon{position:absolute;left:28px;top:31px;width:66px;height:66px;border-radius:50%}
+.rx-dashboard .rx-stat-top>.rx-icon svg{width:30px;height:30px}
+.rx-dashboard .rx-stat-top>svg{position:absolute;right:24px;top:36px;width:19px;height:19px}
+.rx-dashboard .rx-stat-label{font-size:15px;font-weight:750;color:var(--rx-text);margin:0 42px 4px 0}
+.rx-dashboard .rx-stat>strong{font-size:47px;line-height:1;margin:10px 0 12px;font-weight:800}
+.rx-dashboard .rx-stat-note{font-size:13px;line-height:1.35}
+.rx-dashboard .rx-stat.rx-blue{background:linear-gradient(135deg,#f7fbff,#eef6ff);border-color:#b9d8ff}
+.rx-dashboard .rx-stat.rx-blue::after{background:rgba(64,139,255,.07)}
+.rx-dashboard .rx-stat.rx-green{background:linear-gradient(135deg,#f5fff9,#ebfaf2);border-color:#b8e9cf}
+.rx-dashboard .rx-stat.rx-green::after{background:rgba(31,190,113,.07)}
+.rx-dashboard .rx-stat.rx-amber{background:linear-gradient(135deg,#fffaf0,#fff5df);border-color:#efd18b}
+.rx-dashboard .rx-stat.rx-amber::after{background:rgba(224,163,24,.08)}
+.rx-dashboard .rx-stat.rx-purple{background:linear-gradient(135deg,#faf8ff,#f2efff);border-color:#d2c0ff}
+.rx-dashboard .rx-stat.rx-purple::after{background:rgba(112,67,226,.08)}
+.rx-purple .rx-icon{background:#e8dfff!important;color:#6935d5!important}
+.rx-purple .rx-stat-top>svg{color:#6935d5}
+.dashboard-shell.theme-dark .rx-dashboard .rx-stat.rx-blue{background:linear-gradient(135deg,#10243b,#0d1d31);border-color:#24476a}
+.dashboard-shell.theme-dark .rx-dashboard .rx-stat.rx-green{background:linear-gradient(135deg,#0e3027,#0b271f);border-color:#1d6049}
+.dashboard-shell.theme-dark .rx-dashboard .rx-stat.rx-amber{background:linear-gradient(135deg,#342914,#2a2111);border-color:#66501f}
+.dashboard-shell.theme-dark .rx-dashboard .rx-stat.rx-purple{background:linear-gradient(135deg,#261e3b,#201932);border-color:#493873}
+@media(max-width:1100px){.rx-dashboard .rx-stat{min-height:156px;padding-left:94px!important}.rx-dashboard .rx-stat-top>.rx-icon{left:20px;width:56px;height:56px}.rx-dashboard .rx-stat>strong{font-size:40px}}
+@media(max-width:640px){.rx-dashboard .rx-stat{min-height:142px;padding:18px 16px 18px 76px!important}.rx-dashboard .rx-stat-top>.rx-icon{left:15px;top:22px;width:46px;height:46px}.rx-dashboard .rx-stat-top>.rx-icon svg{width:23px;height:23px}.rx-dashboard .rx-stat-label{font-size:13px}.rx-dashboard .rx-stat>strong{font-size:34px;margin:7px 0}.rx-dashboard .rx-stat-note{font-size:11px}}
