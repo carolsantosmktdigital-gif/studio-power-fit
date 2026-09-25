@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import ManagementIcon from './ManagementIcon'
 import './ReceptionDashboard.css'
 
@@ -8,6 +8,19 @@ const timeOf = (value) => String(value).slice(0, 5)
 export default function ReceptionDashboard({ profile, panel, loading, error, updatedAt, onRefresh, onNavigate, onNewStudent, onScheduleStudent, onRegisterPayment, teachers = [], onChangeTeacher }) {
   const [period, setPeriod] = useState('upcoming')
   const [expandedTimes, setExpandedTimes] = useState({})
+  const [notificationsOpen, setNotificationsOpen] = useState(false)
+  const [waitlistToastVisible, setWaitlistToastVisible] = useState(false)
+  const waitlistKey = `waitlist-${new Date().toISOString().slice(0,10)}-${panel.waitlist || 0}`
+  useEffect(() => {
+    if (!panel.waitlist || !updatedAt) { setWaitlistToastVisible(false); return }
+    try { setWaitlistToastVisible(localStorage.getItem(`power-fit-seen-${waitlistKey}`) !== 'true') } catch { setWaitlistToastVisible(true) }
+  }, [panel.waitlist, updatedAt, waitlistKey])
+  const openWaitlistNotification = () => {
+    try { localStorage.setItem(`power-fit-seen-${waitlistKey}`, 'true') } catch { /* ignore */ }
+    setWaitlistToastVisible(false)
+    setNotificationsOpen(false)
+    onNavigate('Agenda')
+  }
   const now = new Date()
   const clock = now.toTimeString().slice(0, 5)
   const greeting = now.getHours() < 12 ? 'Bom dia' : now.getHours() < 18 ? 'Boa tarde' : 'Boa noite'
@@ -32,7 +45,7 @@ export default function ReceptionDashboard({ profile, panel, loading, error, upd
     { icon: 'team', label: 'Em espera hoje', number: panel.waitlist, note: 'Consultar horários na agenda', page: 'Agenda', tone: 'purple' },
   ]
   return <section className="rx-dashboard" aria-label="Painel da recepção" aria-busy={loading}>
-    <div className="rx-intro">
+    <div className="rx-notification-center"><button className="rx-bell" type="button" onClick={()=>setNotificationsOpen(v=>!v)} aria-label="Notificações"><ManagementIcon name="alert" size={19}/>{panel.waitlist>0&&<span>{panel.waitlist}</span>}</button>{notificationsOpen&&<div className="rx-notification-menu"><strong>Notificações</strong>{panel.waitlist>0?<button type="button" onClick={openWaitlistNotification}><span className="rx-icon rx-red"><ManagementIcon name="alert" size={17}/></span><span><b>{plural(panel.waitlist,'aluno na lista de espera','alunos na lista de espera')}</b><small>Verificar vagas e ordem da fila</small></span></button>:<p>Nenhuma pendência no momento.</p>}</div>}</div>{waitlistToastVisible&&<div className="rx-waitlist-toast" role="status"><button className="rx-toast-close" type="button" onClick={()=>setWaitlistToastVisible(false)} aria-label="Fechar">×</button><span className="rx-toast-icon"><ManagementIcon name="alert" size={21}/></span><div><strong>{plural(panel.waitlist,'vaga da lista de espera precisa de atenção','vagas da lista de espera precisam de atenção')}</strong><p>Confira a vaga liberada e atenda o próximo aluno da fila.</p><button type="button" onClick={openWaitlistNotification}>Ver lista de espera <ManagementIcon name="arrow" size={14}/></button></div></div>}<div className="rx-intro">
       <div><span className="rx-eyebrow">RECEPÇÃO · OPERAÇÃO DO DIA</span><h2>{greeting}, {firstName}.</h2><p className="rx-date">{now.toLocaleDateString('pt-BR', { weekday: 'long', day: 'numeric', month: 'long' })}</p></div>
       <div className="rx-update"><button className="rx-button rx-secondary" onClick={onRefresh} disabled={loading} type="button"><ManagementIcon name="refresh" size={17} />{loading ? 'Atualizando…' : 'Atualizar'}</button><span role="status">{updatedAt ? `Atualizado às ${updatedAt.toLocaleTimeString('pt-BR', { hour: '2-digit', minute: '2-digit' })}` : 'Carregando informações'}</span></div>
     </div>
