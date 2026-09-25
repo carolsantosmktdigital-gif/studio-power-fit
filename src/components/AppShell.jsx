@@ -696,7 +696,12 @@ function AppShell({ profile, onLogout }) {
     setQuickLoading(true)
     const { error } = await supabase.rpc('create_appointment', { p_student_id: quickAction.student_id, p_date: quickAction.date, p_start_time: quickAction.time, p_source: 'RECEPCAO' })
     setQuickLoading(false); if (error) return setNotice(error.message)
-    setQuickAction(null); setNotice('Aluno agendado com sucesso.'); await Promise.all([loadAgenda(),loadReceptionPanel()])
+    setQuickAction(null)
+    setAgendaDate(quickAction.date)
+    setAgendaTeacher('')
+    setAgendaStatus('')
+    setNotice('Aluno agendado com sucesso.')
+    await Promise.all([loadAgenda(),loadReceptionPanel()])
   }
   const saveQuickPayment = async (event) => {
     event.preventDefault(); const q=quickAction; const amount=Number(String(q.amount||'').replace(',','.'))
