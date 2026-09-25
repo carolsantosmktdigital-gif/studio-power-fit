@@ -4036,3 +4036,15 @@ body {
 .header-notification-popover>strong{display:block;font-size:13px;margin:2px 4px 10px}
 .header-notification-popover>button{width:100%;display:grid;grid-template-columns:30px 1fr;gap:9px;align-items:center;text-align:left;border:0;border-radius:10px;padding:10px;background:var(--surface-soft);color:var(--text);cursor:pointer}
 .header-notification-popover b,.header-notification-popover small{display:block}.header-notification-popover b{font-size:12px}.header-notification-popover small{font-size:10px;color:var(--text-soft);margin-top:3px}.header-notification-popover p{margin:8px 4px;font-size:12px;color:var(--text-soft)}
+
+/* Active waitlist inside agenda */
+.agenda-waitlist-card{margin-top:14px;border:1px solid var(--border);border-radius:16px;background:var(--surface,#fff);overflow:hidden}
+.agenda-waitlist-head{display:flex;align-items:center;justify-content:space-between;gap:16px;padding:16px 20px;border-bottom:1px solid var(--border)}
+.agenda-waitlist-head h3{margin:4px 0 0;font-size:15px}.agenda-waitlist-head .placeholder-kicker{font-size:9px}
+.agenda-waitlist-head .outline-action{min-height:36px}
+.agenda-waitlist-list{display:grid}.agenda-waitlist-row{display:grid;grid-template-columns:64px 34px minmax(0,1fr) auto;align-items:center;gap:10px;padding:12px 18px;border-bottom:1px solid var(--border)}
+.agenda-waitlist-row:last-child{border-bottom:0}.agenda-waitlist-row time{font-size:14px;font-weight:800}.agenda-waitlist-avatar{display:grid;place-items:center;width:32px;height:32px;border-radius:50%;background:#fff1d2;color:#a96c00;font-weight:800}
+.agenda-waitlist-row div{display:grid;gap:2px}.agenda-waitlist-row strong{font-size:11px}.agenda-waitlist-row small{font-size:9px;color:var(--text-soft)}
+.agenda-waitlist-badge{padding:5px 8px;border-radius:999px;background:#fff5dc;color:#9b6500;font-size:9px;font-weight:700}
+.dashboard-shell.theme-dark .agenda-waitlist-card{background:var(--surface)}.dashboard-shell.theme-dark .agenda-waitlist-avatar{background:#392f1d;color:#ffd78b}.dashboard-shell.theme-dark .agenda-waitlist-badge{background:#392f1d;color:#ffd78b}
+@media(max-width:600px){.agenda-waitlist-head{align-items:flex-start;flex-direction:column}.agenda-waitlist-head .outline-action{width:100%}.agenda-waitlist-row{grid-template-columns:52px 32px 1fr}.agenda-waitlist-badge{grid-column:3;justify-self:start}}
