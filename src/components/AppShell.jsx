@@ -694,10 +694,14 @@ function AppShell({ profile, onLogout }) {
   const saveQuickBooking = async (event) => {
     event.preventDefault(); if (!quickAction.student_id || !quickAction.date || !quickAction.time) return setNotice('Selecione aluno, data e horário.')
     setQuickLoading(true)
-    const { error } = await supabase.rpc('create_appointment', { p_student_id: quickAction.student_id, p_date: quickAction.date, p_start_time: quickAction.time, p_source: 'RECEPCAO' })
-    setQuickLoading(false); if (error) return setNotice(error.message)
+    const booking = { studentId: quickAction.student_id, date: quickAction.date, time: quickAction.time }
+    const { data: appointmentId, error } = await supabase.rpc('create_appointment', { p_student_id: booking.studentId, p_date: booking.date, p_start_time: booking.time, p_source: 'RECEPCAO' })
+    if (error) { setQuickLoading(false); setModalError(error.message); return setNotice(`Agendamento não gravado: ${error.message}`) }
+    const { data: savedAppointment, error: verifyError } = await supabase.from('appointments').select('id,student_id,appointment_date,start_time,status,source').eq('id', appointmentId).maybeSingle()
+    setQuickLoading(false)
+    if (verifyError || !savedAppointment) { setModalError('O banco não confirmou a gravação do agendamento. Tente novamente.'); return setNotice('O agendamento não foi confirmado pelo banco.') }
     setQuickAction(null)
-    setAgendaDate(quickAction.date)
+    setAgendaDate(booking.date)
     setAgendaTeacher('')
     setAgendaStatus('')
     setNotice('Aluno agendado com sucesso.')
